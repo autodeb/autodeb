@@ -12,40 +12,28 @@ autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project 
 
 ## Getting started
 
-### 1. Clone the project
-
-```shell
-$ export GOPATH=~/go
-$ mkdir -p $GOPATH/src/salsa.debian.org/aviau/
-$ git clone git@salsa.debian.org:aviau/autopkgupdate.git $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
-```
-
-### 2. Build the project
-
-#### Building inside a docker container
-
-This is useful if you don't want to spend time setting up a Go environement.
-
-```shell
-$ make docker-all
-```
-
-#### Building without a docker container
-
-##### Setup Go
+### 1. Setup Go
 
 ```shell
 $ sudo apt install golang-go
 ```
 
-##### Build the scripts
+### 2. Clone the project
 
 ```shell
+$ export GOPATH=~/go
+$ mkdir -p $GOPATH/src/salsa.debian.org/aviau/
+$ git clone git@salsa.debian.org:aviau/autopkgupdate.git $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
 $ cd $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
+```
+
+### 3. Build the project
+
+```shell
 $ make all
 ```
 
-### 3. Run any of the scripts
+### 4. Run any of the scripts
 
 Note that runtime dependencies of the scripts include:
  - devscripts

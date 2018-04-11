@@ -4,7 +4,3 @@
 
 # update-random-package output
 update-random-package-output-*
-
-# Makefile - Docker
-/.golang-build-image
-/.pkg

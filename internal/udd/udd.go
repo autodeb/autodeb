@@ -1,4 +1,4 @@
-//Package udd queries the UltimateDebianDatabase
+//Package udd is a client for the API at udd.debian.org
 package udd
 
 import (

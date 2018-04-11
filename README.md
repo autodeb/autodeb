@@ -18,6 +18,8 @@ autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project 
 
 ### 1. Setup Go
 
+Note that you might want to get a recent version of the go compiler from a backports repository.
+
 ```shell
 $ apt-get install golang-go git make
 $ export GOPATH=~/go

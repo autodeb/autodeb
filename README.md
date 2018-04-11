@@ -19,7 +19,7 @@ autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project 
 ### 1. Setup Go
 
 ```shell
-$ apt-get install golang-go
+$ apt-get install golang-go git make
 $ export GOPATH=~/go
 $ go get -u golang.org/x/lint/golint
 ```

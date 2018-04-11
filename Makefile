@@ -25,6 +25,10 @@ update-random-package: $(SOURCES) install
 autopkgupdate-server: $(SOURCES) install
 	go build -v -o autopkgupdate-server ${GO_IMPORT_PATH}/cmd/autopkgupdate-server
 
+.PHONY: test
+test:
+	go test -v ${GO_IMPORT_PATH}/...
+
 .PHONY: vet
 vet: install
 	go vet -v ${GO_IMPORT_PATH}/...

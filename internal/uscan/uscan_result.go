@@ -5,7 +5,8 @@ const (
 	ResultStatusNewerPackageAvailable = "newer package available"
 )
 
-//Result of the uscan command
+// Result of the uscan command. Uscan produces this XML output when ran with
+// the --dehs flag.
 type Result struct {
 	Package         string `xml:"package"`
 	DebianUVersion  string `xml:"debian-uversion"`

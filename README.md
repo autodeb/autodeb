@@ -16,13 +16,13 @@ autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project 
 
 ```shell
 $ apt-get install golang-go
+$ export GOPATH=~/go
 $ go get -u golang.org/x/lint/golint
 ```
 
 ### 2. Clone the project
 
 ```shell
-$ export GOPATH=~/go
 $ mkdir -p $GOPATH/src/salsa.debian.org/aviau/
 $ git clone git@salsa.debian.org:aviau/autopkgupdate.git $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
 $ cd $GOPATH/src/salsa.debian.org/aviau/autopkgupdate

@@ -24,7 +24,7 @@ type Package struct {
 }
 
 //PackagesWithNewerUpstreamVersions returns a list of souce packages that have newer upstream versions available
-func PackagesWithNewerUpstreamVersions() ([]Package, error) {
+func PackagesWithNewerUpstreamVersions() ([]*Package, error) {
 	resp, err := http.Get(upstreamStatusJSONURL)
 	if err != nil {
 		return nil, fmt.Errorf("getting %q: %v", upstreamStatusJSONURL, err)
@@ -34,12 +34,12 @@ func PackagesWithNewerUpstreamVersions() ([]Package, error) {
 		return nil, fmt.Errorf("unexpected HTTP status code: got %d, want %d", got, want)
 	}
 
-	var pkgs []Package
+	var pkgs []*Package
 	if err := json.NewDecoder(resp.Body).Decode(&pkgs); err != nil {
 		return nil, err
 	}
 
-	var pkgsToUpdate []Package
+	var pkgsToUpdate []*Package
 	for _, pkg := range pkgs {
 		if pkg.Status == "newer package available" {
 			pkgsToUpdate = append(pkgsToUpdate, pkg)

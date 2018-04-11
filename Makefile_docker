@@ -1,0 +1,39 @@
+##
+## This Makefile is responsible for running stuff inside docker containers.
+##
+
+GO_IMPORT_PATH := salsa.debian.org/aviau/autopkgupdate
+AUTOPKGUPDATE_USER := $(shell id -u)
+
+docker_run_golang = docker run \
+					--rm \
+					-i \
+					-t \
+					-v $$(pwd)/.pkg:/go/pkg \
+					-v $$(pwd):/go/src/${GO_IMPORT_PATH} \
+					-w /go/src/${GO_IMPORT_PATH} \
+					-u ${AUTOPKGUPDATE_USER}:${AUTOPKGUPDATE_USER} \
+					autopkgupdate-golang
+
+# This directory contains the installed golang packages.
+.pkg:
+	rm -rf .pkg
+	mkdir .pkg
+
+.golang-build-image: docker/golang Makefile Makefile_docker .pkg
+	docker build --build-arg userid=${AUTOPKGUPDATE_USER} -f docker/golang -t autopkgupdate-golang docker
+	touch .golang-build-image
+
+# Run MAKEFILE_TARGET inside the golang container
+.PHONY: golang-run-makefile-target
+golang-run-makefile-target: .golang-build-image
+	$(docker_run_golang) bash -c 'cd /go/src/${GO_IMPORT_PATH} && make ${MAKEFILE_TARGET}'
+
+.PHONY: all
+all: MAKEFILE_TARGET = all
+all: golang-run-makefile-target
+
+.PHONY: clean
+clean:
+	rm -f .golang-build-image
+	rm -rf .pkg

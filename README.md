@@ -24,7 +24,7 @@ $ go get -u golang.org/x/lint/golint
 
 ```shell
 $ mkdir -p $GOPATH/src/salsa.debian.org/aviau/
-$ git clone git@salsa.debian.org:aviau/autopkgupdate.git $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
+$ git clone https://salsa.debian.org/aviau/autopkgupdate.git $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
 $ cd $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
 ```
 

@@ -31,6 +31,7 @@ $ cd $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
 ### 3. Build the project
 
 ```shell
+$ make get-deps
 $ make
 ```
 

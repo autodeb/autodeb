@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>autopkgupdate</title>
+    </head>
+    <body>
+        <h1>autopkgupdate</h1>
+
+        <p>Hello, World!</p>
+
+        <p>
+            This server has a dput-compatible API. Try adding this to ~/.dput.cf:
+        </p>
+
+        <pre>
+[autopkgupdate]
+fqdn = HOST:PORT
+incoming = /test-and-upload
+method = http
+allow_unsigned_uploads = 0
+progress_indicator = 2
+# Allow uploads for UNRELEASED packages
+allowed_distributions = .
+        </pre>
+
+        <p>
+            Then, upload a package: "dput autopkgupdate package.changes"
+        </p>
+
+        <p>
+            Now, take a look at the logs on the server.
+            You will see PUT requests going trough.
+        <p>
+
+        <p>
+            Finally, confirm that the files were received by looking at the "data" directory.
+        </p>
+
+        <p>
+            This is it for now, but there is more to come.
+        </p>
+
+    </body>
+</html>

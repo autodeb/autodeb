@@ -1,6 +1,9 @@
-# Built scripts
+# Built binaries
 /list-packages-with-newer-upstream-versions
 /update-random-package
+/autopkgupdate-server
 
-# update-random-package output
-update-random-package-output-*
+# Stuff created at runtime
+/update-random-package-output-*
+/database.sqlite
+/data

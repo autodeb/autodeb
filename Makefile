@@ -6,6 +6,7 @@
 all: fmt \
 	list-packages-with-newer-upstream-versions \
 	update-random-package \
+	autopkgupdate-server \
 	vet \
 	lint
 
@@ -19,6 +20,10 @@ list-packages-with-newer-upstream-versions: $(SOURCES) install
 
 update-random-package: $(SOURCES) install
 	go build -v -o update-random-package ${GO_IMPORT_PATH}/cmd/update-random-package
+
+
+autopkgupdate-server: $(SOURCES) install
+	go build -v -o autopkgupdate-server ${GO_IMPORT_PATH}/cmd/autopkgupdate-server
 
 .PHONY: vet
 vet: install

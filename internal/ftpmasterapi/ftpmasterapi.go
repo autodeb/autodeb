@@ -1,3 +1,5 @@
+// Package ftpmasterapi is a client for the REST API at
+// api-ftp-master.debian.org
 package ftpmasterapi
 
 import (

@@ -30,7 +30,7 @@ install:
 
 .PHONY: lint
 lint:
-	golint ${GO_IMPORT_PATH}/...
+	${GOPATH}/bin/golint ${GO_IMPORT_PATH}/...
 
 .PHONY: fmt
 fmt:

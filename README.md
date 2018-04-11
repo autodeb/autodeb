@@ -15,7 +15,8 @@ autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project 
 ### 1. Setup Go
 
 ```shell
-$ sudo apt install golang-go
+$ apt-get install golang-go
+$ go get -u golang.org/x/lint/golint
 ```
 
 ### 2. Clone the project

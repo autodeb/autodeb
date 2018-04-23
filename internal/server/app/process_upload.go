@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/crypto/sha256"
+	"salsa.debian.org/aviau/autodeb/internal/crypto/sha256"
 )
 
 // ProcessUpload receives uploaded files
@@ -50,7 +50,7 @@ func (app *App) ProcessUpload(uploadFileName string, uploadContent io.Reader) er
 
 func writeToTempfile(data io.Reader) (string, error) {
 	// Create temp file
-	tmpfile, err := ioutil.TempFile("", "autopkgupdate-upload")
+	tmpfile, err := ioutil.TempFile("", "autodeb-upload")
 	if err != nil {
 		return "", err
 	}

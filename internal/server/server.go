@@ -1,11 +1,11 @@
-// Package server contains the core of the autopkgupdate server
+// Package server contains the core of the autodeb server
 package server
 
 import (
-	"salsa.debian.org/aviau/autopkgupdate/internal/http"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/api"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/app"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/database"
+	"salsa.debian.org/aviau/autodeb/internal/http"
+	"salsa.debian.org/aviau/autodeb/internal/server/api"
+	"salsa.debian.org/aviau/autodeb/internal/server/app"
+	"salsa.debian.org/aviau/autodeb/internal/server/database"
 )
 
 // Server is the main server. It has dput-compatible interface

@@ -4,10 +4,10 @@ package app
 import (
 	"path/filepath"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/database"
+	"salsa.debian.org/aviau/autodeb/internal/server/database"
 )
 
-// App is an autopkgupdate server application
+// App is an autodeb server application
 type App struct {
 	config    *Config
 	dataStore *database.Database

@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/ftpmasterapi"
-	"salsa.debian.org/aviau/autopkgupdate/internal/tar"
+	"salsa.debian.org/aviau/autodeb/internal/ftpmasterapi"
+	"salsa.debian.org/aviau/autodeb/internal/tar"
 )
 
 const (

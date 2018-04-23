@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/apt"
-	"salsa.debian.org/aviau/autopkgupdate/internal/dch"
-	"salsa.debian.org/aviau/autopkgupdate/internal/sbuild"
-	"salsa.debian.org/aviau/autopkgupdate/internal/udd"
-	"salsa.debian.org/aviau/autopkgupdate/internal/uscan"
+	"salsa.debian.org/aviau/autodeb/internal/apt"
+	"salsa.debian.org/aviau/autodeb/internal/dch"
+	"salsa.debian.org/aviau/autodeb/internal/sbuild"
+	"salsa.debian.org/aviau/autodeb/internal/udd"
+	"salsa.debian.org/aviau/autodeb/internal/uscan"
 )
 
 func main() {

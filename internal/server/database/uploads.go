@@ -1,7 +1,7 @@
 package database
 
 import (
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/models"
+	"salsa.debian.org/aviau/autodeb/internal/server/models"
 )
 
 // CreateUpload will create an upload

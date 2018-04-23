@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/api/internal/decorators"
+	"salsa.debian.org/aviau/autodeb/internal/server/api/internal/decorators"
 )
 
 func TestHTMLHeaders(t *testing.T) {

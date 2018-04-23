@@ -8,17 +8,17 @@ import (
 	"io"
 	"io/ioutil"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/http"
-	"salsa.debian.org/aviau/autopkgupdate/internal/logo"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/app"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/database"
+	"salsa.debian.org/aviau/autodeb/internal/http"
+	"salsa.debian.org/aviau/autodeb/internal/logo"
+	"salsa.debian.org/aviau/autodeb/internal/server"
+	"salsa.debian.org/aviau/autodeb/internal/server/app"
+	"salsa.debian.org/aviau/autodeb/internal/server/database"
 )
 
-// Run reads arguments and creates an autopkgupdate server
+// Run reads arguments and creates an autodeb server
 func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, error) {
 
-	fs := flag.NewFlagSet("autopkgupdate-server", flag.ContinueOnError)
+	fs := flag.NewFlagSet("autodeb-server", flag.ContinueOnError)
 	fs.SetOutput(ioutil.Discard)
 
 	var h, help bool
@@ -59,7 +59,7 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 
 	fmt.Fprintln(writerOutput, logo.Logo)
 
-	fmt.Fprintf(writerOutput, "Starting autopkgupdate API on %s:%d.\n", address, port)
+	fmt.Fprintf(writerOutput, "Starting autodeb API on %s:%d.\n", address, port)
 
 	cfg := &server.Config{
 		App: &app.Config{

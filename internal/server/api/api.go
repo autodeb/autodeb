@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/app"
+	"salsa.debian.org/aviau/autodeb/internal/server/app"
 )
 
 // NewRouter creates the main router for the application.

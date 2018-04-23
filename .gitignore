@@ -1,7 +1,7 @@
 # Built binaries
 /list-packages-with-newer-upstream-versions
 /update-random-package
-/autopkgupdate-server
+/autodeb-server
 
 # Stuff created at runtime
 /update-random-package-output-*

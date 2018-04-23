@@ -1,8 +1,8 @@
-# autopkgupdate
+# autodeb
 
-autopkgupdate tries to automatically update Debian packages to newer upstream versions or to backport them.
+autodeb tries to automatically update Debian packages to newer upstream versions or to backport them.
 
-autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project titled "Automatic Packages for Everything (backports, new upstream versions, etc.)". The [project proposal](https://wiki.debian.org/SummerOfCode2018/Projects) can be found in the Debian Wiki.
+autodeb is the concretization Lucas Nussbaum's GSOC 2018 proposed project titled "Automatic Packages for Everything (backports, new upstream versions, etc.)". The [project proposal](https://wiki.debian.org/SummerOfCode2018/Projects) can be found in the Debian Wiki.
 
 ## Available executables
 
@@ -10,9 +10,9 @@ autopkgupdate is the concretization Lucas Nussbaum's GSOC 2018 proposed project 
 
 - ``update-random-package``: find a package that needs updating to a newer upstream version and try updating it automatically. On success, the output is moved to the current directory.
 
-- ``autopkgupdate-server``: This is the server component of the system. It provides a web interface, a REST API and dput-compatible interface.
+- ``autodeb-server``: This is the server component of the system. It provides a web interface, a REST API and dput-compatible interface.
 
-- ``autopkgupdate-runner``: TODO. This executable is not yet available.
+- ``autodeb-runner``: TODO. This executable is not yet available.
 
 ## Getting started
 
@@ -30,8 +30,8 @@ $ go get -u golang.org/x/lint/golint
 
 ```shell
 $ mkdir -p $GOPATH/src/salsa.debian.org/aviau/
-$ git clone https://salsa.debian.org/aviau/autopkgupdate.git $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
-$ cd $GOPATH/src/salsa.debian.org/aviau/autopkgupdate
+$ git clone https://salsa.debian.org/aviau/autodeb.git $GOPATH/src/salsa.debian.org/aviau/autodeb
+$ cd $GOPATH/src/salsa.debian.org/aviau/autodeb
 ```
 
 ### 3. Build the project
@@ -50,5 +50,5 @@ Note that runtime dependencies of the scripts include:
 ```shell
 $ ./list-packages-with-newer-upstream-versions
 $ ./update-random-package
-$ ./autopkgupdate-server
+$ ./autodeb-server
 ```

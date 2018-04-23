@@ -6,14 +6,14 @@
 all: fmt \
 	list-packages-with-newer-upstream-versions \
 	update-random-package \
-	autopkgupdate-server \
+	autodeb-server \
 	vet \
 	lint
 
 SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go') Makefile
 
-GO_IMPORT_PATH := salsa.debian.org/aviau/autopkgupdate
+GO_IMPORT_PATH := salsa.debian.org/aviau/autodeb
 
 list-packages-with-newer-upstream-versions: $(SOURCES) install
 	go build -v -o list-packages-with-newer-upstream-versions ${GO_IMPORT_PATH}/cmd/list-packages-with-newer-upstream-versions
@@ -22,8 +22,8 @@ update-random-package: $(SOURCES) install
 	go build -v -o update-random-package ${GO_IMPORT_PATH}/cmd/update-random-package
 
 
-autopkgupdate-server: $(SOURCES) install
-	go build -v -o autopkgupdate-server ${GO_IMPORT_PATH}/cmd/autopkgupdate-server
+autodeb-server: $(SOURCES) install
+	go build -v -o autodeb-server ${GO_IMPORT_PATH}/cmd/autodeb-server
 
 .PHONY: test
 test:

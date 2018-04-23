@@ -1,9 +1,9 @@
 package server
 
 import (
-	"salsa.debian.org/aviau/autopkgupdate/internal/http"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/app"
-	"salsa.debian.org/aviau/autopkgupdate/internal/server/database"
+	"salsa.debian.org/aviau/autodeb/internal/http"
+	"salsa.debian.org/aviau/autodeb/internal/server/app"
+	"salsa.debian.org/aviau/autodeb/internal/server/database"
 )
 
 // Config contains configuration for Server

@@ -4,6 +4,10 @@ autodeb tries to automatically update Debian packages to newer upstream versions
 
 autodeb is the concretization Lucas Nussbaum's GSOC 2018 proposed project titled "Automatic Packages for Everything (backports, new upstream versions, etc.)". The [project proposal](https://wiki.debian.org/SummerOfCode2018/Projects) can be found in the Debian Wiki. The project was [officialy accepted](https://summerofcode.withgoogle.com/projects/#5560246244737024).
 
+## Getting in touch
+
+You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/autodeb) (or via [webchat](https://webchat.oftc.net/?channels=autodeb)).
+
 ## Available executables
 
 - ``list-packages-with-newer-upstream-versions``: lists source packages that have newer upstream versions available

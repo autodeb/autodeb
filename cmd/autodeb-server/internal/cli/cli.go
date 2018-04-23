@@ -8,11 +8,11 @@ import (
 	"io"
 	"io/ioutil"
 
-	"salsa.debian.org/aviau/autodeb/internal/http"
-	"salsa.debian.org/aviau/autodeb/internal/logo"
-	"salsa.debian.org/aviau/autodeb/internal/server"
-	"salsa.debian.org/aviau/autodeb/internal/server/app"
-	"salsa.debian.org/aviau/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http"
+	"salsa.debian.org/autodeb-team/autodeb/internal/logo"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
 // Run reads arguments and creates an autodeb server

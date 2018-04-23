@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"salsa.debian.org/aviau/autodeb/cmd/autodeb-server/internal/cli"
+	"salsa.debian.org/autodeb-team/autodeb/cmd/autodeb-server/internal/cli"
 )
 
 func main() {

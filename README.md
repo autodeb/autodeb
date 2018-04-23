@@ -29,9 +29,9 @@ $ go get -u golang.org/x/lint/golint
 ### 2. Clone the project
 
 ```shell
-$ mkdir -p $GOPATH/src/salsa.debian.org/aviau/
-$ git clone https://salsa.debian.org/aviau/autodeb.git $GOPATH/src/salsa.debian.org/aviau/autodeb
-$ cd $GOPATH/src/salsa.debian.org/aviau/autodeb
+$ mkdir -p $GOPATH/src/salsa.debian.org/autodeb-team/
+$ git clone https://salsa.debian.org/autodeb-team/autodeb.git $GOPATH/src/salsa.debian.org/autodeb-team/autodeb
+$ cd $GOPATH/src/salsa.debian.org/autodeb-team/autodeb
 ```
 
 ### 3. Build the project

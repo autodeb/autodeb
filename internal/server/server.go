@@ -2,10 +2,10 @@
 package server
 
 import (
-	"salsa.debian.org/aviau/autodeb/internal/http"
-	"salsa.debian.org/aviau/autodeb/internal/server/api"
-	"salsa.debian.org/aviau/autodeb/internal/server/app"
-	"salsa.debian.org/aviau/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
 // Server is the main server. It has dput-compatible interface

@@ -4,7 +4,7 @@ package app
 import (
 	"path/filepath"
 
-	"salsa.debian.org/aviau/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
 // App is an autodeb server application

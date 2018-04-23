@@ -13,7 +13,7 @@ all: fmt \
 SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go') Makefile
 
-GO_IMPORT_PATH := salsa.debian.org/aviau/autodeb
+GO_IMPORT_PATH := salsa.debian.org/autodeb-team/autodeb
 
 list-packages-with-newer-upstream-versions: $(SOURCES) install
 	go build -v -o list-packages-with-newer-upstream-versions ${GO_IMPORT_PATH}/cmd/list-packages-with-newer-upstream-versions

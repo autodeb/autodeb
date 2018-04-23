@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"salsa.debian.org/aviau/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
 func uploadHandler(app *app.App) http.Handler {

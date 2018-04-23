@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"salsa.debian.org/aviau/autodeb/internal/server/api/internal/decorators"
-	"salsa.debian.org/aviau/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/internal/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
 func indexHandler(app *app.App) http.Handler {

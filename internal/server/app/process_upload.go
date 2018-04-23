@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"salsa.debian.org/aviau/autodeb/internal/crypto/sha256"
+	"salsa.debian.org/autodeb-team/autodeb/internal/crypto/sha256"
 )
 
 // ProcessUpload receives uploaded files

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"salsa.debian.org/aviau/autodeb/internal/udd"
+	"salsa.debian.org/autodeb-team/autodeb/internal/udd"
 )
 
 func main() {

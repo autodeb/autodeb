@@ -11,11 +11,17 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/crypto/sha256"
 )
 
+// UploadParameters defines upload behaviour
+type UploadParameters struct {
+	Filename      string
+	ForwardUpload bool
+}
+
 // ProcessUpload receives uploaded files
-func (app *App) ProcessUpload(uploadFileName string, uploadContent io.Reader) error {
+func (app *App) ProcessUpload(uploadParameters *UploadParameters, uploadContent io.Reader) error {
 	// Clean the file name, ensure that it contains only a file name and
 	// that it isn't something shady like ../../filename.txt
-	_, uploadFileName = filepath.Split(uploadFileName)
+	_, uploadFileName := filepath.Split(uploadParameters.Filename)
 
 	// Check if this is a .changes upload
 	isChanges := strings.HasSuffix(uploadFileName, ".changes")

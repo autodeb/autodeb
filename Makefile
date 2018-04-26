@@ -55,3 +55,7 @@ clean:
 	rm -f list-packages-with-newer-upstream-versions
 	rm -f update-random-package
 	rm -rf update-random-package-output-*
+
+	# stuff produced at runtime
+	rm -rf data
+	rm -f database.sqlite

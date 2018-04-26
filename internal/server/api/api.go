@@ -17,7 +17,7 @@ func NewRouter(app *app.App) *mux.Router {
 
 	// Setup routes
 	router.Path("/").Handler(indexHandler(app)).Methods(http.MethodGet)
-	router.Path("/test-and-upload/{filename}").Handler(uploadHandler(app)).Methods(http.MethodPut)
+	router.Path("/upload/{filename}").Handler(uploadHandler(app)).Methods(http.MethodPut)
 
 	return router
 }

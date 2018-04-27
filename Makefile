@@ -8,7 +8,8 @@ all: fmt \
 	update-random-package \
 	autodeb-server \
 	vet \
-	lint
+	lint \
+	data
 
 SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go') Makefile
@@ -24,6 +25,9 @@ update-random-package: $(SOURCES) install
 
 autodeb-server: $(SOURCES) install
 	go build -v -o autodeb-server ${GO_IMPORT_PATH}/cmd/autodeb-server
+
+data:
+	mkdir data
 
 .PHONY: test
 test:
@@ -55,7 +59,7 @@ clean:
 	rm -f list-packages-with-newer-upstream-versions
 	rm -f update-random-package
 	rm -rf update-random-package-output-*
+	rm -rf data
 
 	# stuff produced at runtime
-	rm -rf data
 	rm -f database.sqlite

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/crypto/sha256"
+	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 )
 
 // UploadParameters defines upload behaviour
@@ -26,32 +27,73 @@ func (app *App) ProcessUpload(uploadParameters *UploadParameters, uploadContent 
 	// Check if this is a .changes upload
 	isChanges := strings.HasSuffix(uploadFileName, ".changes")
 
-	// Save the upload to a temp file
-	tmpfile, err := writeToTempfile(uploadContent)
+	// Save the upload to a temp file on the os's filesystem so that we can
+	// calculate the shasum
+	tmpfileName, err := writeToTempfile(uploadContent)
 	if err != nil {
 		return err
 	}
+	defer os.Remove(tmpfileName)
 
 	// Find out the destination directory
 	var destDir string
 	if isChanges {
-		upload, err := app.dataStore.CreateUpload()
-		if err != nil {
+
+		if upload, err := app.dataStore.CreateUpload(); err == nil {
+			destDir = filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID))
+		} else {
 			return err
 		}
-		destDir = filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID))
+
 	} else {
-		shasum, err := sha256.Sum256HexFile(tmpfile)
-		if err != nil {
+
+		if shasum, err := sha256.Sum256HexFile(tmpfileName); err == nil {
+			destDir = filepath.Join(app.UploadedFilesDirectory(), shasum)
+		} else {
 			return err
 		}
-		destDir = filepath.Join(app.UploadedFilesDirectory(), shasum)
+
 	}
 
-	// move the file to destination
-	err = moveFileToDest(tmpfile, destDir, uploadFileName)
+	// Open the temporary file
+	tmpFile, err := os.Open(tmpfileName)
+	if err != nil {
+		return err
+	}
+	defer tmpFile.Close()
+
+	// Write the upload in the fileStorage
+	err = writeDataToDestInFS(
+		tmpFile,
+		destDir,
+		uploadFileName,
+		app.dataFS,
+	)
 
 	return err
+}
+
+func writeDataToDestInFS(data io.Reader, destDir, destFileName string, fs filesystem.FS) error {
+	// Create the destination directory
+	if err := fs.MkdirAll(destDir, 0744); err != nil {
+		return err
+	}
+
+	// Create the destination file
+	destFile, err := fs.Create(filepath.Join(destDir, destFileName))
+	if err != nil {
+		fs.RemoveAll(destDir)
+		return err
+	}
+	defer destFile.Close()
+
+	// Write data
+	if _, err := io.Copy(destFile, data); err != nil {
+		destFile.Close()
+		fs.RemoveAll(destDir)
+	}
+
+	return nil
 }
 
 func writeToTempfile(data io.Reader) (string, error) {
@@ -62,7 +104,6 @@ func writeToTempfile(data io.Reader) (string, error) {
 	}
 	defer tmpfile.Close()
 
-	// Get the file name
 	filename := tmpfile.Name()
 
 	// Write data
@@ -74,18 +115,4 @@ func writeToTempfile(data io.Reader) (string, error) {
 	}
 
 	return filename, nil
-}
-
-func moveFileToDest(source, destdir, destfilename string) error {
-	fulldestpath := filepath.Join(destdir, destfilename)
-
-	// Create the destination directory
-	if err := os.MkdirAll(destdir, 0744); err != nil {
-		return err
-	}
-
-	// Move the file
-	err := os.Rename(source, fulldestpath)
-
-	return err
 }

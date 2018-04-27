@@ -11,7 +11,6 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/logo"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
@@ -62,10 +61,6 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 	fmt.Fprintf(writerOutput, "Starting autodeb API on %s:%d.\n", address, port)
 
 	cfg := &server.Config{
-		App: &app.Config{
-			TemplatesDirectory: templatesDirectory,
-			DataDirectory:      dataDirectory,
-		},
 		HTTP: &http.ServerConfig{
 			Address: address,
 			Port:    port,
@@ -74,6 +69,8 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},
+		DataDirectory:      dataDirectory,
+		TemplatesDirectory: templatesDirectory,
 	}
 
 	srv, err := server.NewServer(cfg)

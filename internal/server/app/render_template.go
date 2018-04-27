@@ -4,19 +4,27 @@ import (
 	"bytes"
 	"html/template"
 	"path/filepath"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 )
 
 // RenderTemplate renders a template
 func (app *App) RenderTemplate(templateName string, data interface{}) (string, error) {
-	templatePath := filepath.Join(app.config.TemplatesDirectory, templateName)
-
-	template, err := template.ParseFiles(templatePath)
+	b, err := filesystem.ReadFile(app.templatesFS, templateName)
 	if err != nil {
 		return "", err
 	}
 
+	str := string(b)
+
+	tmpl := template.New(filepath.Base(templateName))
+
+	if _, err := tmpl.Parse(str); err != nil {
+		return "", err
+	}
+
 	var buf bytes.Buffer
-	if err := template.Execute(&buf, data); err != nil {
+	if err := tmpl.Execute(&buf, data); err != nil {
 		return "", err
 	}
 

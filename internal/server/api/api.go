@@ -20,7 +20,7 @@ func NewRouter(app *app.App) *mux.Router {
 
 	router.PathPrefix("/upload/").Handler(
 		http.StripPrefix("/upload/", uploadHandler(app)),
-	)
+	).Methods(http.MethodPut)
 
 	return router
 }

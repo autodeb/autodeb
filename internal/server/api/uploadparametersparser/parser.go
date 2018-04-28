@@ -29,27 +29,15 @@ func Parse(r *http.Request) (*app.UploadParameters, error) {
 	}
 
 	// Get parameters from method #2
-	queryParams := make(map[string][]string)
-	for len(splitPath) >= 2 {
-		param := splitPath[0]
-		value := splitPath[1]
-
-		splitPath = splitPath[2:]
-
-		if existingValue, ok := queryParams[param]; ok {
-			queryParams[param] = append(existingValue, value)
-		} else {
-			queryParams[param] = []string{value}
-		}
-	}
+	parameters := getURLPathParameters(splitPath)
 
 	// Override with parameters from method #1
 	for param, value := range r.URL.Query() {
-		queryParams[param] = value
+		parameters[param] = value
 	}
 
 	// Set the values in uploadParameters
-	for param, value := range queryParams {
+	for param, value := range parameters {
 
 		switch param {
 		case "forward_upload":
@@ -84,4 +72,23 @@ func splitURLPath(path string) (string, []string, error) {
 	splitPath = splitPath[0 : len(splitPath)-1]
 
 	return filename, splitPath, nil
+}
+
+func getURLPathParameters(splitPath []string) map[string][]string {
+	urlPathParameters := make(map[string][]string)
+
+	for len(splitPath) >= 2 {
+		param := splitPath[0]
+		value := splitPath[1]
+
+		splitPath = splitPath[2:]
+
+		if existingValue, ok := urlPathParameters[param]; ok {
+			urlPathParameters[param] = append(existingValue, value)
+		} else {
+			urlPathParameters[param] = []string{value}
+		}
+	}
+
+	return urlPathParameters
 }

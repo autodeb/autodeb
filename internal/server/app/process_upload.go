@@ -60,6 +60,7 @@ func writeToTempfile(data io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer tmpfile.Close()
 
 	// Get the file name
 	filename := tmpfile.Name()

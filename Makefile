@@ -31,7 +31,7 @@ test:
 
 .PHONY: vet
 vet: install
-	go vet -v ${GO_IMPORT_PATH}/...
+	go vet ${GO_IMPORT_PATH}/...
 
 .PHONY: install
 install:

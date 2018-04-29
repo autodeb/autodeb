@@ -1,4 +1,5 @@
-// Package server contains the core of the autodeb server
+// Package server contains the core of the autodeb server. It creates all
+// dependencies injects them at the right place.
 package server
 
 import (

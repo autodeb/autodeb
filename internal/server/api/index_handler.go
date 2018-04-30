@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/internal/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
-func indexHandler(app *app.App) http.Handler {
+func indexHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		rendered, err := app.RenderTemplate("index.html", nil)
+		rendered, err := renderer.RenderTemplate("index.html", nil)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

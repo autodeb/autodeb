@@ -4,6 +4,7 @@ package server
 
 import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
+	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
@@ -28,21 +29,19 @@ func NewServer(cfg *Config) (*Server, error) {
 		return nil, err
 	}
 
+	app, err := app.NewApp(db, dataFS)
+	if err != nil {
+		return nil, err
+	}
+
 	templatesFS, err := filesystem.NewFS(cfg.TemplatesDirectory)
 	if err != nil {
 		return nil, err
 	}
 
-	app, err := app.NewApp(
-		db,
-		dataFS,
-		templatesFS,
-	)
-	if err != nil {
-		return nil, err
-	}
+	renderer := htmltemplate.NewRenderer(templatesFS)
 
-	router := api.NewRouter(app)
+	router := api.NewRouter(renderer, app)
 
 	httpServer, err := http.NewHTTPServer(router, cfg.HTTP)
 	if err != nil {

@@ -8,14 +8,14 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 )
 
-func setup() (*Renderer, filesystem.FS) {
+func setupTest() (*Renderer, filesystem.FS) {
 	fs := filesystem.NewMemMapFs()
 	renderer := NewRenderer(fs)
 	return renderer, fs
 }
 
 func TestTemplatesAreCached(t *testing.T) {
-	renderer, fs := setup()
+	renderer, fs := setupTest()
 	fs.Create("parent")
 	fs.Create("child")
 
@@ -31,7 +31,7 @@ func TestTemplatesAreCached(t *testing.T) {
 }
 
 func TestTemplateNames(t *testing.T) {
-	renderer, fs := setup()
+	renderer, fs := setupTest()
 	fs.Create("parent")
 	fs.Create("child")
 

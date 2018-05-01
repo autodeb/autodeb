@@ -8,4 +8,5 @@ import (
 
 func runMigrations(gormDB *gorm.DB) {
 	gormDB.AutoMigrate(&models.Upload{})
+	gormDB.AutoMigrate(&models.PendingFileUpload{})
 }

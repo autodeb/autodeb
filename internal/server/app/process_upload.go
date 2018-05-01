@@ -50,6 +50,11 @@ func (app *App) processChangesUpload(filename string, content io.Reader) error {
 		bufio.NewReader(bytes.NewReader(b)),
 		"",
 	)
+	if err != nil {
+		return err
+	} else if len(changes.ChecksumsSha256) < 1 {
+		return fmt.Errorf("changes has no Sha256 checksums")
+	}
 
 	//Verify that we have all specified files
 	//otherwise, immediately reject the upload

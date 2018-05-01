@@ -1,8 +1,9 @@
+image: debian:buster
+
 job:
     before_script:
-        - echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
         - apt-get update
-        - apt-get install -y -t stretch-backports golang-go git make
+        - apt-get install -y golang-go git make
         - export GOPATH=~/go
         - mkdir -p $GOPATH/src/salsa.debian.org/$CI_PROJECT_NAMESPACE
         - cp -r $CI_PROJECT_DIR $GOPATH/src/salsa.debian.org/$CI_PROJECT_PATH

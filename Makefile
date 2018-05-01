@@ -31,7 +31,7 @@ data:
 
 .PHONY: test
 test:
-	go test -v ${GO_IMPORT_PATH}/...
+	go test -v ${GO_IMPORT_PATH}/... -coverprofile .test_coverage.txt
 
 .PHONY: vet
 vet: install
@@ -60,6 +60,9 @@ clean:
 	rm -f update-random-package
 	rm -rf update-random-package-output-*
 	rm -rf data
+
+	# test output
+	rm -f .test_coverage.txt
 
 	# stuff produced at runtime
 	rm -f database.sqlite

@@ -3,9 +3,6 @@
 /update-random-package
 /autodeb-server
 
-# test output
-/.test_coverage.txt
-
 # Stuff created at runtime
 /update-random-package-output-*
 /database.sqlite

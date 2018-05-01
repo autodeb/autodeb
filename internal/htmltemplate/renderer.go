@@ -3,6 +3,7 @@ package htmltemplate
 import (
 	"bytes"
 	"html/template"
+	"strings"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 )
@@ -23,8 +24,8 @@ func NewRenderer(fs filesystem.FS) *Renderer {
 }
 
 //RenderTemplate renders an html template with the given data
-func (renderer *Renderer) RenderTemplate(name string, data interface{}) (string, error) {
-	tmpl, err := renderer.getOrCreateTemplate(name)
+func (renderer *Renderer) RenderTemplate(data interface{}, filenames ...string) (string, error) {
+	tmpl, err := renderer.getOrCreateTemplate(filenames...)
 	if err != nil {
 		return "", err
 	}
@@ -39,34 +40,39 @@ func (renderer *Renderer) RenderTemplate(name string, data interface{}) (string,
 	return output, nil
 }
 
-func (renderer *Renderer) getOrCreateTemplate(name string) (*template.Template, error) {
-	tmpl, ok := renderer.cache.Load(name)
+func (renderer *Renderer) getOrCreateTemplate(filenames ...string) (*template.Template, error) {
+	templateName := strings.Join(filenames, "+")
+
+	tmpl, ok := renderer.cache.Load(templateName)
 	if ok {
 		return tmpl, nil
 	}
 
-	tmpl, err := renderer.createTemplate(name)
+	tmpl, err := renderer.createTemplate(filenames...)
 	if err != nil {
 		return nil, err
 	}
 
-	renderer.cache.Store(name, tmpl)
+	renderer.cache.Store(templateName, tmpl)
 
 	return tmpl, nil
 }
 
-func (renderer *Renderer) createTemplate(name string) (*template.Template, error) {
-	b, err := filesystem.ReadFile(renderer.fs, name)
-	if err != nil {
-		return nil, err
-	}
+func (renderer *Renderer) createTemplate(filenames ...string) (*template.Template, error) {
+	tmpl := template.New("")
 
-	str := string(b)
+	for _, filename := range filenames {
 
-	tmpl := template.New(name)
+		b, err := filesystem.ReadFile(renderer.fs, filename)
+		if err != nil {
+			return nil, err
+		}
 
-	if _, err := tmpl.Parse(str); err != nil {
-		return nil, err
+		str := string(b)
+
+		if _, err := tmpl.Parse(str); err != nil {
+			return nil, err
+		}
 	}
 
 	return tmpl, nil

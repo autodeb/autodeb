@@ -22,3 +22,8 @@ func NewFS(basepath string) (FS, error) {
 
 	return basePathFs, nil
 }
+
+//NewMemMapFs creates a memory-based file system
+func NewMemMapFs() FS {
+	return afero.NewMemMapFs()
+}

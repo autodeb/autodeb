@@ -5,6 +5,7 @@ import (
 	"sync"
 )
 
+//templateCache is a thread-safe template cache
 type templateCache struct {
 	m     map[string]*template.Template
 	mutex sync.RWMutex

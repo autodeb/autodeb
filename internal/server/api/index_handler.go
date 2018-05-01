@@ -12,7 +12,7 @@ import (
 func indexHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		rendered, err := renderer.RenderTemplate("index.html", nil)
+		rendered, err := renderer.RenderTemplate(nil, "base.html", "index.html")
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

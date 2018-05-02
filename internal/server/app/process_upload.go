@@ -26,7 +26,7 @@ type UploadParameters struct {
 }
 
 // ProcessUpload receives uploaded files
-func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) error {
+func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) (*models.Upload, error) {
 	// Clean the file name, ensure that it contains only a file name and
 	// that it isn't something shady like ../../filename.txt
 	_, uploadFileName := filepath.Split(uploadParameters.Filename)
@@ -35,15 +35,18 @@ func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Rea
 	isChanges := strings.HasSuffix(uploadFileName, ".changes")
 
 	if isChanges {
-		return app.processChangesUpload(uploadFileName, content)
+		upload, err := app.processChangesUpload(uploadFileName, content)
+		return upload, err
 	}
-	return app.processFileUpload(uploadFileName, content)
+
+	err := app.processFileUpload(uploadFileName, content)
+	return nil, err
 }
 
-func (app *App) processChangesUpload(filename string, content io.Reader) error {
+func (app *App) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
 	b, err := ioutil.ReadAll(content)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	changes, err := control.ParseChanges(
@@ -51,9 +54,11 @@ func (app *App) processChangesUpload(filename string, content io.Reader) error {
 		"",
 	)
 	if err != nil {
-		return err
-	} else if len(changes.ChecksumsSha256) < 1 {
-		return fmt.Errorf("changes has no Sha256 checksums")
+		return nil, err
+	}
+
+	if len(changes.ChecksumsSha256) < 1 {
+		return nil, fmt.Errorf("changes has no Sha256 checksums")
 	}
 
 	//Verify that we have all specified files
@@ -62,16 +67,16 @@ func (app *App) processChangesUpload(filename string, content io.Reader) error {
 	for _, file := range changes.ChecksumsSha256 {
 		pendingFileUpload, err := app.dataStore.GetPendingFileUpload(file.Filename, file.Hash, false)
 		if err != nil {
-			return err
+			return nil, err
 		} else if pendingFileUpload == nil {
-			return fmt.Errorf("changes refers to unexisting file %s with hash %s", file.Filename, file.Hash)
+			return nil, fmt.Errorf("changes refers to unexisting file %s with hash %s", file.Filename, file.Hash)
 		}
 		pendingFileUploads = append(pendingFileUploads, pendingFileUpload)
 	}
 
 	upload, err := app.dataStore.CreateUpload()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	destDir := filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID))
@@ -83,7 +88,7 @@ func (app *App) processChangesUpload(filename string, content io.Reader) error {
 		filename,
 		app.dataFS,
 	); err != nil {
-		return err
+		return nil, err
 	}
 
 	//Move all files to the upload folder and delete the pendingFileUploads
@@ -109,7 +114,7 @@ func (app *App) processChangesUpload(filename string, content io.Reader) error {
 
 	}
 
-	return nil
+	return upload, nil
 }
 
 func (app *App) processFileUpload(filename string, content io.Reader) error {

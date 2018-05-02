@@ -15,13 +15,14 @@ func TestProcessFileUpload(t *testing.T) {
 	_, err := fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1"))
 	require.Error(t, err, "the file directory should not exist")
 
-	err = app.ProcessUpload(
+	upload, err := app.ProcessUpload(
 		&UploadParameters{
 			Filename: "test.dsc",
 		},
 		strings.NewReader("this is a test file\n"),
 	)
 	assert.NoError(t, err)
+	assert.Nil(t, upload)
 
 	_, err = fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1"))
 	assert.NoError(t, err)
@@ -72,45 +73,51 @@ Files:
 func TestProcessChangesBadFormatRejected(t *testing.T) {
 	app, _, _ := setupTest(t)
 
-	err := app.ProcessUpload(
+	upload, err := app.ProcessUpload(
 		&UploadParameters{
 			Filename: "test.changes",
 		},
 		strings.NewReader("test"),
 	)
 	assert.Error(t, err)
+	assert.Nil(t, upload)
 }
 
 func TestProcessChangesMissingFile(t *testing.T) {
 	app, _, _ := setupTest(t)
 
-	err := app.ProcessUpload(
+	upload, err := app.ProcessUpload(
 		&UploadParameters{
 			Filename: "test.changes",
 		},
 		strings.NewReader(dummyChangesFile),
 	)
 	assert.Error(t, err)
+	assert.Nil(t, upload)
 }
 
 func TestProcessChanges(t *testing.T) {
 	app, fs, _ := setupTest(t)
 
-	err := app.ProcessUpload(
+	upload, err := app.ProcessUpload(
 		&UploadParameters{
 			Filename: "test.dsc",
 		},
 		strings.NewReader("this is a test file\n"),
 	)
 	assert.NoError(t, err)
+	assert.Nil(t, upload)
 
-	err = app.ProcessUpload(
+	upload, err = app.ProcessUpload(
 		&UploadParameters{
 			Filename: "test.changes",
 		},
 		strings.NewReader(dummyChangesFile),
 	)
 	assert.NoError(t, err)
+	assert.NotNil(t, upload)
+
+	assert.Equal(t, uint(1), upload.ID)
 
 	_, err = fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1"))
 	assert.Error(t, err, "the uploaded files directory should be removed")

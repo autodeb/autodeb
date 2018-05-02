@@ -17,7 +17,7 @@ func uploadHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
 			return
 		}
 
-		if err := app.ProcessUpload(uploadParameters, r.Body); err != nil {
+		if _, err := app.ProcessUpload(uploadParameters, r.Body); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

@@ -12,16 +12,25 @@ import (
 )
 
 // NewRouter creates the main router for the application.
-func NewRouter(renderer *htmltemplate.Renderer, app *app.App) *mux.Router {
+func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *app.App) *mux.Router {
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	// Setup routes
-	router.Path("/").Handler(indexHandler(renderer, app)).Methods(http.MethodGet)
-
+	// Upload API
 	router.PathPrefix("/upload/").Handler(
 		http.StripPrefix("/upload/", uploadHandler(renderer, app)),
 	).Methods(http.MethodPut)
+
+	// Static files (for the web)
+	router.PathPrefix("/static/").Handler(
+		http.StripPrefix(
+			"/static/",
+			http.FileServer(staticFS),
+		),
+	).Methods(http.MethodGet)
+
+	// Web pages
+	router.Path("/").Handler(indexHandler(renderer, app)).Methods(http.MethodGet)
 
 	return router
 }

@@ -41,7 +41,16 @@ func NewServer(cfg *Config) (*Server, error) {
 
 	renderer := htmltemplate.NewRenderer(templatesFS)
 
-	router := api.NewRouter(renderer, app)
+	staticFilesFS, err := filesystem.NewFS(cfg.StaticFilesDirectory)
+	if err != nil {
+		return nil, err
+	}
+
+	router := api.NewRouter(
+		renderer,
+		filesystem.NewHTTPFS(staticFilesFS),
+		app,
+	)
 
 	httpServer, err := http.NewHTTPServer(router, cfg.HTTP)
 	if err != nil {

@@ -33,6 +33,9 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 	var templatesDirectory string
 	fs.StringVar(&templatesDirectory, "templates", "web/templates", "templates directory")
 
+	var staticFilesDirectory string
+	fs.StringVar(&staticFilesDirectory, "static-files", "web/static", "static files directory")
+
 	var dataDirectory string
 	fs.StringVar(&dataDirectory, "data", "data", "data directory")
 
@@ -69,8 +72,9 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},
-		DataDirectory:      dataDirectory,
-		TemplatesDirectory: templatesDirectory,
+		DataDirectory:        dataDirectory,
+		TemplatesDirectory:   templatesDirectory,
+		StaticFilesDirectory: staticFilesDirectory,
 	}
 
 	srv, err := server.NewServer(cfg)

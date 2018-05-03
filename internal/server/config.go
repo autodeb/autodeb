@@ -7,8 +7,9 @@ import (
 
 // Config contains configuration for Server
 type Config struct {
-	HTTP               *http.ServerConfig
-	Database           *database.Config
-	DataDirectory      string
-	TemplatesDirectory string
+	HTTP                 *http.ServerConfig
+	Database             *database.Config
+	DataDirectory        string
+	TemplatesDirectory   string
+	StaticFilesDirectory string
 }

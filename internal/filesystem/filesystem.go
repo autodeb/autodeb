@@ -3,6 +3,8 @@
 package filesystem
 
 import (
+	"net/http"
+
 	"github.com/spf13/afero"
 )
 
@@ -26,4 +28,9 @@ func NewFS(basepath string) (FS, error) {
 //NewMemMapFs creates a memory-based file system
 func NewMemMapFs() FS {
 	return afero.NewMemMapFs()
+}
+
+//NewHTTPFS creates a net/http compatible filesystem from the source
+func NewHTTPFS(source FS) http.FileSystem {
+	return afero.NewHttpFs(source)
 }

@@ -7,6 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 )
 
 func TestProcessFileUpload(t *testing.T) {
@@ -80,6 +82,7 @@ func TestProcessChangesBadFormatRejected(t *testing.T) {
 		strings.NewReader("test"),
 	)
 	assert.Error(t, err)
+	assert.True(t, errorchecks.IsInputError(err))
 	assert.Nil(t, upload)
 }
 
@@ -93,6 +96,7 @@ func TestProcessChangesMissingFile(t *testing.T) {
 		strings.NewReader(dummyChangesFile),
 	)
 	assert.Error(t, err)
+	assert.True(t, errorchecks.IsInputError(err))
 	assert.Nil(t, upload)
 }
 

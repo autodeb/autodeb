@@ -3,6 +3,7 @@ package app
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,6 +24,15 @@ import (
 type UploadParameters struct {
 	Filename      string
 	ForwardUpload bool
+}
+
+type uploadError struct {
+	error
+	isInputError bool
+}
+
+func (err *uploadError) IsInputError() bool {
+	return err.isInputError
 }
 
 // ProcessUpload receives uploaded files
@@ -54,11 +64,11 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 		"",
 	)
 	if err != nil {
-		return nil, err
+		return nil, &uploadError{err, true}
 	}
 
 	if len(changes.ChecksumsSha256) < 1 {
-		return nil, fmt.Errorf("changes has no Sha256 checksums")
+		return nil, &uploadError{errors.New("changes has no SHA256 checksums"), true}
 	}
 
 	//Verify that we have all specified files
@@ -69,7 +79,7 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 		if err != nil {
 			return nil, err
 		} else if pendingFileUpload == nil {
-			return nil, fmt.Errorf("changes refers to unexisting file %s with hash %s", file.Filename, file.Hash)
+			return nil, &uploadError{fmt.Errorf("changes refers to unexisting file %s with hash %s", file.Filename, file.Hash), true}
 		}
 		pendingFileUploads = append(pendingFileUploads, pendingFileUpload)
 	}

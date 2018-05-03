@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/uploadparametersparser"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
@@ -18,7 +19,11 @@ func uploadHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
 		}
 
 		if _, err := app.ProcessUpload(uploadParameters, r.Body); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			if errorchecks.IsInputError(err) {
+				w.WriteHeader(http.StatusBadRequest)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			return
 		}
 

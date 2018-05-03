@@ -10,7 +10,7 @@ autodeb is the concretization Lucas Nussbaum's GSOC 2018 proposed project titled
 
 ## Getting in touch
 
-You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/autodeb) (or via [webchat](https://webchat.oftc.net/?channels=autodeb)).
+You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/autodeb) (or via [webchat](https://webchat.oftc.net/?channels=autodeb)). If you've found something that is clearly a bug, feel free to report it in the [issue tracker](https://salsa.debian.org/autodeb-team/autodeb/issues).
 
 ## Available executables
 

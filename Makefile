@@ -59,7 +59,7 @@ clean:
 
 	# Other things created by this Makefile
 	rm -rf data
-	rm -f dependency-graph.svg
+	rm -f dependency-graph-autodeb-server.svg
 
 	# stuff produced at runtime
 	rm -f database.sqlite
@@ -68,9 +68,9 @@ clean:
 ## Misc
 ##
 
-dependency-graph.svg: $(SOURCES)
+dependency-graph-autodeb-server.svg: $(SOURCES)
 	go get github.com/kisielk/godepgraph
-	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph.svg
+	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph-autodeb-server.svg
 	# This would also work:
 	#    go get github.com/davecheney/graphpkg
-	#    $(GOPATH)/bin/graphpkg -stdout -match '$(GO_IMPORT_PATH)' $(GO_IMPORT_PATH)/cmd/autodeb-server > dependency-graph.svg
+	#    $(GOPATH)/bin/graphpkg -stdout -match '$(GO_IMPORT_PATH)' $(GO_IMPORT_PATH)/cmd/autodeb-server > dependency-graph-autodeb-server.svg

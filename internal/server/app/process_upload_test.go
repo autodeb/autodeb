@@ -52,18 +52,19 @@ func TestProcessFileUpload(t *testing.T) {
 
 const dummyChangesFile = `Format: 1.8
 Date: Wed, 04 Apr 2018 14:28:29 -0400
-Source: source-package-name
-Binary: binary-package-name
+Source: autodeb
+Binary: autodeb-server autodeb-worker
 Architecture: source
 Version: 1.0+ds1-1
 Distribution: unstable
 Urgency: medium
 Maintainer: Alexandre Viau <aviau@debian.org>
-Changed-By: Alexandre Viau <aviau@debian.org>
+Changed-By: Changed By <changed.by@debian.org>
 Description:
- binary-package-name - dummy description
+ autodeb-server - main autodeb server
+ autodeb-worker - autodeb worker component
 Changes:
- syncthing (1.0+ds1-1) unstable; urgency=medium
+ autodeb (1.0+ds1-1) unstable; urgency=medium
  .
    * Less bugs.
 Checksums-Sha1:
@@ -124,6 +125,10 @@ func TestProcessChanges(t *testing.T) {
 	assert.NotNil(t, upload)
 
 	assert.Equal(t, uint(1), upload.ID)
+	assert.Equal(t, "autodeb", upload.Source)
+	assert.Equal(t, "1.0+ds1-1", upload.Version)
+	assert.Equal(t, "Alexandre Viau <aviau@debian.org>", upload.Maintainer)
+	assert.Equal(t, "Changed By <changed.by@debian.org>", upload.ChangedBy)
 
 	_, err = fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
 	assert.Error(t, err, "the uploaded files directory should be removed")

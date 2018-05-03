@@ -84,7 +84,12 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 		pendingFileUploads = append(pendingFileUploads, pendingFileUpload)
 	}
 
-	upload, err := app.dataStore.CreateUpload()
+	upload, err := app.dataStore.CreateUpload(
+		changes.Source,
+		changes.Version.String(),
+		changes.Maintainer,
+		changes.ChangedBy,
+	)
 	if err != nil {
 		return nil, err
 	}

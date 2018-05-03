@@ -9,8 +9,13 @@ import (
 )
 
 // CreateUpload will create an upload
-func (db *Database) CreateUpload() (*models.Upload, error) {
-	upload := &models.Upload{}
+func (db *Database) CreateUpload(source, version, maintainer, changedBy string) (*models.Upload, error) {
+	upload := &models.Upload{
+		Source:     source,
+		Version:    version,
+		Maintainer: maintainer,
+		ChangedBy:  changedBy,
+	}
 
 	if err := db.gormDB.Create(upload).Error; err != nil {
 		return nil, err

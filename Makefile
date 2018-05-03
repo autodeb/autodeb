@@ -1,7 +1,3 @@
-##
-## This makefile is responsible for building, linting and testing the project
-##
-
 .PHONY: all
 all: fmt \
 	list-packages-with-newer-upstream-versions \
@@ -56,10 +52,25 @@ get-deps:
 
 .PHONY: clean
 clean:
+	# Binaries
 	rm -f list-packages-with-newer-upstream-versions
 	rm -f update-random-package
 	rm -rf update-random-package-output-*
+
+	# Other things created by this Makefile
 	rm -rf data
+	rm -f dependency-graph.svg
 
 	# stuff produced at runtime
 	rm -f database.sqlite
+
+##
+## Misc
+##
+
+dependency-graph.svg: $(SOURCES)
+	go get github.com/kisielk/godepgraph
+	godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph.svg
+	# This would also work:
+	#    go get github.com/davecheney/graphpkg
+	#    graphpkg -stdout -match '$(GO_IMPORT_PATH)' $(GO_IMPORT_PATH)/cmd/autodeb-server > dependency-graph.svg

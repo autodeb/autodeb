@@ -3,7 +3,10 @@
 /update-random-package
 /autodeb-server
 
-# Stuff created at runtime
+# Other things created by the Makefile
+/data
+/dependency-graph.svg
+
+# stuff produced at runtime
 /update-random-package-output-*
 /database.sqlite
-/data

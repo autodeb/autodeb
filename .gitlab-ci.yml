@@ -1,14 +1,13 @@
-image: debian:buster
+image: golang:1.10-stretch
 
-job:
-    before_script:
-        - apt-get update
-        - apt-get install -y golang-go git make
-        - export GOPATH=~/go
-        - mkdir -p $GOPATH/src/salsa.debian.org/$CI_PROJECT_NAMESPACE
-        - cp -r $CI_PROJECT_DIR $GOPATH/src/salsa.debian.org/$CI_PROJECT_PATH
-        - cd $GOPATH/src/salsa.debian.org/$CI_PROJECT_PATH
-        - pwd
-    script:
+before_script:
+    - pwd
+    - mkdir -p $GOPATH/src/salsa.debian.org/$CI_PROJECT_NAMESPACE
+    - cp -r $CI_PROJECT_DIR $GOPATH/src/salsa.debian.org/$CI_PROJECT_PATH
+    - cd $GOPATH/src/salsa.debian.org/$CI_PROJECT_PATH
+    - pwd
+
+test:
+   script:
         - make get-deps
         - make test

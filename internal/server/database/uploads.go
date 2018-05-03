@@ -19,6 +19,17 @@ func (db *Database) CreateUpload() (*models.Upload, error) {
 	return upload, nil
 }
 
+// GetAllUploads returns all uploads
+func (db *Database) GetAllUploads() ([]*models.Upload, error) {
+	var uploads []*models.Upload
+
+	if err := db.gormDB.Model(&models.Upload{}).Find(&uploads).Error; err != nil {
+		return nil, err
+	}
+
+	return uploads, nil
+}
+
 // CreatePendingFileUpload will create a pending file upload
 func (db *Database) CreatePendingFileUpload(filename, sha256Sum string, uploadedAt time.Time) (*models.PendingFileUpload, error) {
 	fileUpload := &models.PendingFileUpload{

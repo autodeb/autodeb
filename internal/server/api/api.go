@@ -30,7 +30,8 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 	).Methods(http.MethodGet)
 
 	// Web pages
-	router.Path("/").Handler(indexHandler(renderer, app)).Methods(http.MethodGet)
+	router.Path("/").Handler(indexGetHandler(renderer, app)).Methods(http.MethodGet)
+	router.Path("/uploads").Handler(uploadsGetHandler(renderer, app)).Methods(http.MethodGet)
 
 	return router
 }

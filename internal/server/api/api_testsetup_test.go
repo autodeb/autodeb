@@ -25,7 +25,7 @@ func setupTest(t *testing.T) *APITest {
 	testApp, dataFS, db := apptest.SetupTest(t)
 
 	tmplFS := filesystem.NewMemMapFs()
-	tmplRenderer := htmltemplate.NewRenderer(tmplFS)
+	tmplRenderer := htmltemplate.NewRenderer(tmplFS, true)
 
 	staticFS := filesystem.NewMemMapFs()
 

@@ -7,12 +7,25 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/internal/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-func indexGetHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
+func uploadsGetHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		rendered, err := renderer.RenderTemplate(nil, "base.html", "index.html")
+		uploads, err := app.GetAllUploads()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			Uploads []*models.Upload
+		}{
+			Uploads: uploads,
+		}
+
+		rendered, err := renderer.RenderTemplate(data, "base.html", "uploads.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

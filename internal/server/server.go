@@ -39,7 +39,7 @@ func NewServer(cfg *Config) (*Server, error) {
 		return nil, err
 	}
 
-	renderer := htmltemplate.NewRenderer(templatesFS)
+	renderer := htmltemplate.NewRenderer(templatesFS, cfg.TemplatesCacheEnabled)
 
 	staticFilesFS, err := filesystem.NewFS(cfg.StaticFilesDirectory)
 	if err != nil {

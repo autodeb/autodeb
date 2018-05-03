@@ -2,8 +2,26 @@
 <html>
     <head>
         <title>{{ block "title" . }}{{ end }}</title>
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
     </head>
     <body>
-        {{ template "content" . }}
+
+        <header class="main-header">
+            <h1>autodeb</h1>
+        </header>
+
+        <aside class="primary-sidebar">
+            <a href="/">Home</a><br>
+            <a href="/uploads">Uploads</a>
+        </aside>
+
+        <main class="content">
+            {{ template "content" . }}
+        </main>
+
+        <footer class="main-footer">
+            Footer
+        </footer>
+
     </body>
 </html>

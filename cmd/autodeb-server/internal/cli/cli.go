@@ -33,6 +33,9 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 	var templatesDirectory string
 	fs.StringVar(&templatesDirectory, "templates", "web/templates", "templates directory")
 
+	var cacheTemplates bool
+	fs.BoolVar(&cacheTemplates, "cache-templates", true, "whether or not to cache templates")
+
 	var staticFilesDirectory string
 	fs.StringVar(&staticFilesDirectory, "static-files", "web/static", "static files directory")
 
@@ -72,9 +75,10 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},
-		DataDirectory:        dataDirectory,
-		TemplatesDirectory:   templatesDirectory,
-		StaticFilesDirectory: staticFilesDirectory,
+		DataDirectory:         dataDirectory,
+		TemplatesDirectory:    templatesDirectory,
+		StaticFilesDirectory:  staticFilesDirectory,
+		TemplatesCacheEnabled: cacheTemplates,
 	}
 
 	srv, err := server.NewServer(cfg)

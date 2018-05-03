@@ -10,15 +10,17 @@ import (
 
 //Renderer renders html templates
 type Renderer struct {
-	fs    filesystem.FS
-	cache *templateCache
+	fs           filesystem.FS
+	cache        *templateCache
+	cacheEnabled bool
 }
 
 //NewRenderer created a new renderer
-func NewRenderer(fs filesystem.FS) *Renderer {
+func NewRenderer(fs filesystem.FS, cacheEnabled bool) *Renderer {
 	r := Renderer{
-		fs:    fs,
-		cache: newTemplateCache(),
+		fs:           fs,
+		cache:        newTemplateCache(),
+		cacheEnabled: cacheEnabled,
 	}
 	return &r
 }
@@ -43,9 +45,11 @@ func (renderer *Renderer) RenderTemplate(data interface{}, filenames ...string) 
 func (renderer *Renderer) getOrCreateTemplate(filenames ...string) (*template.Template, error) {
 	templateName := strings.Join(filenames, "+")
 
-	tmpl, ok := renderer.cache.Load(templateName)
-	if ok {
-		return tmpl, nil
+	if renderer.cacheEnabled {
+		tmpl, ok := renderer.cache.Load(templateName)
+		if ok {
+			return tmpl, nil
+		}
 	}
 
 	tmpl, err := renderer.createTemplate(filenames...)
@@ -53,7 +57,9 @@ func (renderer *Renderer) getOrCreateTemplate(filenames ...string) (*template.Te
 		return nil, err
 	}
 
-	renderer.cache.Store(templateName, tmpl)
+	if renderer.cacheEnabled {
+		renderer.cache.Store(templateName, tmpl)
+	}
 
 	return tmpl, nil
 }

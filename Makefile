@@ -70,7 +70,7 @@ clean:
 
 dependency-graph.svg: $(SOURCES)
 	go get github.com/kisielk/godepgraph
-	godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph.svg
+	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph.svg
 	# This would also work:
 	#    go get github.com/davecheney/graphpkg
-	#    graphpkg -stdout -match '$(GO_IMPORT_PATH)' $(GO_IMPORT_PATH)/cmd/autodeb-server > dependency-graph.svg
+	#    $(GOPATH)/bin/graphpkg -stdout -match '$(GO_IMPORT_PATH)' $(GO_IMPORT_PATH)/cmd/autodeb-server > dependency-graph.svg

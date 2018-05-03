@@ -16,6 +16,7 @@ You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/a
 
  - [Getting started](#getting-started): everything you need to know to build autodeb
  - [autodeb-server dependency graph](https://autodeb-team.pages.debian.net/autodeb/dependency-graph-autodeb-server.svg): helpful to understand the autodeb-server software architecture
+ - [godoc](https://godoc.org/salsa.debian.org/autodeb-team/autodeb): code documentation
  - [Wiki](https://salsa.debian.org/autodeb-team/autodeb/wikis/home): everything else
 
 ## Available executables

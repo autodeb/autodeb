@@ -12,7 +12,7 @@ import (
 )
 
 // NewRouter creates the main router for the application.
-func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *app.App) *mux.Router {
+func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *app.App) http.Handler {
 
 	router := mux.NewRouter().StrictSlash(true)
 

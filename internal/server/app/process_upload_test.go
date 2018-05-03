@@ -1,4 +1,4 @@
-package app
+package app_test
 
 import (
 	"path/filepath"
@@ -9,16 +9,18 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/apptest"
 )
 
 func TestProcessFileUpload(t *testing.T) {
-	app, fs, db := setupTest(t)
+	testApp, fs, db := apptest.SetupTest(t)
 
-	_, err := fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1"))
+	_, err := fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
 	require.Error(t, err, "the file directory should not exist")
 
-	upload, err := app.ProcessUpload(
-		&UploadParameters{
+	upload, err := testApp.ProcessUpload(
+		&app.UploadParameters{
 			Filename: "test.dsc",
 		},
 		strings.NewReader("this is a test file\n"),
@@ -26,10 +28,10 @@ func TestProcessFileUpload(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, upload)
 
-	_, err = fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1"))
+	_, err = fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1", "test.dsc"))
+	_, err = fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1", "test.dsc"))
 	assert.NoError(t, err)
 
 	expectedSHASum := "b6668cf8c46c7075e18215d922e7812ca082fa6cc34668d00a6c20aee4551fb6"
@@ -73,10 +75,10 @@ Files:
 `
 
 func TestProcessChangesBadFormatRejected(t *testing.T) {
-	app, _, _ := setupTest(t)
+	testApp, _, _ := apptest.SetupTest(t)
 
-	upload, err := app.ProcessUpload(
-		&UploadParameters{
+	upload, err := testApp.ProcessUpload(
+		&app.UploadParameters{
 			Filename: "test.changes",
 		},
 		strings.NewReader("test"),
@@ -87,10 +89,10 @@ func TestProcessChangesBadFormatRejected(t *testing.T) {
 }
 
 func TestProcessChangesMissingFile(t *testing.T) {
-	app, _, _ := setupTest(t)
+	testApp, _, _ := apptest.SetupTest(t)
 
-	upload, err := app.ProcessUpload(
-		&UploadParameters{
+	upload, err := testApp.ProcessUpload(
+		&app.UploadParameters{
 			Filename: "test.changes",
 		},
 		strings.NewReader(dummyChangesFile),
@@ -101,10 +103,10 @@ func TestProcessChangesMissingFile(t *testing.T) {
 }
 
 func TestProcessChanges(t *testing.T) {
-	app, fs, _ := setupTest(t)
+	testApp, fs, _ := apptest.SetupTest(t)
 
-	upload, err := app.ProcessUpload(
-		&UploadParameters{
+	upload, err := testApp.ProcessUpload(
+		&app.UploadParameters{
 			Filename: "test.dsc",
 		},
 		strings.NewReader("this is a test file\n"),
@@ -112,8 +114,8 @@ func TestProcessChanges(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, upload)
 
-	upload, err = app.ProcessUpload(
-		&UploadParameters{
+	upload, err = testApp.ProcessUpload(
+		&app.UploadParameters{
 			Filename: "test.changes",
 		},
 		strings.NewReader(dummyChangesFile),
@@ -123,15 +125,15 @@ func TestProcessChanges(t *testing.T) {
 
 	assert.Equal(t, uint(1), upload.ID)
 
-	_, err = fs.Stat(filepath.Join(app.UploadedFilesDirectory(), "1"))
+	_, err = fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
 	assert.Error(t, err, "the uploaded files directory should be removed")
 
-	_, err = fs.Stat(filepath.Join(app.UploadsDirectory(), "1"))
+	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1"))
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(filepath.Join(app.UploadsDirectory(), "1", "test.changes"))
+	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1", "test.changes"))
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(filepath.Join(app.UploadsDirectory(), "1", "test.dsc"))
+	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1", "test.dsc"))
 	assert.NoError(t, err)
 }

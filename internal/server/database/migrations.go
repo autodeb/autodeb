@@ -7,6 +7,7 @@ import (
 )
 
 func runMigrations(gormDB *gorm.DB) {
-	gormDB.AutoMigrate(&models.Upload{})
+	gormDB.AutoMigrate(&models.Job{})
 	gormDB.AutoMigrate(&models.PendingFileUpload{})
+	gormDB.AutoMigrate(&models.Upload{})
 }

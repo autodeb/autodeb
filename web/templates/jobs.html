@@ -1,0 +1,26 @@
+{{ define "title" }}Jobs{{ end }}
+
+{{ define "content" }}
+
+<p>This page lists all jobs:</p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Upload ID</th>
+    </tr>
+
+    {{ range $.Jobs }}
+    <tr>
+        <td>{{ .ID }}</td>
+        <td>{{ .Type }}</td>
+        <td>{{ .Status }}</td>
+        <td>{{ .UploadID }}</td>
+    </tr>
+    {{ end }}
+
+</table>
+
+{{ end }}

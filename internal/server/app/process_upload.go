@@ -94,6 +94,10 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 		return nil, err
 	}
 
+	if _, err := app.dataStore.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
+		return nil, err
+	}
+
 	destDir := filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID))
 
 	//Save the .changes file

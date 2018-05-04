@@ -1,5 +1,8 @@
 image: golang:1.10-stretch
 
+variables:
+    GIT_STRATEGY: clone
+
 before_script:
     - pwd
     - mkdir -p $GOPATH/src/salsa.debian.org/$CI_PROJECT_NAMESPACE

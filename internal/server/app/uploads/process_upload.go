@@ -1,4 +1,4 @@
-package app
+package uploads
 
 import (
 	"bufio"
@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/crypto/sha256"
-	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 
 	"pault.ag/go/debian/control"
@@ -36,7 +35,7 @@ func (err *uploadError) IsInputError() bool {
 }
 
 // ProcessUpload receives uploaded files
-func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) (*models.Upload, error) {
+func (man *Manager) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) (*models.Upload, error) {
 	// Clean the file name, ensure that it contains only a file name and
 	// that it isn't something shady like ../../filename.txt
 	_, uploadFileName := filepath.Split(uploadParameters.Filename)
@@ -45,15 +44,15 @@ func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Rea
 	isChanges := strings.HasSuffix(uploadFileName, ".changes")
 
 	if isChanges {
-		upload, err := app.processChangesUpload(uploadFileName, content)
+		upload, err := man.processChangesUpload(uploadFileName, content)
 		return upload, err
 	}
 
-	err := app.processFileUpload(uploadFileName, content)
+	err := man.processFileUpload(uploadFileName, content)
 	return nil, err
 }
 
-func (app *App) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
+func (man *Manager) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
 	contentBytes, err := ioutil.ReadAll(content)
 	if err != nil {
 		return nil, err
@@ -73,13 +72,13 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 
 	//Verify that we have all specified files
 	//otherwise, immediately reject the upload
-	pendingFileUploads, err := app.getChangesPendingFileUploads(changes)
+	pendingFileUploads, err := man.getChangesPendingFileUploads(changes)
 	if err != nil {
 		return nil, err
 	}
 
 	//Create the upload
-	upload, err := app.db.CreateUpload(
+	upload, err := man.db.CreateUpload(
 		changes.Source,
 		changes.Version.String(),
 		changes.Maintainer,
@@ -92,16 +91,16 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 	//Save the .changes file
 	if err := writeDataToDestInFS(
 		bytes.NewReader(contentBytes),
-		filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID)),
+		filepath.Join(man.UploadsDirectory(), fmt.Sprint(upload.ID)),
 		filename,
-		app.dataFS,
+		man.dataFS,
 	); err != nil {
 		return nil, err
 	}
 
 	//Move all files to the upload folder
 	for _, pendingFileUpload := range pendingFileUploads {
-		if err := app.movePendingFileUpload(pendingFileUpload, upload); err != nil {
+		if err := man.movePendingFileUpload(pendingFileUpload, upload); err != nil {
 			//At this point, it is too late to back down. We could have moved
 			//a PendingFileUpload already so we better finish moving what we can
 			//and just log the error.
@@ -111,7 +110,7 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 
 	//Create jobs. We do this at only after moving files
 	//because the job could be picked-up immediately.
-	if _, err := app.db.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
+	if _, err := man.db.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
 		return nil, err
 	}
 
@@ -120,9 +119,9 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 
 //movePendingFileUpload will move a pendingFileUpload to the upload directory
 //and mark the pending file upload as completed
-func (app *App) movePendingFileUpload(pendingFileUpload *models.PendingFileUpload, upload *models.Upload) error {
+func (man *Manager) movePendingFileUpload(pendingFileUpload *models.PendingFileUpload, upload *models.Upload) error {
 	sourceDir := filepath.Join(
-		app.UploadedFilesDirectory(),
+		man.UploadedFilesDirectory(),
 		fmt.Sprint(pendingFileUpload.ID),
 	)
 
@@ -132,31 +131,31 @@ func (app *App) movePendingFileUpload(pendingFileUpload *models.PendingFileUploa
 	)
 
 	dest := filepath.Join(
-		app.UploadsDirectory(),
+		man.UploadsDirectory(),
 		fmt.Sprint(upload.ID),
 		pendingFileUpload.Filename,
 	)
 
-	if err := app.dataFS.Rename(source, dest); err != nil {
+	if err := man.dataFS.Rename(source, dest); err != nil {
 		return fmt.Errorf("could not move %s to %s", source, dest)
 	}
 
 	pendingFileUpload.Completed = true
-	if err := app.db.UpdatePendingFileUpload(pendingFileUpload); err != nil {
+	if err := man.db.UpdatePendingFileUpload(pendingFileUpload); err != nil {
 		return fmt.Errorf("could not mark pendingFileUpload %v as completed", pendingFileUpload.ID)
 	}
 
-	app.dataFS.RemoveAll(sourceDir)
+	man.dataFS.RemoveAll(sourceDir)
 
 	return nil
 }
 
 //getChangedPendingFileUploads returns the pending file uploads associated with this changes file
-func (app *App) getChangesPendingFileUploads(changes *control.Changes) ([]*models.PendingFileUpload, error) {
+func (man *Manager) getChangesPendingFileUploads(changes *control.Changes) ([]*models.PendingFileUpload, error) {
 	var pendingFileUploads []*models.PendingFileUpload
 
 	for _, file := range changes.ChecksumsSha256 {
-		pendingFileUpload, err := app.db.GetPendingFileUpload(
+		pendingFileUpload, err := man.db.GetPendingFileUpload(
 			file.Filename,
 			file.Hash,
 			false,
@@ -182,7 +181,7 @@ func (app *App) getChangesPendingFileUploads(changes *control.Changes) ([]*model
 	return pendingFileUploads, nil
 }
 
-func (app *App) processFileUpload(filename string, content io.Reader) error {
+func (man *Manager) processFileUpload(filename string, content io.Reader) error {
 	// Save the upload to a temp file on the os's filesystem so that we can
 	// calculate the shasum
 	tmpfileName, err := writeToTempfile(content)
@@ -196,12 +195,12 @@ func (app *App) processFileUpload(filename string, content io.Reader) error {
 		return err
 	}
 
-	pendingFileUpload, err := app.db.CreatePendingFileUpload(filename, shasum, time.Now())
+	pendingFileUpload, err := man.db.CreatePendingFileUpload(filename, shasum, time.Now())
 	if err != nil {
 		return err
 	}
 
-	destDir := filepath.Join(app.UploadedFilesDirectory(), fmt.Sprint(pendingFileUpload.ID))
+	destDir := filepath.Join(man.UploadedFilesDirectory(), fmt.Sprint(pendingFileUpload.ID))
 
 	// Open the temporary file
 	tmpFile, err := os.Open(tmpfileName)
@@ -215,52 +214,8 @@ func (app *App) processFileUpload(filename string, content io.Reader) error {
 		tmpFile,
 		destDir,
 		filename,
-		app.dataFS,
+		man.dataFS,
 	)
 
 	return err
-}
-
-func writeDataToDestInFS(data io.Reader, destDir, destFileName string, fs filesystem.FS) error {
-	// Create the destination directory
-	if err := fs.MkdirAll(destDir, 0744); err != nil {
-		return err
-	}
-
-	// Create the destination file
-	destFile, err := fs.Create(filepath.Join(destDir, destFileName))
-	if err != nil {
-		fs.RemoveAll(destDir)
-		return err
-	}
-	defer destFile.Close()
-
-	// Write data
-	if _, err := io.Copy(destFile, data); err != nil {
-		destFile.Close()
-		fs.RemoveAll(destDir)
-	}
-
-	return nil
-}
-
-func writeToTempfile(data io.Reader) (string, error) {
-	// Create temp file
-	tmpfile, err := ioutil.TempFile("", "autodeb-upload")
-	if err != nil {
-		return "", err
-	}
-	defer tmpfile.Close()
-
-	filename := tmpfile.Name()
-
-	// Write data
-	_, err = io.Copy(tmpfile, data)
-	if err != nil {
-		tmpfile.Close()
-		os.Remove(filename)
-		return "", err
-	}
-
-	return filename, nil
 }

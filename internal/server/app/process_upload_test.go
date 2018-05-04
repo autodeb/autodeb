@@ -11,6 +11,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/apptest"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
 func TestProcessFileUpload(t *testing.T) {
@@ -104,7 +105,7 @@ func TestProcessChangesMissingFile(t *testing.T) {
 }
 
 func TestProcessChanges(t *testing.T) {
-	testApp, fs, _ := apptest.SetupTest(t)
+	testApp, fs, db := apptest.SetupTest(t)
 
 	upload, err := testApp.ProcessUpload(
 		&app.UploadParameters{
@@ -141,4 +142,14 @@ func TestProcessChanges(t *testing.T) {
 
 	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1", "test.dsc"))
 	assert.NoError(t, err)
+
+	jobs, err := db.GetAllJobs()
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(jobs))
+
+	job := jobs[0]
+	assert.Equal(t, uint(1), job.ID)
+	assert.Equal(t, uint(1), job.UploadID)
+	assert.Equal(t, models.JobTypeBuild, job.Type)
+	assert.Equal(t, models.JobStatusQueued, job.Status)
 }

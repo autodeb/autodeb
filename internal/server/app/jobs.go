@@ -6,5 +6,5 @@ import (
 
 // GetAllJobs returns all jobs
 func (app *App) GetAllJobs() ([]*models.Job, error) {
-	return app.dataStore.GetAllJobs()
+	return app.db.GetAllJobs()
 }

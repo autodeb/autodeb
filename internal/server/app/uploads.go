@@ -6,5 +6,5 @@ import (
 
 // GetAllUploads returns all uploads
 func (app *App) GetAllUploads() ([]*models.Upload, error) {
-	return app.dataStore.GetAllUploads()
+	return app.db.GetAllUploads()
 }

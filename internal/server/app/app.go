@@ -8,16 +8,16 @@ import (
 
 // App is an autodeb server application
 type App struct {
-	dataStore *database.Database
-	dataFS    filesystem.FS
+	db     *database.Database
+	dataFS filesystem.FS
 }
 
 // NewApp create an app from a configuration
-func NewApp(dataStore *database.Database, dataFS filesystem.FS) (*App, error) {
+func NewApp(db *database.Database, dataFS filesystem.FS) (*App, error) {
 
 	app := App{
-		dataStore: dataStore,
-		dataFS:    dataFS,
+		db:     db,
+		dataFS: dataFS,
 	}
 
 	if err := app.setupDataDirectory(); err != nil {

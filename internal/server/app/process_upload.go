@@ -79,7 +79,7 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 	}
 
 	//Create the upload
-	upload, err := app.dataStore.CreateUpload(
+	upload, err := app.db.CreateUpload(
 		changes.Source,
 		changes.Version.String(),
 		changes.Maintainer,
@@ -111,7 +111,7 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 
 	//Create jobs. We do this at only after moving files
 	//because the job could be picked-up immediately.
-	if _, err := app.dataStore.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
+	if _, err := app.db.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
 		return nil, err
 	}
 
@@ -142,7 +142,7 @@ func (app *App) movePendingFileUpload(pendingFileUpload *models.PendingFileUploa
 	}
 
 	pendingFileUpload.Completed = true
-	if err := app.dataStore.UpdatePendingFileUpload(pendingFileUpload); err != nil {
+	if err := app.db.UpdatePendingFileUpload(pendingFileUpload); err != nil {
 		return fmt.Errorf("could not mark pendingFileUpload %v as completed", pendingFileUpload.ID)
 	}
 
@@ -156,7 +156,7 @@ func (app *App) getChangesPendingFileUploads(changes *control.Changes) ([]*model
 	var pendingFileUploads []*models.PendingFileUpload
 
 	for _, file := range changes.ChecksumsSha256 {
-		pendingFileUpload, err := app.dataStore.GetPendingFileUpload(
+		pendingFileUpload, err := app.db.GetPendingFileUpload(
 			file.Filename,
 			file.Hash,
 			false,
@@ -196,7 +196,7 @@ func (app *App) processFileUpload(filename string, content io.Reader) error {
 		return err
 	}
 
-	pendingFileUpload, err := app.dataStore.CreatePendingFileUpload(filename, shasum, time.Now())
+	pendingFileUpload, err := app.db.CreatePendingFileUpload(filename, shasum, time.Now())
 	if err != nil {
 		return err
 	}

@@ -54,36 +54,31 @@ func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Rea
 }
 
 func (app *App) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
-	b, err := ioutil.ReadAll(content)
+	contentBytes, err := ioutil.ReadAll(content)
 	if err != nil {
 		return nil, err
 	}
 
+	//Parse the changes file
 	changes, err := control.ParseChanges(
-		bufio.NewReader(bytes.NewReader(b)),
+		bufio.NewReader(bytes.NewReader(contentBytes)),
 		"",
 	)
 	if err != nil {
 		return nil, &uploadError{err, true}
 	}
-
 	if len(changes.ChecksumsSha256) < 1 {
 		return nil, &uploadError{errors.New("changes has no SHA256 checksums"), true}
 	}
 
 	//Verify that we have all specified files
 	//otherwise, immediately reject the upload
-	var pendingFileUploads []*models.PendingFileUpload
-	for _, file := range changes.ChecksumsSha256 {
-		pendingFileUpload, err := app.dataStore.GetPendingFileUpload(file.Filename, file.Hash, false)
-		if err != nil {
-			return nil, err
-		} else if pendingFileUpload == nil {
-			return nil, &uploadError{fmt.Errorf("changes refers to unexisting file %s with hash %s", file.Filename, file.Hash), true}
-		}
-		pendingFileUploads = append(pendingFileUploads, pendingFileUpload)
+	pendingFileUploads, err := app.getChangesPendingFileUploads(changes)
+	if err != nil {
+		return nil, err
 	}
 
+	//Create the upload
 	upload, err := app.dataStore.CreateUpload(
 		changes.Source,
 		changes.Version.String(),
@@ -94,46 +89,97 @@ func (app *App) processChangesUpload(filename string, content io.Reader) (*model
 		return nil, err
 	}
 
-	if _, err := app.dataStore.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
-		return nil, err
-	}
-
-	destDir := filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID))
-
 	//Save the .changes file
 	if err := writeDataToDestInFS(
-		bytes.NewReader(b),
-		destDir,
+		bytes.NewReader(contentBytes),
+		filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID)),
 		filename,
 		app.dataFS,
 	); err != nil {
 		return nil, err
 	}
 
-	//Move all files to the upload folder and delete the pendingFileUploads
+	//Move all files to the upload folder
 	for _, pendingFileUpload := range pendingFileUploads {
-
-		sourceDir := filepath.Join(app.UploadedFilesDirectory(), fmt.Sprint(pendingFileUpload.ID))
-		source := filepath.Join(sourceDir, pendingFileUpload.Filename)
-		dest := filepath.Join(app.UploadsDirectory(), fmt.Sprint(upload.ID), pendingFileUpload.Filename)
-
-		if err := app.dataFS.Rename(source, dest); err != nil {
-			//At this point, it is too late to back down. We could have deleted
+		if err := app.movePendingFileUpload(pendingFileUpload, upload); err != nil {
+			//At this point, it is too late to back down. We could have moved
 			//a PendingFileUpload already so we better finish moving what we can
 			//and just log the error.
-			log.Printf("Couldn't move %s to %s\n", source, dest)
+			log.Printf("cannot move file upload: %v\n", err)
 		}
+	}
 
-		pendingFileUpload.Completed = true
-		if err := app.dataStore.UpdatePendingFileUpload(pendingFileUpload); err != nil {
-			// Not stopping, same reason as above.
-			log.Printf("Couldn't update pendingFileUpload %d\n", pendingFileUpload.ID)
-		}
-		app.dataFS.RemoveAll(sourceDir)
-
+	//Create jobs. We do this at only after moving files
+	//because the job could be picked-up immediately.
+	if _, err := app.dataStore.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
+		return nil, err
 	}
 
 	return upload, nil
+}
+
+//movePendingFileUpload will move a pendingFileUpload to the upload directory
+//and mark the pending file upload as completed
+func (app *App) movePendingFileUpload(pendingFileUpload *models.PendingFileUpload, upload *models.Upload) error {
+	sourceDir := filepath.Join(
+		app.UploadedFilesDirectory(),
+		fmt.Sprint(pendingFileUpload.ID),
+	)
+
+	source := filepath.Join(
+		sourceDir,
+		pendingFileUpload.Filename,
+	)
+
+	dest := filepath.Join(
+		app.UploadsDirectory(),
+		fmt.Sprint(upload.ID),
+		pendingFileUpload.Filename,
+	)
+
+	if err := app.dataFS.Rename(source, dest); err != nil {
+		return fmt.Errorf("could not move %s to %s", source, dest)
+	}
+
+	pendingFileUpload.Completed = true
+	if err := app.dataStore.UpdatePendingFileUpload(pendingFileUpload); err != nil {
+		return fmt.Errorf("could not mark pendingFileUpload %v as completed", pendingFileUpload.ID)
+	}
+
+	app.dataFS.RemoveAll(sourceDir)
+
+	return nil
+}
+
+//getChangedPendingFileUploads returns the pending file uploads associated with this changes file
+func (app *App) getChangesPendingFileUploads(changes *control.Changes) ([]*models.PendingFileUpload, error) {
+	var pendingFileUploads []*models.PendingFileUpload
+
+	for _, file := range changes.ChecksumsSha256 {
+		pendingFileUpload, err := app.dataStore.GetPendingFileUpload(
+			file.Filename,
+			file.Hash,
+			false,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if pendingFileUpload == nil {
+			return nil, &uploadError{
+				fmt.Errorf(
+					"changes refers to unexisting file %s with hash %s",
+					file.Filename,
+					file.Hash,
+				),
+				true,
+			}
+		}
+
+		pendingFileUploads = append(pendingFileUploads, pendingFileUpload)
+	}
+
+	return pendingFileUploads, nil
 }
 
 func (app *App) processFileUpload(filename string, content io.Reader) error {

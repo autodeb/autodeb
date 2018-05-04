@@ -15,10 +15,8 @@ func SetupTest(t *testing.T) (*app.App, filesystem.FS, *database.Database) {
 	dataFS := filesystem.NewMemMapFs()
 
 	db, err := database.NewDatabase(
-		&database.Config{
-			Driver:           "sqlite3",
-			ConnectionString: ":memory:",
-		},
+		"sqlite3",
+		":memory:",
 	)
 	require.NoError(t, err)
 

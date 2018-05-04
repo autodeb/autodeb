@@ -19,7 +19,7 @@ type Server struct {
 
 // NewServer creates a Server
 func NewServer(cfg *Config) (*Server, error) {
-	db, err := database.NewDatabase(cfg.Database)
+	db, err := database.NewDatabase(cfg.DB.Driver, cfg.DB.ConnectionString)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func NewServer(cfg *Config) (*Server, error) {
 		app,
 	)
 
-	httpServer, err := http.NewHTTPServer(router, cfg.HTTP)
+	httpServer, err := http.NewHTTPServer(cfg.HTTP.Address, cfg.HTTP.Port, router)
 	if err != nil {
 		return nil, err
 	}

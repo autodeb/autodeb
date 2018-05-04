@@ -14,11 +14,11 @@ type Server struct {
 }
 
 // NewHTTPServer starts a logged http server on the given address
-func NewHTTPServer(router http.Handler, cfg *ServerConfig) (*Server, error) {
+func NewHTTPServer(address string, port int, router http.Handler) (*Server, error) {
 	// Create the logged handler
 	loggedHandler := logHandler(router)
 
-	listenAddress := fmt.Sprintf("%s:%d", cfg.Address, cfg.Port)
+	listenAddress := fmt.Sprintf("%s:%d", address, port)
 
 	// Listen on the given address
 	listener, err := net.Listen("tcp", listenAddress)

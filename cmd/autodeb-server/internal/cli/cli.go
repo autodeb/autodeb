@@ -8,10 +8,8 @@ import (
 	"io"
 	"io/ioutil"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/logo"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
 // Run reads arguments and creates an autodeb server
@@ -67,11 +65,11 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 	fmt.Fprintf(writerOutput, "Starting autodeb API on %s:%d.\n", address, port)
 
 	cfg := &server.Config{
-		HTTP: &http.ServerConfig{
+		HTTP: server.HTTPServerConfig{
 			Address: address,
 			Port:    port,
 		},
-		Database: &database.Config{
+		DB: server.DBConfig{
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},

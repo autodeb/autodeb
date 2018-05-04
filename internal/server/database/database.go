@@ -14,9 +14,9 @@ type Database struct {
 }
 
 // NewDatabase creates a new database connection
-func NewDatabase(cfg *Config) (*Database, error) {
+func NewDatabase(driver, connectionString string) (*Database, error) {
 
-	gormDB, err := gorm.Open(cfg.Driver, cfg.ConnectionString)
+	gormDB, err := gorm.Open(driver, connectionString)
 	if err != nil {
 		return nil, err
 	}

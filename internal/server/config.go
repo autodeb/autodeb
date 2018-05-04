@@ -1,16 +1,23 @@
 package server
 
-import (
-	"salsa.debian.org/autodeb-team/autodeb/internal/http"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
-)
-
 // Config contains configuration for Server
 type Config struct {
-	HTTP                  *http.ServerConfig
-	Database              *database.Config
+	DB                    DBConfig
+	HTTP                  HTTPServerConfig
 	DataDirectory         string
 	TemplatesDirectory    string
 	StaticFilesDirectory  string
 	TemplatesCacheEnabled bool
+}
+
+// HTTPServerConfig holds configuration related to the HTTP server
+type HTTPServerConfig struct {
+	Address string
+	Port    int
+}
+
+// DBConfig holds configuration related to the database
+type DBConfig struct {
+	Driver           string
+	ConnectionString string
 }

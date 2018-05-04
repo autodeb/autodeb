@@ -7,8 +7,10 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
+//UploadParameters define upload options
 type UploadParameters = uploads.UploadParameters
 
+// ProcessUpload processes uploads
 func (app *App) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) (*models.Upload, error) {
 	return app.uploadsManager.ProcessUpload(uploadParameters, content)
 }

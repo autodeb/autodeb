@@ -3,6 +3,7 @@ all: fmt \
 	list-packages-with-newer-upstream-versions \
 	update-random-package \
 	autodeb-server \
+	autodeb-worker \
 	vet \
 	lint \
 	data
@@ -21,6 +22,9 @@ update-random-package: $(SOURCES) install
 
 autodeb-server: $(SOURCES) install
 	go build -v -o autodeb-server ${GO_IMPORT_PATH}/cmd/autodeb-server
+
+autodeb-worker: $(SOURCES) install
+	go build -v -o autodeb-worker ${GO_IMPORT_PATH}/cmd/autodeb-worker
 
 data:
 	mkdir data
@@ -55,6 +59,8 @@ clean:
 	# Binaries
 	rm -f list-packages-with-newer-upstream-versions
 	rm -f update-random-package
+	rm -f autodeb-server
+	rm -f autodeb-worker
 	rm -rf update-random-package-output-*
 
 	# Other things created by this Makefile

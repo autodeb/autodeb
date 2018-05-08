@@ -29,16 +29,16 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 	fs.IntVar(&port, "port", 8080, "port to listen to")
 
 	var templatesDirectory string
-	fs.StringVar(&templatesDirectory, "templates", "web/templates", "templates directory")
+	fs.StringVar(&templatesDirectory, "templates-directory", "web/templates", "templates directory")
 
 	var cacheTemplates bool
 	fs.BoolVar(&cacheTemplates, "cache-templates", true, "whether or not to cache templates")
 
 	var staticFilesDirectory string
-	fs.StringVar(&staticFilesDirectory, "static-files", "web/static", "static files directory")
+	fs.StringVar(&staticFilesDirectory, "static-files-directory", "web/static", "static files directory")
 
 	var dataDirectory string
-	fs.StringVar(&dataDirectory, "data", "data", "data directory")
+	fs.StringVar(&dataDirectory, "data-directory", "data", "data directory")
 
 	var databaseDriver string
 	fs.StringVar(&databaseDriver, "database-driver", "sqlite3", "database driver")

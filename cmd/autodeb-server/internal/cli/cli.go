@@ -50,8 +50,10 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 		return nil, err
 	}
 
-	if fs.NArg() > 0 {
-		return nil, fmt.Errorf("unrecognized argument: %s", fs.Arg(0))
+	for _, arg := range fs.Args() {
+		if arg != "" {
+			return nil, fmt.Errorf("unrecognized argument: %s", arg)
+		}
 	}
 
 	if h || help {

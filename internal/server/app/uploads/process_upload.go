@@ -72,7 +72,7 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 
 	//Verify that we have all specified files
 	//otherwise, immediately reject the upload
-	pendingFileUploads, err := man.getChangesPendingFileUploads(changes)
+	fileUploads, err := man.getChangesFileUploads(changes)
 	if err != nil {
 		return nil, err
 	}
@@ -99,10 +99,10 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 	}
 
 	//Move all files to the upload folder
-	for _, pendingFileUpload := range pendingFileUploads {
-		if err := man.movePendingFileUpload(pendingFileUpload, upload); err != nil {
+	for _, fileUpload := range fileUploads {
+		if err := man.moveFileUpload(fileUpload, upload); err != nil {
 			//At this point, it is too late to back down. We could have moved
-			//a PendingFileUpload already so we better finish moving what we can
+			//a FileUpload already so we better finish moving what we can
 			//and just log the error.
 			log.Printf("cannot move file upload: %v\n", err)
 		}
@@ -117,32 +117,32 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 	return upload, nil
 }
 
-//movePendingFileUpload will move a pendingFileUpload to the upload directory
-//and mark the pending file upload as completed
-func (man *Manager) movePendingFileUpload(pendingFileUpload *models.PendingFileUpload, upload *models.Upload) error {
+//moveFileUpload will move a FileUpload to the upload directory
+//and mark the FileUpload as completed
+func (man *Manager) moveFileUpload(fileUpload *models.FileUpload, upload *models.Upload) error {
 	sourceDir := filepath.Join(
 		man.UploadedFilesDirectory(),
-		fmt.Sprint(pendingFileUpload.ID),
+		fmt.Sprint(fileUpload.ID),
 	)
 
 	source := filepath.Join(
 		sourceDir,
-		pendingFileUpload.Filename,
+		fileUpload.Filename,
 	)
 
 	dest := filepath.Join(
 		man.UploadsDirectory(),
 		fmt.Sprint(upload.ID),
-		pendingFileUpload.Filename,
+		fileUpload.Filename,
 	)
 
 	if err := man.dataFS.Rename(source, dest); err != nil {
 		return fmt.Errorf("could not move %s to %s", source, dest)
 	}
 
-	pendingFileUpload.Completed = true
-	if err := man.db.UpdatePendingFileUpload(pendingFileUpload); err != nil {
-		return fmt.Errorf("could not mark pendingFileUpload %v as completed", pendingFileUpload.ID)
+	fileUpload.Completed = true
+	if err := man.db.UpdateFileUpload(fileUpload); err != nil {
+		return fmt.Errorf("could not mark fileUpload %v as completed", fileUpload.ID)
 	}
 
 	man.dataFS.RemoveAll(sourceDir)
@@ -150,12 +150,12 @@ func (man *Manager) movePendingFileUpload(pendingFileUpload *models.PendingFileU
 	return nil
 }
 
-//getChangedPendingFileUploads returns the pending file uploads associated with this changes file
-func (man *Manager) getChangesPendingFileUploads(changes *control.Changes) ([]*models.PendingFileUpload, error) {
-	var pendingFileUploads []*models.PendingFileUpload
+//getChangedFileUploads returns the FileUploads associated with this changes file
+func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.FileUpload, error) {
+	var pendingFileUploads []*models.FileUpload
 
 	for _, file := range changes.ChecksumsSha256 {
-		pendingFileUpload, err := man.db.GetPendingFileUpload(
+		pendingFileUpload, err := man.db.GetFileUpload(
 			file.Filename,
 			file.Hash,
 			false,
@@ -195,12 +195,12 @@ func (man *Manager) processFileUpload(filename string, content io.Reader) error 
 		return err
 	}
 
-	pendingFileUpload, err := man.db.CreatePendingFileUpload(filename, shasum, time.Now())
+	fileUpload, err := man.db.CreateFileUpload(filename, shasum, time.Now())
 	if err != nil {
 		return err
 	}
 
-	destDir := filepath.Join(man.UploadedFilesDirectory(), fmt.Sprint(pendingFileUpload.ID))
+	destDir := filepath.Join(man.UploadedFilesDirectory(), fmt.Sprint(fileUpload.ID))
 
 	// Open the temporary file
 	tmpFile, err := os.Open(tmpfileName)

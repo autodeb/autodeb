@@ -37,7 +37,7 @@ func TestProcessFileUpload(t *testing.T) {
 
 	expectedSHASum := "b6668cf8c46c7075e18215d922e7812ca082fa6cc34668d00a6c20aee4551fb6"
 
-	fileUpload, err := db.GetPendingFileUpload(
+	fileUpload, err := db.GetFileUpload(
 		"test.dsc",
 		expectedSHASum,
 		false,

@@ -4,9 +4,8 @@ import (
 	"time"
 )
 
-// PendingFileUpload is a file that has not yet been associated with
-// a source package upload
-type PendingFileUpload struct {
+// FileUpload is an individual file that was uploaded
+type FileUpload struct {
 	ID         uint
 	Filename   string
 	SHA256Sum  string

@@ -35,9 +35,9 @@ func (db *Database) GetAllUploads() ([]*models.Upload, error) {
 	return uploads, nil
 }
 
-// CreatePendingFileUpload will create a pending file upload
-func (db *Database) CreatePendingFileUpload(filename, sha256Sum string, uploadedAt time.Time) (*models.PendingFileUpload, error) {
-	fileUpload := &models.PendingFileUpload{
+// CreateFileUpload will create a pending file upload
+func (db *Database) CreateFileUpload(filename, sha256Sum string, uploadedAt time.Time) (*models.FileUpload, error) {
+	fileUpload := &models.FileUpload{
 		Filename:   filename,
 		SHA256Sum:  sha256Sum,
 		UploadedAt: uploadedAt,
@@ -51,12 +51,12 @@ func (db *Database) CreatePendingFileUpload(filename, sha256Sum string, uploaded
 	return fileUpload, nil
 }
 
-// GetPendingFileUpload will return the first pending file upload that matches
-func (db *Database) GetPendingFileUpload(filename, sha256Sum string, completed bool) (*models.PendingFileUpload, error) {
-	var fileUpload models.PendingFileUpload
+// GetFileUpload will return the first pending file upload that matches
+func (db *Database) GetFileUpload(filename, sha256Sum string, completed bool) (*models.FileUpload, error) {
+	var fileUpload models.FileUpload
 
 	query := db.gormDB.Where(
-		&models.PendingFileUpload{
+		&models.FileUpload{
 			Filename:  filename,
 			SHA256Sum: sha256Sum,
 			Completed: completed,
@@ -79,8 +79,8 @@ func (db *Database) GetPendingFileUpload(filename, sha256Sum string, completed b
 	return &fileUpload, nil
 }
 
-// UpdatePendingFileUpload will update a file upload
-func (db *Database) UpdatePendingFileUpload(fileUpload *models.PendingFileUpload) error {
+// UpdateFileUpload will update a file upload
+func (db *Database) UpdateFileUpload(fileUpload *models.FileUpload) error {
 	err := db.gormDB.Save(fileUpload).Error
 	return err
 }

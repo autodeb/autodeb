@@ -9,11 +9,14 @@ type JobType int
 
 // Job Type enum
 const (
-	JobTypeBuild JobType = iota
+	JobTypeUnknown JobType = iota
+	JobTypeBuild
 )
 
 func (jt JobType) String() string {
 	switch jt {
+	case JobTypeUnknown:
+		return "unknown"
 	case JobTypeBuild:
 		return "build"
 	default:
@@ -26,13 +29,19 @@ type JobStatus int
 
 // Job Status enum
 const (
-	JobStatusQueued JobStatus = iota
+	JobStatusUnknown JobStatus = iota
+	JobStatusQueued
+	JobStatusAssigned
 )
 
 func (js JobStatus) String() string {
 	switch js {
+	case JobStatusUnknown:
+		return "unknown"
 	case JobStatusQueued:
 		return "queued"
+	case JobStatusAssigned:
+		return "assigned"
 	default:
 		panic(fmt.Sprintf("Unknown job status %d", js))
 	}
@@ -40,8 +49,8 @@ func (js JobStatus) String() string {
 
 // Job is a builds a test, etc.
 type Job struct {
-	ID       uint
-	Type     JobType
-	Status   JobStatus
-	UploadID uint
+	ID       uint      `json:"id"`
+	Type     JobType   `json:"type"`
+	Status   JobStatus `json:"status"`
+	UploadID uint      `json:"upload_id"`
 }

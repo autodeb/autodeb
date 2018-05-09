@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/webpages"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
@@ -30,9 +31,13 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 	).Methods(http.MethodGet)
 
 	// Web pages
-	router.Path("/").Handler(indexGetHandler(renderer, app)).Methods(http.MethodGet)
-	router.Path("/uploads").Handler(uploadsGetHandler(renderer, app)).Methods(http.MethodGet)
-	router.Path("/jobs").Handler(jobsGetHandler(renderer, app)).Methods(http.MethodGet)
+	router.Path("/").Handler(webpages.IndexGetHandler(renderer, app)).Methods(http.MethodGet)
+	router.Path("/uploads").Handler(webpages.UploadsGetHandler(renderer, app)).Methods(http.MethodGet)
+	router.Path("/jobs").Handler(webpages.JobsGetHandler(renderer, app)).Methods(http.MethodGet)
+
+	// REST API Router
+	restAPIRouter := router.PathPrefix("/api/").Subrouter()
+	restAPIRouter.Path("/queue/next").Handler(queueNextPostHandler(renderer, app)).Methods(http.MethodPost)
 
 	return router
 }

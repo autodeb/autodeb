@@ -1,31 +1,32 @@
-package api
+package webpages
 
 import (
 	"fmt"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/internal/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-func uploadsGetHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
+//JobsGetHandler returns a handler that renders the jobs page
+func JobsGetHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		uploads, err := app.GetAllUploads()
+		jobs, err := app.GetAllJobs()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		data := struct {
-			Uploads []*models.Upload
+			Jobs []*models.Job
 		}{
-			Uploads: uploads,
+			Jobs: jobs,
 		}
 
-		rendered, err := renderer.RenderTemplate(data, "base.html", "uploads.html")
+		rendered, err := renderer.RenderTemplate(data, "base.html", "jobs.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

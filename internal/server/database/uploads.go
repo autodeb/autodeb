@@ -79,7 +79,7 @@ func (db *Database) GetPendingFileUpload(filename, sha256Sum string, completed b
 	return &fileUpload, nil
 }
 
-// UpdatePendingFileUpload will a file upload
+// UpdatePendingFileUpload will update a file upload
 func (db *Database) UpdatePendingFileUpload(fileUpload *models.PendingFileUpload) error {
 	err := db.gormDB.Save(fileUpload).Error
 	return err

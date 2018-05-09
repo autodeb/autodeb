@@ -1,11 +1,11 @@
-package uploads
+package uploadqueue
 
 import (
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploads/uploadparametersparser"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue/uploadparametersparser"
 )
 
 //UploadHandler returns a handler that accepts http package uploads

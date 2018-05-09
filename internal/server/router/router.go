@@ -10,7 +10,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploads"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/webpages"
 )
 
@@ -21,7 +21,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// Upload Queue
 	router.PathPrefix("/upload/").Handler(
-		http.StripPrefix("/upload/", uploads.UploadHandler(app)),
+		http.StripPrefix("/upload/", uploadqueue.UploadHandler(app)),
 	).Methods(http.MethodPut)
 
 	// Static files (for the web)

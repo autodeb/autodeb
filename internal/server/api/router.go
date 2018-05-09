@@ -37,7 +37,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()
-	restAPIRouter.Path("/queue/next").Handler(queueNextPostHandler(renderer, app)).Methods(http.MethodPost)
+	restAPIRouter.Path("/jobs/next").Handler(jobsNextPostHandler(renderer, app)).Methods(http.MethodPost)
 
 	return router
 }

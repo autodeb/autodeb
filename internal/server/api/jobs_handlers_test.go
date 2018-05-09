@@ -15,7 +15,7 @@ func TestNextJobNoJob(t *testing.T) {
 	testAPI := setupTest(t)
 
 	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(http.MethodPost, "/api/queue/next", nil)
+	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
 
 	testAPI.API.ServeHTTP(response, request)
 
@@ -28,7 +28,7 @@ func TestNextJob(t *testing.T) {
 	testAPI.Database.CreateJob(models.JobTypeBuild, uint(3))
 
 	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(http.MethodPost, "/api/queue/next", nil)
+	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
 
 	testAPI.API.ServeHTTP(response, request)
 

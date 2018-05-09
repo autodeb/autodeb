@@ -1,6 +1,6 @@
-// Package api provides the main router. It translates http requests to App
+// Package router provides the main router. It translates http requests to App
 // actions and creates http responses.
-package api
+package router
 
 import (
 	"net/http"
@@ -8,8 +8,10 @@ import (
 	"github.com/gorilla/mux"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/api/webpages"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploads"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/webpages"
 )
 
 // NewRouter creates the main router for the application.
@@ -19,7 +21,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// Upload API
 	router.PathPrefix("/upload/").Handler(
-		http.StripPrefix("/upload/", uploadHandler(app)),
+		http.StripPrefix("/upload/", uploads.UploadHandler(app)),
 	).Methods(http.MethodPut)
 
 	// Static files (for the web)
@@ -37,7 +39,10 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()
-	restAPIRouter.Path("/jobs/next").Handler(jobsNextPostHandler(app)).Methods(http.MethodPost)
+	//    Jobs
+	restAPIRouter.Path("/jobs/next").Handler(api.JobsNextPostHandler(app)).Methods(http.MethodPost)
+	//    Upload
+	//restAPIRouter.Path("/uploads/{id:[0-9]+}")).Handler()
 
 	return router
 }

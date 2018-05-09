@@ -1,4 +1,4 @@
-package api_test
+package routertest
 
 import (
 	"net/http"
@@ -6,22 +6,24 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/apptest"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 )
 
-type APITest struct {
+//RouterTest allows for testing the server's Router
+type RouterTest struct {
 	App         *app.App
 	DataFS      filesystem.FS
 	Database    *database.Database
 	TemplatesFS filesystem.FS
 	StaticFS    filesystem.FS
-	API         http.Handler
+	Router      http.Handler
 }
 
-func setupTest(t *testing.T) *APITest {
+// SetupTest returns a new RouterTest
+func SetupTest(t *testing.T) *RouterTest {
 	testApp, dataFS, db := apptest.SetupTest(t)
 
 	tmplFS := filesystem.NewMemMapFs()
@@ -29,20 +31,20 @@ func setupTest(t *testing.T) *APITest {
 
 	staticFS := filesystem.NewMemMapFs()
 
-	router := api.NewRouter(
+	router := router.NewRouter(
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
 		testApp,
 	)
 
-	apiTest := &APITest{
+	routerTest := &RouterTest{
 		App:         testApp,
 		DataFS:      dataFS,
 		Database:    db,
 		TemplatesFS: tmplFS,
 		StaticFS:    staticFS,
-		API:         router,
+		Router:      router,
 	}
 
-	return apiTest
+	return routerTest
 }

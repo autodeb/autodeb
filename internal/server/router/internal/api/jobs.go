@@ -9,10 +9,11 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
-func jobsNextPostHandler(app *app.App) http.Handler {
+//JobsNextPostHandler returns a handler that find the next job to run
+func JobsNextPostHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		job, err := app.GetNextJob()
+		job, err := app.UnqueueNextJob()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

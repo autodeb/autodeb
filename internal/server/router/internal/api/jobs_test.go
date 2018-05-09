@@ -7,30 +7,31 @@ import (
 	"testing"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNextJobNoJob(t *testing.T) {
-	testAPI := setupTest(t)
+	testRouter := routertest.SetupTest(t)
 
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
 
-	testAPI.API.ServeHTTP(response, request)
+	testRouter.Router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusNoContent, response.Result().StatusCode)
 	assert.Equal(t, response.Body.String(), "")
 }
 
 func TestNextJob(t *testing.T) {
-	testAPI := setupTest(t)
-	testAPI.Database.CreateJob(models.JobTypeBuild, uint(3))
+	testRouter := routertest.SetupTest(t)
+	testRouter.Database.CreateJob(models.JobTypeBuild, uint(3))
 
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
 
-	testAPI.API.ServeHTTP(response, request)
+	testRouter.Router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 

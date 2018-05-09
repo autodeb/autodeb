@@ -6,9 +6,9 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 )
 
 // Server is the main server. It has dput-compatible interface
@@ -46,7 +46,7 @@ func NewServer(cfg *Config) (*Server, error) {
 		return nil, err
 	}
 
-	router := api.NewRouter(
+	router := router.NewRouter(
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
 		app,

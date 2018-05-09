@@ -9,8 +9,8 @@ func (app *App) GetAllJobs() ([]*models.Job, error) {
 	return app.db.GetAllJobs()
 }
 
-// GetNextJob returns the next job and marks it as assigned
-func (app *App) GetNextJob() (*models.Job, error) {
+// UnqueueNextJob returns the next job and marks it as assigned
+func (app *App) UnqueueNextJob() (*models.Job, error) {
 	job, err := app.db.GetNextJob()
 	if err != nil {
 		return nil, err

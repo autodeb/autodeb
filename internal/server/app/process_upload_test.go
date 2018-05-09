@@ -37,13 +37,14 @@ func TestProcessFileUpload(t *testing.T) {
 
 	expectedSHASum := "b6668cf8c46c7075e18215d922e7812ca082fa6cc34668d00a6c20aee4551fb6"
 
-	fileUpload, err := db.GetFileUpload(
+	fileUpload, err := db.GetFileUploadByFileNameSHASumCompleted(
 		"test.dsc",
 		expectedSHASum,
 		false,
 	)
 	assert.NoError(t, err)
 	assert.NotNil(t, fileUpload)
+	assert.Equal(t, uint(0), fileUpload.UploadID)
 
 	assert.Equal(t, uint(1), fileUpload.ID)
 	assert.Equal(t, "test.dsc", fileUpload.Filename)
@@ -142,6 +143,11 @@ func TestProcessChanges(t *testing.T) {
 
 	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1", "test.dsc"))
 	assert.NoError(t, err)
+
+	fileUpload, err := db.GetFileUpload(uint(1))
+	assert.NoError(t, err)
+	assert.Equal(t, true, fileUpload.Completed)
+	assert.Equal(t, uint(1), fileUpload.UploadID)
 
 	jobs, err := db.GetAllJobs()
 	assert.NoError(t, err)

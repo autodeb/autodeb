@@ -11,4 +11,5 @@ type FileUpload struct {
 	SHA256Sum  string
 	UploadedAt time.Time
 	Completed  bool
+	UploadID   uint
 }

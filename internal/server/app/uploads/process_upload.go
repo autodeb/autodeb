@@ -141,6 +141,7 @@ func (man *Manager) moveFileUpload(fileUpload *models.FileUpload, upload *models
 	}
 
 	fileUpload.Completed = true
+	fileUpload.UploadID = upload.ID
 	if err := man.db.UpdateFileUpload(fileUpload); err != nil {
 		return fmt.Errorf("could not mark fileUpload %v as completed", fileUpload.ID)
 	}
@@ -155,7 +156,7 @@ func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.F
 	var fileUploads []*models.FileUpload
 
 	for _, file := range changes.ChecksumsSha256 {
-		fileUpload, err := man.db.GetFileUpload(
+		fileUpload, err := man.db.GetFileUploadByFileNameSHASumCompleted(
 			file.Filename,
 			file.Hash,
 			false,

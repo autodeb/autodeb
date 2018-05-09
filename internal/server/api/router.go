@@ -19,7 +19,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// Upload API
 	router.PathPrefix("/upload/").Handler(
-		http.StripPrefix("/upload/", uploadHandler(renderer, app)),
+		http.StripPrefix("/upload/", uploadHandler(app)),
 	).Methods(http.MethodPut)
 
 	// Static files (for the web)
@@ -37,7 +37,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()
-	restAPIRouter.Path("/jobs/next").Handler(jobsNextPostHandler(renderer, app)).Methods(http.MethodPost)
+	restAPIRouter.Path("/jobs/next").Handler(jobsNextPostHandler(app)).Methods(http.MethodPost)
 
 	return router
 }

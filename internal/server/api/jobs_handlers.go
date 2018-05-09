@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
-func jobsNextPostHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
+func jobsNextPostHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
 		job, err := app.GetNextJob()

@@ -152,10 +152,10 @@ func (man *Manager) moveFileUpload(fileUpload *models.FileUpload, upload *models
 
 //getChangedFileUploads returns the FileUploads associated with this changes file
 func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.FileUpload, error) {
-	var pendingFileUploads []*models.FileUpload
+	var fileUploads []*models.FileUpload
 
 	for _, file := range changes.ChecksumsSha256 {
-		pendingFileUpload, err := man.db.GetFileUpload(
+		fileUpload, err := man.db.GetFileUpload(
 			file.Filename,
 			file.Hash,
 			false,
@@ -164,7 +164,7 @@ func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.F
 			return nil, err
 		}
 
-		if pendingFileUpload == nil {
+		if fileUpload == nil {
 			return nil, &uploadError{
 				fmt.Errorf(
 					"changes refers to unexisting file %s with hash %s",
@@ -175,10 +175,10 @@ func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.F
 			}
 		}
 
-		pendingFileUploads = append(pendingFileUploads, pendingFileUpload)
+		fileUploads = append(fileUploads, fileUpload)
 	}
 
-	return pendingFileUploads, nil
+	return fileUploads, nil
 }
 
 func (man *Manager) processFileUpload(filename string, content io.Reader) error {

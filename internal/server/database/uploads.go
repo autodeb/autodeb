@@ -35,7 +35,7 @@ func (db *Database) GetAllUploads() ([]*models.Upload, error) {
 	return uploads, nil
 }
 
-// CreateFileUpload will create a pending file upload
+// CreateFileUpload will create a FileUpload
 func (db *Database) CreateFileUpload(filename, sha256Sum string, uploadedAt time.Time) (*models.FileUpload, error) {
 	fileUpload := &models.FileUpload{
 		Filename:   filename,
@@ -51,7 +51,7 @@ func (db *Database) CreateFileUpload(filename, sha256Sum string, uploadedAt time
 	return fileUpload, nil
 }
 
-// GetFileUpload will return the first pending file upload that matches
+// GetFileUpload will return the first FileUpload that matches
 func (db *Database) GetFileUpload(filename, sha256Sum string, completed bool) (*models.FileUpload, error) {
 	var fileUpload models.FileUpload
 

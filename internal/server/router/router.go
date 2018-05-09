@@ -19,7 +19,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	router := mux.NewRouter().StrictSlash(true)
 
-	// Upload API
+	// Upload Queue
 	router.PathPrefix("/upload/").Handler(
 		http.StripPrefix("/upload/", uploads.UploadHandler(app)),
 	).Methods(http.MethodPut)
@@ -39,10 +39,14 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()
-	//    Jobs
+
+	// ==== Jobs API ====
 	restAPIRouter.Path("/jobs/next").Handler(api.JobsNextPostHandler(app)).Methods(http.MethodPost)
-	//    Upload
-	//restAPIRouter.Path("/uploads/{id:[0-9]+}")).Handler()
+
+	// ==== Uploads API ====
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/dsc").Handler(api.UploadDSCGetHandler(app)).Methods(http.MethodGet)
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}.dsc").Handler(api.UploadDSCGetHandler(app)).Methods(http.MethodGet) // just so that we are compatible with dget
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/{filename}").Handler(api.UploadFileGetHandler(app)).Methods(http.MethodGet)
 
 	return router
 }

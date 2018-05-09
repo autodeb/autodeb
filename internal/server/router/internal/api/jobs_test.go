@@ -21,6 +21,7 @@ func TestNextJobNoJob(t *testing.T) {
 	testRouter.Router.ServeHTTP(response, request)
 
 	assert.Equal(t, http.StatusNoContent, response.Result().StatusCode)
+	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, response.Body.String(), "")
 }
 
@@ -33,6 +34,7 @@ func TestNextJob(t *testing.T) {
 
 	testRouter.Router.ServeHTTP(response, request)
 
+	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 
 	var job models.Job

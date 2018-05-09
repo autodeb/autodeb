@@ -80,3 +80,22 @@ func (db *Database) UpdateFileUpload(fileUpload *models.FileUpload) error {
 	err := db.gormDB.Save(fileUpload).Error
 	return err
 }
+
+// GetAllFileUploadsByUploadID returns all file uploads for an Upload
+func (db *Database) GetAllFileUploadsByUploadID(uploadID uint) ([]*models.FileUpload, error) {
+	var fileUploads []*models.FileUpload
+
+	query := db.gormDB.Model(
+		&models.FileUpload{},
+	).Where(
+		&models.FileUpload{
+			UploadID: uploadID,
+		},
+	)
+
+	if err := query.Find(&fileUploads).Error; err != nil {
+		return nil, err
+	}
+
+	return fileUploads, nil
+}

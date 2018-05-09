@@ -1,6 +1,8 @@
 package database
 
 import (
+	"github.com/jinzhu/gorm"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
@@ -29,4 +31,27 @@ func (db *Database) GetAllUploads() ([]*models.Upload, error) {
 	}
 
 	return uploads, nil
+}
+
+// GetUpload returns the Upload with the given id
+func (db *Database) GetUpload(id uint) (*models.Upload, error) {
+	var upload models.Upload
+
+	query := db.gormDB.Where(
+		&models.Upload{
+			ID: id,
+		},
+	)
+
+	err := query.First(&upload).Error
+
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &upload, nil
 }

@@ -2,14 +2,35 @@
 // dependencies injects them at the right place.
 package worker
 
+import (
+	"io"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
+)
+
 // Worker is the autodeb worker. It retrieves jobs from the main
 // server and executes them
 type Worker struct {
+	writerOutput io.Writer
+	writerError  io.Writer
+	apiClient    *apiclient.APIClient
 }
 
 // New creates a Worker
 func New(cfg *Config) (*Worker, error) {
-	worker := Worker{}
+
+	apiClient := apiclient.New(
+		cfg.ServerAddress,
+		cfg.ServerPort,
+	)
+
+	worker := Worker{
+		apiClient:    apiClient,
+		writerOutput: cfg.WriterOutput,
+		writerError:  cfg.WriterError,
+	}
+
+	go worker.run()
 
 	return &worker, nil
 }

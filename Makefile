@@ -67,7 +67,8 @@ clean:
 	rm -rf data
 	rm -f dependency-graph-autodeb-server.svg
 
-	# stuff produced at runtime
+	# stuff created at runtime
+	rm -rf jobs
 	rm -f database.sqlite
 
 ##

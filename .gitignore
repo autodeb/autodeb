@@ -8,6 +8,7 @@
 /data
 /dependency-graph-autodeb-server.svg
 
-# stuff produced at runtime
+# stuff created at runtime
+/jobs
 /update-random-package-output-*
 /database.sqlite

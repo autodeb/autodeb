@@ -6,7 +6,8 @@ import (
 
 // Config contains configuration for Worker
 type Config struct {
-	ServerURL    string
-	WriterOutput io.Writer
-	WriterError  io.Writer
+	ServerURL        string
+	WorkingDirectory string
+	WriterOutput     io.Writer
+	WriterError      io.Writer
 }

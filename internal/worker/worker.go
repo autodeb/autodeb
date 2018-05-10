@@ -3,7 +3,10 @@
 package worker
 
 import (
+	"errors"
 	"io"
+	"os"
+	"path/filepath"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
 )
@@ -11,23 +14,51 @@ import (
 // Worker is the autodeb worker. It retrieves jobs from the main
 // server and executes them
 type Worker struct {
-	writerOutput io.Writer
-	writerError  io.Writer
-	apiClient    *apiclient.APIClient
+	apiClient        *apiclient.APIClient
+	workingDirectory string
+	writerOutput     io.Writer
+	writerError      io.Writer
 }
 
 // New creates a Worker
 func New(cfg *Config) (*Worker, error) {
 
+	// Check that all fields are present
+	if cfg.ServerURL == "" {
+		return nil, errors.New("ServerURL is empty")
+	}
+	if cfg.WorkingDirectory == "" {
+		return nil, errors.New("WorkingDirectory is empty")
+	}
+	if cfg.WriterOutput == nil {
+		return nil, errors.New("WriterOutput is nil")
+	}
+	if cfg.WriterError == nil {
+		return nil, errors.New("WriterError is nil")
+	}
+
+	// Create the apiClient
 	apiClient, err := apiclient.New(cfg.ServerURL)
 	if err != nil {
 		return nil, err
 	}
 
+	// Set workingDirectory to the absolute path
+	workingDirectory, err := filepath.Abs(cfg.WorkingDirectory)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the workingDirectory
+	if err := os.MkdirAll(workingDirectory, 0755); err != nil {
+		return nil, err
+	}
+
 	worker := Worker{
-		apiClient:    apiClient,
-		writerOutput: cfg.WriterOutput,
-		writerError:  cfg.WriterError,
+		apiClient:        apiClient,
+		workingDirectory: workingDirectory,
+		writerOutput:     cfg.WriterOutput,
+		writerError:      cfg.WriterError,
 	}
 
 	go worker.run()
@@ -36,6 +67,6 @@ func New(cfg *Config) (*Worker, error) {
 }
 
 // Close will shutdown the worker
-func (srv *Worker) Close() error {
+func (w *Worker) Close() error {
 	return nil
 }

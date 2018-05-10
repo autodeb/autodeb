@@ -24,6 +24,9 @@ func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, 
 	var serverURL string
 	fs.StringVar(&serverURL, "server-url", "", "URL of the autodeb server")
 
+	var workingDirectory string
+	fs.StringVar(&workingDirectory, "working-directory", "jobs", "working directory for jobs")
+
 	if err := fs.Parse(args); err != nil {
 		return nil, err
 	}
@@ -45,9 +48,10 @@ func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, 
 	}
 
 	cfg := &worker.Config{
-		ServerURL:    serverURL,
-		WriterOutput: writerOutput,
-		WriterError:  writerError,
+		ServerURL:        serverURL,
+		WorkingDirectory: workingDirectory,
+		WriterOutput:     writerOutput,
+		WriterError:      writerError,
 	}
 
 	return cfg, nil

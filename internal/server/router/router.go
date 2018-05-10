@@ -45,7 +45,8 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 
 	// ==== Uploads API ====
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/dsc").Handler(api.UploadDSCGetHandler(app)).Methods(http.MethodGet)
-	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}.dsc").Handler(api.UploadDSCGetHandler(app)).Methods(http.MethodGet) // just so that we are compatible with dget
+	// This route is kept for dget compatibility. Dget requires that the URL ends with /<something>.dsc (TODO: open a bug)
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/source.dsc").Handler(api.UploadDSCGetHandler(app)).Methods(http.MethodGet)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/files").Handler(api.UploadFilesGetHandler(app)).Methods(http.MethodGet)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/{filename}").Handler(api.UploadFileGetHandler(app)).Methods(http.MethodGet)
 

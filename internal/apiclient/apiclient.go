@@ -12,11 +12,17 @@ import (
 //APIClient is a client for the autodeb-server REST API
 type APIClient struct {
 	baseURL    *url.URL
-	httpClient *http.Client
+	httpClient HTTPClient
+}
+
+//HTTPClient is needed for the APIClient to perform requests. Typically, it
+//would be an &http.Client.
+type HTTPClient interface {
+	Do(*http.Request) (*http.Response, error)
 }
 
 //New creates a new APIClient
-func New(serverURL string) (*APIClient, error) {
+func New(serverURL string, httpClient HTTPClient) (*APIClient, error) {
 	baseURL, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
@@ -24,10 +30,16 @@ func New(serverURL string) (*APIClient, error) {
 
 	apiClient := &APIClient{
 		baseURL:    baseURL,
-		httpClient: &http.Client{},
+		httpClient: httpClient,
 	}
 
 	return apiClient, nil
+}
+
+func (c *APIClient) url(path string) *url.URL {
+	relativeURL := &url.URL{Path: path}
+	absoluteURL := c.baseURL.ResolveReference(relativeURL)
+	return absoluteURL
 }
 
 func (c *APIClient) post(path string, body io.Reader) (*http.Response, error) {
@@ -47,8 +59,7 @@ func (c *APIClient) postJSON(path string, body io.Reader, v interface{}) (*http.
 }
 
 func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, error) {
-	relativeURL := &url.URL{Path: path}
-	absoluteURL := c.baseURL.ResolveReference(relativeURL)
+	absoluteURL := c.url(path)
 
 	fmt.Printf("%v %v\n", method, absoluteURL.String())
 

@@ -3,12 +3,13 @@ package worker
 import (
 	"fmt"
 	"time"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
 func (w *Worker) run() {
 
 	for {
-
 		// Wait a little bit before asking for a new job
 		fmt.Fprintln(w.writerOutput, "Waiting 10 seconds...")
 		time.Sleep(10 * time.Second)
@@ -17,12 +18,21 @@ func (w *Worker) run() {
 		job, err := w.apiClient.UnqueueNextJob()
 		if err != nil {
 			fmt.Fprintf(w.writerOutput, "Error: could not obtain new job: %v\n", err)
-		} else if job == nil {
-			fmt.Fprintf(w.writerOutput, "No job available.\n")
-		} else {
-			fmt.Fprintf(w.writerOutput, "Obtained job: %+v\n", job)
+			continue
 		}
+		if job == nil {
+			fmt.Fprintf(w.writerOutput, "No job available.\n")
+			continue
+		}
+		fmt.Fprintf(w.writerOutput, "Obtained job: %+v\n", job)
 
+		// Execute the job
+		switch job.Type {
+		case models.JobTypeBuild:
+			w.execBuild(job)
+		default:
+			fmt.Fprintf(w.writerOutput, "Unknown job type: %s\n", job.Type)
+		}
 	}
 
 }

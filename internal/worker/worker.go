@@ -5,6 +5,7 @@ package worker
 import (
 	"errors"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -38,7 +39,7 @@ func New(cfg *Config) (*Worker, error) {
 	}
 
 	// Create the apiClient
-	apiClient, err := apiclient.New(cfg.ServerURL)
+	apiClient, err := apiclient.New(cfg.ServerURL, &http.Client{})
 	if err != nil {
 		return nil, err
 	}

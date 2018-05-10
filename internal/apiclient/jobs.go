@@ -13,7 +13,7 @@ func (c *APIClient) UnqueueNextJob() (*models.Job, error) {
 	response, err := c.postJSON("/api/jobs/next", nil, &job)
 
 	// no job available, don't bother looking at the json decoding error
-	if response.StatusCode == http.StatusNoContent {
+	if response != nil && response.StatusCode == http.StatusNoContent {
 		return nil, nil
 	}
 

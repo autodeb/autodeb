@@ -1,5 +1,5 @@
 // Package cli is responsible for parsing command line arguments and creating
-// a server instance.
+// a server config.
 package cli
 
 import (
@@ -8,12 +8,11 @@ import (
 	"io"
 	"io/ioutil"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/logo"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server"
 )
 
-// Run reads arguments and creates an autodeb server
-func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, error) {
+// Parse reads arguments and creates an autodeb server config
+func Parse(args []string, writerOutput, writerError io.Writer) (*server.Config, error) {
 
 	fs := flag.NewFlagSet("autodeb-server", flag.ContinueOnError)
 	fs.SetOutput(ioutil.Discard)
@@ -62,10 +61,6 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 		return nil, nil
 	}
 
-	fmt.Fprintln(writerOutput, logo.Logo)
-
-	fmt.Fprintf(writerOutput, "Starting autodeb API on %s:%d.\n", address, port)
-
 	cfg := &server.Config{
 		HTTP: server.HTTPServerConfig{
 			Address: address,
@@ -81,10 +76,5 @@ func Run(args []string, writerOutput, writerError io.Writer) (*server.Server, er
 		TemplatesCacheEnabled: cacheTemplates,
 	}
 
-	srv, err := server.NewServer(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	return srv, nil
+	return cfg, nil
 }

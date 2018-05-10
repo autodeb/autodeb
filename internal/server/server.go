@@ -17,8 +17,8 @@ type Server struct {
 	httpServer *http.Server
 }
 
-// NewServer creates a Server
-func NewServer(cfg *Config) (*Server, error) {
+// New creates a Server
+func New(cfg *Config) (*Server, error) {
 	db, err := database.NewDatabase(cfg.DB.Driver, cfg.DB.ConnectionString)
 	if err != nil {
 		return nil, err

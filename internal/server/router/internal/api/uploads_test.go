@@ -1,12 +1,14 @@
 package api_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 
 	"github.com/stretchr/testify/assert"
@@ -76,4 +78,31 @@ func TestUploadFileGetHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "Hello", response.Body.String())
+}
+
+func TestUploadFilesGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	testRouter.Database.CreateFileUpload("test", "sum", time.Now())
+	fileUpload, _ := testRouter.Database.GetFileUpload(uint(1))
+	fileUpload.UploadID = uint(3)
+	fileUpload.Completed = true
+	err := testRouter.Database.UpdateFileUpload(fileUpload)
+
+	assert.NoError(t, err)
+
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/3/files", nil)
+
+	testRouter.Router.ServeHTTP(response, request)
+
+	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+
+	var fileUploads []models.FileUpload
+	err = json.Unmarshal(response.Body.Bytes(), &fileUploads)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(fileUploads))
+	assert.Equal(t, "test", fileUploads[0].Filename)
 }

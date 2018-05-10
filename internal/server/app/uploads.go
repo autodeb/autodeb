@@ -23,9 +23,18 @@ func (app *App) GetAllUploads() ([]*models.Upload, error) {
 	return app.db.GetAllUploads()
 }
 
+//GetAllFileUploadsByUploadID returns all FileUploads associated to an upload
+func (app *App) GetAllFileUploadsByUploadID(uploadID uint) ([]*models.FileUpload, error) {
+	fileUploads, err := app.db.GetAllFileUploadsByUploadID(uploadID)
+	if err != nil {
+		return nil, err
+	}
+	return fileUploads, nil
+}
+
 // GetUploadDSC returns the DSC of the upload with a matching id
 func (app *App) GetUploadDSC(uploadID uint) (io.ReadCloser, error) {
-	fileUploads, err := app.db.GetAllFileUploadsByUploadID(uploadID)
+	fileUploads, err := app.GetAllFileUploadsByUploadID(uploadID)
 	if err != nil {
 		return nil, err
 	}

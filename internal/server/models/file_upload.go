@@ -6,10 +6,10 @@ import (
 
 // FileUpload is an individual file that was uploaded
 type FileUpload struct {
-	ID         uint
-	Filename   string
-	SHA256Sum  string
-	UploadedAt time.Time
-	Completed  bool
-	UploadID   uint
+	ID         uint      `json:"id"`
+	Filename   string    `json:"filename"`
+	SHA256Sum  string    `json:"sha256sum"`
+	UploadedAt time.Time `json:"uploaded_at"`
+	Completed  bool      `json:"completed"`
+	UploadID   uint      `json:"upload_id"`
 }

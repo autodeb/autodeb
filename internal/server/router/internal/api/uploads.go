@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -38,6 +40,39 @@ func UploadDSCGetHandler(app *app.App) http.Handler {
 	}
 
 	handler = decorators.TextPlainHeaders(handler)
+
+	return http.HandlerFunc(handler)
+}
+
+//UploadFilesGetHandler returns a handler that lists all files for an upload
+func UploadFilesGetHandler(app *app.App) http.Handler {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		uploadID, err := strconv.Atoi(vars["uploadID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		fileUploads, err := app.GetAllFileUploadsByUploadID(uint(uploadID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		b, err := json.Marshal(fileUploads)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		jsonFileUploads := string(b)
+
+		fmt.Fprint(w, jsonFileUploads)
+	}
+
+	handler = decorators.JSONHeaders(handler)
 
 	return http.HandlerFunc(handler)
 }

@@ -24,34 +24,21 @@ func testSetup() *cliTest {
 	return &cliTest
 }
 
-func TestMissingServerAddress(t *testing.T) {
+func TestMissingServerURL(t *testing.T) {
 	cliTest := testSetup()
 
-	cfg, err := cliTest.Parse(
-		"-server-port", "1",
-	)
+	cfg, err := cliTest.Parse()
 
 	assert.Nil(t, cfg)
-	assert.EqualError(t, err, "missing argument: server-address")
-}
-
-func TestMissingServerPort(t *testing.T) {
-	cliTest := testSetup()
-
-	cfg, err := cliTest.Parse(
-		"-server-address", "test.com",
-	)
-
-	assert.Nil(t, cfg)
-	assert.EqualError(t, err, "missing argument: server-port")
+	assert.EqualError(t, err, "missing argument: server-url")
 }
 
 func TestEmptyArguments(t *testing.T) {
 	cliTest := testSetup()
 
 	cfg, err := cliTest.Parse(
-		"-server-address", "test.com",
-		"-server-port", "1",
+		"-server-url", "hello",
+		"",
 	)
 
 	assert.NotNil(t, cfg)

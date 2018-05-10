@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/dget"
+	"salsa.debian.org/autodeb-team/autodeb/internal/exec/dget"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 

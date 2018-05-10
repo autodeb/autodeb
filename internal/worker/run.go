@@ -29,7 +29,9 @@ func (w *Worker) run() {
 		// Execute the job
 		switch job.Type {
 		case models.JobTypeBuild:
-			w.execBuild(job)
+			if err := w.execBuild(job); err != nil {
+				fmt.Fprintf(w.writerOutput, "Job execution error: %v\n", err)
+			}
 		default:
 			fmt.Fprintf(w.writerOutput, "Unknown job type: %s\n", job.Type)
 		}

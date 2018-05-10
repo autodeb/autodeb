@@ -29,7 +29,7 @@ You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/a
 
 - ``autodeb-server``: This is the server component of the system. It provides a web interface, a REST API and dput-compatible interface.
 
-- ``autodeb-runner``: TODO. This executable is not yet available.
+- ``autodeb-worker``: This is the worker component of the system. It retrieves jobs from the main server and executes them.
 
 ## Getting started
 

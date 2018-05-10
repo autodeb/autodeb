@@ -21,11 +21,8 @@ func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, 
 	fs.BoolVar(&help, "help", false, "print usage information")
 	fs.BoolVar(&h, "h", false, "print usage information")
 
-	var serverAddress string
-	fs.StringVar(&serverAddress, "server-address", "", "address of the autodeb server")
-
-	var serverPort int
-	fs.IntVar(&serverPort, "server-port", 0, "port of the autodeb server")
+	var serverURL string
+	fs.StringVar(&serverURL, "server-url", "", "URL of the autodeb server")
 
 	if err := fs.Parse(args); err != nil {
 		return nil, err
@@ -43,19 +40,14 @@ func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, 
 		return nil, nil
 	}
 
-	if serverAddress == "" {
-		return nil, fmt.Errorf("missing argument: server-address")
-	}
-
-	if serverPort == 0 {
-		return nil, fmt.Errorf("missing argument: server-port")
+	if serverURL == "" {
+		return nil, fmt.Errorf("missing argument: server-url")
 	}
 
 	cfg := &worker.Config{
-		ServerAddress: serverAddress,
-		ServerPort:    serverPort,
-		WriterOutput:  writerOutput,
-		WriterError:   writerError,
+		ServerURL:    serverURL,
+		WriterOutput: writerOutput,
+		WriterError:  writerError,
 	}
 
 	return cfg, nil

@@ -19,10 +19,10 @@ type Worker struct {
 // New creates a Worker
 func New(cfg *Config) (*Worker, error) {
 
-	apiClient := apiclient.New(
-		cfg.ServerAddress,
-		cfg.ServerPort,
-	)
+	apiClient, err := apiclient.New(cfg.ServerURL)
+	if err != nil {
+		return nil, err
+	}
 
 	worker := Worker{
 		apiClient:    apiClient,

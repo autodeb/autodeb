@@ -11,12 +11,13 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-func (w *Worker) execBuild(job *models.Job) error {
+func (w *Worker) execBuild(job *models.Job) {
 	workingDirectory := filepath.Join(w.workingDirectory, fmt.Sprint(job.ID))
 
 	// Create the job directory
 	if err := os.Mkdir(workingDirectory, 0755); err != nil {
-		return err
+		w.submitFailure(job, err)
+		return
 	}
 
 	// Get the .dsc URL
@@ -24,25 +25,30 @@ func (w *Worker) execBuild(job *models.Job) error {
 
 	// Download the source
 	if err := dget.Dget(dscURL.String(), workingDirectory); err != nil {
-		return err
+		w.submitFailure(job, err)
+		return
 	}
 
 	// Find the source directory
 	dirs, err := getDirectories(workingDirectory)
 	if err != nil {
-		return err
+		w.submitFailure(job, err)
+		return
 	}
 	if numDirs := len(dirs); numDirs != 1 {
-		return fmt.Errorf("unexpected number of directories: %v", numDirs)
+		w.submitFailure(job, err)
+		return
 	}
 	sourceDirectory := filepath.Join(workingDirectory, dirs[0])
 
 	// Run sbuild
 	if err := sbuild.Build(sourceDirectory, w.writerOutput, w.writerError); err != nil {
-		return err
+		w.submitFailure(job, err)
+		return
 	}
 
-	return nil
+	w.submitSuccess(job)
+	return
 }
 
 //getDirectories returns a list of all directories in a directory

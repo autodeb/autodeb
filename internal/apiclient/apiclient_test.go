@@ -41,6 +41,9 @@ func (c *FakeHTTPClient) queueResponse(response *http.Response) {
 }
 
 func (c *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
+	// record the request
+	c.requests = append(c.requests, request)
+
 	// pop the next response
 	response := c.responses[0]
 	c.responses = c.responses[1:]

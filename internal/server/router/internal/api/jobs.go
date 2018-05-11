@@ -102,7 +102,6 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 		switch newStatus {
 		case models.JobStatusSuccess:
 		case models.JobStatusFailed:
-			break
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			return

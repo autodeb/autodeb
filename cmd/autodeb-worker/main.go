@@ -34,17 +34,11 @@ func main() {
 	}
 
 	// Handle SIGINT
-	go func() {
-		sigchan := make(chan os.Signal, 10)
-		signal.Notify(sigchan, os.Interrupt)
-		<-sigchan
-		fmt.Println("\nStopping worker...")
-		worker.Close()
-		os.Exit(0)
-	}()
-
-	// Wait for SIGINT
-	select {}
+	sigchan := make(chan os.Signal)
+	signal.Notify(sigchan, os.Interrupt)
+	<-sigchan
+	fmt.Println("\nStopping worker...")
+	worker.Close()
 }
 
 func printErrorAndExit(err error) {

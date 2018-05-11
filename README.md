@@ -68,4 +68,5 @@ Note that runtime dependencies of the scripts include:
 $ ./list-packages-with-newer-upstream-versions
 $ ./update-random-package
 $ ./autodeb-server
+$ ./autodeb-worker
 ```

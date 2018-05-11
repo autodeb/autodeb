@@ -17,7 +17,18 @@ type Logger interface {
 	Info(...interface{})
 	Infof(string, ...interface{})
 	PrefixLogger(string) Logger
+	SetLevel(Level)
 }
+
+// Level represents a logging level
+type Level = logrus.Level
+
+// Logging levels
+const (
+	ErrorLevel  Level = logrus.ErrorLevel
+	WaningLevel Level = logrus.WarnLevel
+	InfoLevel   Level = logrus.InfoLevel
+)
 
 type logger struct {
 	logger *logrus.Logger
@@ -38,6 +49,11 @@ func New(output io.Writer) Logger {
 // PrefixLogger returns a sub-logger that uses a prefix
 func (l *logger) PrefixLogger(prefix string) Logger {
 	return newPrefixLogger(l, prefix)
+}
+
+// SetLevel sets the logging level
+func (l *logger) SetLevel(level Level) {
+	l.SetLevel(level)
 }
 
 // Error logs an error message

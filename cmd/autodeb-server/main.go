@@ -28,7 +28,7 @@ func main() {
 	fmt.Fprintf(os.Stdout, "Starting autodeb API on %v:%d.\n", cfg.HTTP.Address, cfg.HTTP.Port)
 
 	// Start the server
-	srv, err := server.New(cfg)
+	srv, err := server.New(cfg, os.Stderr)
 	if err != nil {
 		printErrorAndExit(err)
 	}

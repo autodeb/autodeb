@@ -27,6 +27,11 @@ func (l *prefixLogger) PrefixLogger(prefix string) Logger {
 	return newPrefixLogger(l, prefix)
 }
 
+// SetLevel sets the logging level
+func (l *prefixLogger) SetLevel(level Level) {
+	l.SetLevel(level)
+}
+
 // Error logs an error message
 func (l *prefixLogger) Error(args ...interface{}) {
 	args = append([]interface{}{l.prefix}, args)

@@ -4,12 +4,12 @@ package worker
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
+	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 )
 
 // Worker is the autodeb worker. It retrieves jobs from the main
@@ -17,7 +17,7 @@ import (
 type Worker struct {
 	apiClient        *apiclient.APIClient
 	workingDirectory string
-	logger           *log.Logger
+	logger           log.Logger
 }
 
 // New creates a Worker
@@ -54,7 +54,7 @@ func New(cfg *Config) (*Worker, error) {
 	worker := Worker{
 		apiClient:        apiClient,
 		workingDirectory: workingDirectory,
-		logger:           log.New(cfg.WriterOutput, "", 0),
+		logger:           log.New(cfg.WriterOutput),
 	}
 
 	go worker.start()

@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"fmt"
 	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -17,9 +18,11 @@ func (w *Worker) start() {
 			workerQueue,
 			w.apiClient,
 			w.workingDirectory,
-			w.logger,
+			w.logger.PrefixLogger(
+				fmt.Sprintf("JobRunner#%d", runnerCount),
+			),
 		)
-		w.logger.Printf("Starting runner #%d:\n", runnerCount)
+		w.logger.Infof("Starting runner #%d:", runnerCount)
 		go jobRunner.Start()
 	}
 
@@ -31,18 +34,18 @@ func (w *Worker) start() {
 				// Try to get fetch a job
 				job, err := w.apiClient.UnqueueNextJob()
 				if err != nil {
-					w.logger.Printf("Error: could not obtain new job: %v\n", err)
+					w.logger.Error("Could not obtain new job: %v", err)
 					time.Sleep(10 * time.Second)
 					continue
 				}
 				if job == nil {
-					w.logger.Printf("No job available.\n")
+					w.logger.Infof("No job available.")
 					time.Sleep(10 * time.Second)
 					continue
 				}
 
 				// Give the job to the worker
-				w.logger.Printf("Obtained job: %+v\n", job)
+				w.logger.Infof("Obtained job: %+v", job)
 				jobs <- job
 				break
 			}

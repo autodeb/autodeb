@@ -1,10 +1,8 @@
 package jobrunner
 
 import (
-	"fmt"
-	"log"
-
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
+	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
@@ -13,11 +11,11 @@ type JobRunner struct {
 	apiClient        *apiclient.APIClient
 	workerQueue      chan chan *models.Job
 	workingDirectory string
-	logger           *log.Logger
+	logger           log.Logger
 }
 
 //New creates a new JobRunner
-func New(workerQueue chan chan *models.Job, apiClient *apiclient.APIClient, workingDirectory string, logger *log.Logger) *JobRunner {
+func New(workerQueue chan chan *models.Job, apiClient *apiclient.APIClient, workingDirectory string, logger log.Logger) *JobRunner {
 	jobRunner := &JobRunner{
 		workerQueue:      workerQueue,
 		apiClient:        apiClient,
@@ -38,7 +36,7 @@ func (jobRunner *JobRunner) Start() {
 		// Wait for a job
 		select {
 		case job := <-jobs:
-			fmt.Printf("received job %v", job)
+			jobRunner.logger.Infof("received job %v", job)
 			jobRunner.execJob(job)
 		}
 	}
@@ -50,6 +48,6 @@ func (jobRunner *JobRunner) execJob(job *models.Job) {
 	case models.JobTypeBuild:
 		jobRunner.execBuild(job)
 	default:
-		fmt.Printf("Unknown job type: %s\n", job.Type)
+		jobRunner.logger.Errorf("Unknown job type: %s", job.Type)
 	}
 }

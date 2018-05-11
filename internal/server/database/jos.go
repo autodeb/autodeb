@@ -8,17 +8,17 @@ import (
 
 // CreateJob will create a job
 func (db *Database) CreateJob(jobType models.JobType, uploadID uint) (*models.Job, error) {
-	upload := &models.Job{
+	job := &models.Job{
 		Type:     jobType,
 		UploadID: uploadID,
 		Status:   models.JobStatusQueued,
 	}
 
-	if err := db.gormDB.Create(upload).Error; err != nil {
+	if err := db.gormDB.Create(job).Error; err != nil {
 		return nil, err
 	}
 
-	return upload, nil
+	return job, nil
 }
 
 // GetAllJobs returns all jobs
@@ -30,6 +30,29 @@ func (db *Database) GetAllJobs() ([]*models.Job, error) {
 	}
 
 	return jobs, nil
+}
+
+// GetJob returns the Job with the given id
+func (db *Database) GetJob(id uint) (*models.Job, error) {
+	var job models.Job
+
+	query := db.gormDB.Where(
+		&models.Job{
+			ID: id,
+		},
+	)
+
+	err := query.First(&job).Error
+
+	if gorm.IsRecordNotFoundError(err) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &job, nil
 }
 
 // UpdateJob will update a job

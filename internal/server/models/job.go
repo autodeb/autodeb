@@ -32,6 +32,8 @@ const (
 	JobStatusUnknown JobStatus = iota
 	JobStatusQueued
 	JobStatusAssigned
+	JobStatusPassed
+	JobStatusFailed
 )
 
 func (js JobStatus) String() string {
@@ -42,6 +44,10 @@ func (js JobStatus) String() string {
 		return "queued"
 	case JobStatusAssigned:
 		return "assigned"
+	case JobStatusPassed:
+		return "passed"
+	case JobStatusFailed:
+		return "failed"
 	default:
 		panic(fmt.Sprintf("Unknown job status %d", js))
 	}

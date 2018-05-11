@@ -27,3 +27,12 @@ func (app *App) UnqueueNextJob() (*models.Job, error) {
 
 	return job, err
 }
+
+// GetJob returns the job with the given id
+func (app *App) GetJob(id uint) (*models.Job, error) {
+	job, err := app.db.GetJob(id)
+	if err != nil {
+		return nil, err
+	}
+	return job, nil
+}

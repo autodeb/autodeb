@@ -16,7 +16,7 @@ import (
 type RouterTest struct {
 	App         *app.App
 	DataFS      filesystem.FS
-	Database    *database.Database
+	DB          *database.Database
 	TemplatesFS filesystem.FS
 	StaticFS    filesystem.FS
 	Router      http.Handler
@@ -40,7 +40,7 @@ func SetupTest(t *testing.T) *RouterTest {
 	routerTest := &RouterTest{
 		App:         testApp,
 		DataFS:      dataFS,
-		Database:    db,
+		DB:          db,
 		TemplatesFS: tmplFS,
 		StaticFS:    staticFS,
 		Router:      router,

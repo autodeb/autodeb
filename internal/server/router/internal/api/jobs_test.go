@@ -15,7 +15,7 @@ import (
 
 func TestJobsNextPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
-	testRouter.Database.CreateJob(models.JobTypeBuild, uint(3))
+	testRouter.DB.CreateJob(models.JobTypeBuild, uint(3))
 
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
@@ -55,7 +55,7 @@ func TestJobsNextPostHandlerNoJob(t *testing.T) {
 func TestJobGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	_, err := testRouter.Database.CreateJob(models.JobTypeBuild, 1)
+	_, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
 
 	response := httptest.NewRecorder()
@@ -91,7 +91,7 @@ func TestJobGetHandlerNotFound(t *testing.T) {
 func TestJobStatusPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	job, err := testRouter.Database.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
 	assert.NotEqual(t, models.JobStatusFailed, job.Status)
 

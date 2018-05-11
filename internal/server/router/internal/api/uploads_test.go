@@ -27,14 +27,14 @@ func TestUploadDSCGetHandler(t *testing.T) {
 	dsc.Write([]byte("Hello"))
 	dsc.Close()
 
-	testRouter.Database.CreateFileUpload("test.dsc", "shasum", time.Now())
+	testRouter.DB.CreateFileUpload("test.dsc", "shasum", time.Now())
 
-	fileUpload, err := testRouter.Database.GetFileUpload(uint(1))
+	fileUpload, err := testRouter.DB.GetFileUpload(uint(1))
 	assert.NotNil(t, fileUpload)
 	assert.NoError(t, err)
 
 	fileUpload.UploadID = 1
-	err = testRouter.Database.UpdateFileUpload(fileUpload)
+	err = testRouter.DB.UpdateFileUpload(fileUpload)
 	assert.NoError(t, err)
 
 	response := httptest.NewRecorder()
@@ -83,11 +83,11 @@ func TestUploadFileGetHandler(t *testing.T) {
 func TestUploadFilesGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	testRouter.Database.CreateFileUpload("test", "sum", time.Now())
-	fileUpload, _ := testRouter.Database.GetFileUpload(uint(1))
+	testRouter.DB.CreateFileUpload("test", "sum", time.Now())
+	fileUpload, _ := testRouter.DB.GetFileUpload(uint(1))
 	fileUpload.UploadID = uint(3)
 	fileUpload.Completed = true
-	err := testRouter.Database.UpdateFileUpload(fileUpload)
+	err := testRouter.DB.UpdateFileUpload(fileUpload)
 
 	assert.NoError(t, err)
 

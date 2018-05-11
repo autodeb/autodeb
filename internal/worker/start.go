@@ -34,7 +34,7 @@ func (w *Worker) start() {
 				// Try to get fetch a job
 				job, err := w.apiClient.UnqueueNextJob()
 				if err != nil {
-					w.logger.Error("Could not obtain new job: %v", err)
+					w.logger.Errorf("Could not obtain new job: %v", err)
 					time.Sleep(10 * time.Second)
 					continue
 				}

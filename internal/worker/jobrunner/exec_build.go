@@ -1,4 +1,4 @@
-package worker
+package jobrunner
 
 import (
 	"fmt"
@@ -11,44 +11,43 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-func (w *Worker) execBuild(job *models.Job) {
-	workingDirectory := filepath.Join(w.workingDirectory, fmt.Sprint(job.ID))
+func (jobRunner *JobRunner) execBuild(job *models.Job) {
+	workingDirectory := filepath.Join(jobRunner.workingDirectory, fmt.Sprint(job.ID))
 
 	// Create the job directory
 	if err := os.Mkdir(workingDirectory, 0755); err != nil {
-		w.submitFailure(job, err)
+		jobRunner.submitFailure(job, err)
 		return
 	}
 
 	// Get the .dsc URL
-	dscURL := w.apiClient.GetUploadDSCURL(job.UploadID)
+	dscURL := jobRunner.apiClient.GetUploadDSCURL(job.UploadID)
 
 	// Download the source
 	if err := dget.Dget(dscURL.String(), workingDirectory); err != nil {
-		w.submitFailure(job, err)
+		jobRunner.submitFailure(job, err)
 		return
 	}
 
 	// Find the source directory
 	dirs, err := getDirectories(workingDirectory)
 	if err != nil {
-		w.submitFailure(job, err)
+		jobRunner.submitFailure(job, err)
 		return
 	}
 	if numDirs := len(dirs); numDirs != 1 {
-		w.submitFailure(job, err)
+		jobRunner.submitFailure(job, err)
 		return
 	}
 	sourceDirectory := filepath.Join(workingDirectory, dirs[0])
 
 	// Run sbuild
-	if err := sbuild.Build(sourceDirectory, w.writerOutput, w.writerError); err != nil {
-		w.submitFailure(job, err)
+	if err := sbuild.Build(sourceDirectory, os.Stdout, os.Stderr); err != nil {
+		jobRunner.submitFailure(job, err)
 		return
 	}
 
-	w.submitSuccess(job)
-	return
+	jobRunner.submitSuccess(job)
 }
 
 //getDirectories returns a list of all directories in a directory

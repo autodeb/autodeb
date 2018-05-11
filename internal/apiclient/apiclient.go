@@ -3,7 +3,6 @@ package apiclient
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -60,8 +59,6 @@ func (c *APIClient) postJSON(path string, body io.Reader, v interface{}) (*http.
 
 func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, error) {
 	absoluteURL := c.url(path)
-
-	fmt.Printf("%v %v\n", method, absoluteURL.String())
 
 	request, err := http.NewRequest(method, absoluteURL.String(), body)
 	if err != nil {

@@ -51,7 +51,6 @@ func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, 
 		ServerURL:        serverURL,
 		WorkingDirectory: workingDirectory,
 		WriterOutput:     writerOutput,
-		WriterError:      writerError,
 	}
 
 	return cfg, nil

@@ -4,7 +4,7 @@ package worker
 
 import (
 	"errors"
-	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,12 +13,11 @@ import (
 )
 
 // Worker is the autodeb worker. It retrieves jobs from the main
-// server and executes them
+// server and passes them to JobRunners that will execute them
 type Worker struct {
 	apiClient        *apiclient.APIClient
 	workingDirectory string
-	writerOutput     io.Writer
-	writerError      io.Writer
+	logger           *log.Logger
 }
 
 // New creates a Worker
@@ -33,9 +32,6 @@ func New(cfg *Config) (*Worker, error) {
 	}
 	if cfg.WriterOutput == nil {
 		return nil, errors.New("WriterOutput is nil")
-	}
-	if cfg.WriterError == nil {
-		return nil, errors.New("WriterError is nil")
 	}
 
 	// Create the apiClient
@@ -58,11 +54,10 @@ func New(cfg *Config) (*Worker, error) {
 	worker := Worker{
 		apiClient:        apiClient,
 		workingDirectory: workingDirectory,
-		writerOutput:     cfg.WriterOutput,
-		writerError:      cfg.WriterError,
+		logger:           log.New(cfg.WriterOutput, "", 0),
 	}
 
-	go worker.run()
+	go worker.start()
 
 	return &worker, nil
 }

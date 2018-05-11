@@ -9,5 +9,4 @@ type Config struct {
 	ServerURL        string
 	WorkingDirectory string
 	WriterOutput     io.Writer
-	WriterError      io.Writer
 }

@@ -65,7 +65,7 @@ clean:
 
 	# Other things created by this Makefile
 	rm -rf data
-	rm -f dependency-graph-autodeb-server.svg
+	rm -f dependency-graph-*.svg
 
 	# stuff created at runtime
 	rm -rf jobs
@@ -75,9 +75,13 @@ clean:
 ## Misc
 ##
 
-dependency-graph-autodeb-server.svg: $(SOURCES)
-	go get github.com/kisielk/godepgraph
-	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph-autodeb-server.svg
+.PHONY: dependency-graphs
+dependency-graphs:
 	# This would also work:
 	#    go get github.com/davecheney/graphpkg
 	#    $(GOPATH)/bin/graphpkg -stdout -match '$(GO_IMPORT_PATH)' $(GO_IMPORT_PATH)/cmd/autodeb-server > dependency-graph-autodeb-server.svg
+	go get github.com/kisielk/godepgraph
+	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH)/internal/server $(GO_IMPORT_PATH)/internal/server | dot -Tsvg > dependency-graph-server.svg
+	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH)/internal/worker $(GO_IMPORT_PATH)/internal/worker | dot -Tsvg > dependency-graph-worker.svg
+	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-server | dot -Tsvg > dependency-graph-autodeb-server.svg
+	$(GOPATH)/bin/godepgraph -o $(GO_IMPORT_PATH) $(GO_IMPORT_PATH)/cmd/autodeb-worker | dot -Tsvg > dependency-graph-autodeb-worker.svg

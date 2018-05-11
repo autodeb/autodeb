@@ -22,8 +22,8 @@ pages:
         - apt-get update
         - apt-get install -y graphviz
         - mkdir public
-        - make dependency-graph-autodeb-server.svg
-        - mv dependency-graph-autodeb-server.svg public/dependency-graph-autodeb-server.svg
+        - make dependency-graphs
+        - mv dependency-*.svg public/
         - mv public /builds/autodeb-team/autodeb/public
     artifacts:
         paths:

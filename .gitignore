@@ -6,7 +6,7 @@
 
 # Other things created by the Makefile
 /data
-/dependency-graph-autodeb-server.svg
+/dependency-graph-*.svg
 
 # stuff created at runtime
 /jobs

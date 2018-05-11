@@ -15,7 +15,11 @@ You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/a
 ## Documentation
 
  - [Getting started](#getting-started): everything you need to know to build autodeb
- - [autodeb-server dependency graph](https://autodeb-team.pages.debian.net/autodeb/dependency-graph-autodeb-server.svg): helpful to understand the autodeb-server software architecture
+ - dependency graphs (helpful to understand the software architecture):
+   + [cmd/autodeb-server](https://autodeb-team.pages.debian.net/autodeb/dependency-graph-autodeb-server.svg): full dependency graph for autodeb-server
+   + [cmd/autodeb-worker](https://autodeb-team.pages.debian.net/autodeb/dependency-graph-autodeb-worker.svg): full dependency graph for autodeb-worker
+   + [internal/server](https://autodeb-team.pages.debian.net/autodeb/dependency-graph-server.svg): dependency graph for the server package (easier to read)
+   + [internal/worker](https://autodeb-team.pages.debian.net/autodeb/dependency-graph-worker.svg): dependency graph for the worker package (easier to read)
  - [godoc](https://godoc.org/salsa.debian.org/autodeb-team/autodeb): code documentation
  - [Packaging (other repository)](https://salsa.debian.org/autodeb-team/autodeb-packaging/blob/master/debian/README.md): Debian packaging for autodeb
  - [Infrastructure (other repository)](https://salsa.debian.org/autodeb-team/infrastructure): Contains the ansible scripts for auto.debian.net

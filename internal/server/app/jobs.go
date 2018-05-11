@@ -36,3 +36,8 @@ func (app *App) GetJob(id uint) (*models.Job, error) {
 	}
 	return job, nil
 }
+
+// UpdateJob will update a job
+func (app *App) UpdateJob(job *models.Job) error {
+	return app.db.UpdateJob(job)
+}

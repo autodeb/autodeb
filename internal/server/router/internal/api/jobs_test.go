@@ -2,6 +2,7 @@ package api_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -85,4 +86,28 @@ func TestJobGetHandlerNotFound(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, response.Body.String(), "")
+}
+
+func TestJobStatusPostHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	job, err := testRouter.Database.CreateJob(models.JobTypeBuild, 1)
+	assert.NoError(t, err)
+	assert.NotEqual(t, models.JobStatusFailed, job.Status)
+
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(
+		http.MethodPost,
+		fmt.Sprintf("/api/jobs/1/status/%d", models.JobStatusFailed),
+		nil,
+	)
+
+	testRouter.Router.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+
+	job, err = testRouter.App.GetJob(1)
+
+	assert.NoError(t, err)
+	assert.Equal(t, models.JobStatusFailed, job.Status)
 }

@@ -32,7 +32,7 @@ const (
 	JobStatusUnknown JobStatus = iota
 	JobStatusQueued
 	JobStatusAssigned
-	JobStatusPassed
+	JobStatusSuccess
 	JobStatusFailed
 )
 
@@ -44,8 +44,8 @@ func (js JobStatus) String() string {
 		return "queued"
 	case JobStatusAssigned:
 		return "assigned"
-	case JobStatusPassed:
-		return "passed"
+	case JobStatusSuccess:
+		return "success"
 	case JobStatusFailed:
 		return "failed"
 	default:

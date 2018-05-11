@@ -10,6 +10,7 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
 //JobsNextPostHandler returns a handler that find the next job to run
@@ -75,6 +76,57 @@ func JobGetHandler(app *app.App) http.Handler {
 	}
 
 	handler = decorators.JSONHeaders(handler)
+
+	return http.HandlerFunc(handler)
+}
+
+//JobStatusPostHandler returns a handler that sets the job status
+func JobStatusPostHandler(app *app.App) http.Handler {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+
+		// Get input values
+		vars := mux.Vars(r)
+		jobID, err := strconv.Atoi(vars["jobID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		jobStatus, err := strconv.Atoi(vars["jobStatus"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Validate the new status
+		newStatus := models.JobStatus(jobStatus)
+		switch newStatus {
+		case models.JobStatusSuccess:
+		case models.JobStatusFailed:
+			break
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// Get the job
+		job, err := app.GetJob(uint(jobID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if job == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		// Update the job
+		job.Status = newStatus
+		if err := app.UpdateJob(job); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+	}
 
 	return http.HandlerFunc(handler)
 }

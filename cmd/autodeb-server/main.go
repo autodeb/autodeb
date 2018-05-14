@@ -56,8 +56,7 @@ func main() {
 
 	// Shutdown the server, this blocks until the shutdown is complete
 	// or until we cancel the context
-	err = srv.Shutdown(ctx)
-	if err != nil {
+	if err := srv.Shutdown(ctx); err != nil {
 		fmt.Println(err)
 	}
 }

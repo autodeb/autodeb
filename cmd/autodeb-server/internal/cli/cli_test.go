@@ -12,11 +12,10 @@ import (
 
 type cliTest struct {
 	outputWriter bytes.Buffer
-	errorWriter  bytes.Buffer
 }
 
 func (cliTest *cliTest) Parse(args ...string) (*server.Config, error) {
-	return cli.Parse(args, &cliTest.outputWriter, &cliTest.errorWriter)
+	return cli.Parse(args, &cliTest.outputWriter)
 }
 
 func testSetup() *cliTest {

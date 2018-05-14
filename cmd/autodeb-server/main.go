@@ -17,7 +17,7 @@ func main() {
 	args := os.Args[1:]
 
 	// Parse the command-line args
-	cfg, err := cli.Parse(args, os.Stdout, os.Stderr)
+	cfg, err := cli.Parse(args, os.Stdout)
 	if err != nil {
 		printErrorAndExit(err)
 	}

@@ -16,7 +16,7 @@ func main() {
 	args := os.Args[1:]
 
 	// Parse the command-line args
-	cfg, err := cli.Parse(args, os.Stdout, os.Stderr)
+	cfg, err := cli.Parse(args, os.Stdout)
 	if err != nil {
 		printErrorAndExit(err)
 	}
@@ -28,7 +28,7 @@ func main() {
 	fmt.Fprintln(os.Stdout, "Starting autodeb worker.")
 
 	// Start the server
-	worker, err := worker.New(cfg)
+	worker, err := worker.New(cfg, os.Stderr)
 	if err != nil {
 		printErrorAndExit(err)
 	}

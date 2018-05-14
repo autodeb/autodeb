@@ -4,6 +4,7 @@ package worker
 
 import (
 	"errors"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,7 +22,7 @@ type Worker struct {
 }
 
 // New creates a Worker
-func New(cfg *Config) (*Worker, error) {
+func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 
 	// Check that all fields are present
 	if cfg.ServerURL == "" {
@@ -29,9 +30,6 @@ func New(cfg *Config) (*Worker, error) {
 	}
 	if cfg.WorkingDirectory == "" {
 		return nil, errors.New("WorkingDirectory is empty")
-	}
-	if cfg.WriterOutput == nil {
-		return nil, errors.New("WriterOutput is nil")
 	}
 
 	// Create the apiClient
@@ -54,7 +52,7 @@ func New(cfg *Config) (*Worker, error) {
 	worker := Worker{
 		apiClient:        apiClient,
 		workingDirectory: workingDirectory,
-		logger:           log.New(cfg.WriterOutput),
+		logger:           log.New(loggingOutput),
 	}
 
 	go worker.start()

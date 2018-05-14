@@ -12,7 +12,7 @@ import (
 )
 
 // Parse reads arguments and creates an autodeb worker config
-func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, error) {
+func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 
 	fs := flag.NewFlagSet("autodeb-worker", flag.ContinueOnError)
 	fs.SetOutput(ioutil.Discard)
@@ -50,7 +50,6 @@ func Parse(args []string, writerOutput, writerError io.Writer) (*worker.Config, 
 	cfg := &worker.Config{
 		ServerURL:        serverURL,
 		WorkingDirectory: workingDirectory,
-		WriterOutput:     writerOutput,
 	}
 
 	return cfg, nil

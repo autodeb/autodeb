@@ -16,7 +16,7 @@ type cliTest struct {
 }
 
 func (cliTest *cliTest) Parse(args ...string) (*worker.Config, error) {
-	return cli.Parse(args, &cliTest.outputWriter, &cliTest.errorWriter)
+	return cli.Parse(args, &cliTest.outputWriter)
 }
 
 func testSetup() *cliTest {

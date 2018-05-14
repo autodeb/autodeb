@@ -12,7 +12,7 @@ import (
 )
 
 // Parse reads arguments and creates an autodeb server config
-func Parse(args []string, writerOutput, writerError io.Writer) (*server.Config, error) {
+func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 
 	fs := flag.NewFlagSet("autodeb-server", flag.ContinueOnError)
 	fs.SetOutput(ioutil.Discard)

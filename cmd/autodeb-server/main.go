@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -33,12 +34,32 @@ func main() {
 		printErrorAndExit(err)
 	}
 
-	// Handle SIGINT
+	// Wait for SIGINT
 	sigchan := make(chan os.Signal)
 	signal.Notify(sigchan, os.Interrupt)
 	<-sigchan
-	fmt.Println("\nStopping server...")
-	srv.Close()
+
+	// SIGINT received, shutdown...
+	fmt.Println("\nShutting down the server. Send SIGINT again to force quit.")
+
+	// Create a context, cancel it if we receive SIGINT again
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		sigchan := make(chan os.Signal)
+		signal.Notify(sigchan, os.Interrupt)
+		select {
+		case <-sigchan:
+			fmt.Println("\nForcing quit...")
+			cancel()
+		}
+	}()
+
+	// Shutdown the server, this blocks until the shutdown is complete
+	// or until we cancel the context
+	err = srv.Shutdown(ctx)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func printErrorAndExit(err error) {

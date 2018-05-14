@@ -3,6 +3,7 @@
 package server
 
 import (
+	"context"
 	"io"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
@@ -69,7 +70,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	return &server, nil
 }
 
-// Close will shutdown the server
-func (srv *Server) Close() error {
-	return srv.httpServer.Close()
+// Shutdown will gracefully stop the server
+func (srv *Server) Shutdown(ctx context.Context) error {
+	return srv.httpServer.Shutdown(ctx)
 }

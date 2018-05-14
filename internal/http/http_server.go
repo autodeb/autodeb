@@ -2,6 +2,7 @@
 package http
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -43,11 +44,10 @@ func NewHTTPServer(address string, port int, router http.Handler, logger log.Log
 	return &server, nil
 }
 
-// Close will shutdown the listener and the http server
-func (srv *Server) Close() error {
+// Shutdown will close the listener and the shutdown http server
+func (srv *Server) Shutdown(ctx context.Context) error {
 	srv.listener.Close()
-	srv.httpServer.Close()
-	return nil
+	return srv.httpServer.Shutdown(ctx)
 }
 
 // Port of the listener

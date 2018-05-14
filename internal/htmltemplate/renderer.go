@@ -3,6 +3,7 @@ package htmltemplate
 import (
 	"bytes"
 	"html/template"
+	"io/ioutil"
 	"strings"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
@@ -69,7 +70,13 @@ func (renderer *Renderer) createTemplate(filenames ...string) (*template.Templat
 
 	for _, filename := range filenames {
 
-		b, err := filesystem.ReadFile(renderer.fs, filename)
+		f, err := renderer.fs.Open(filename)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+
+		b, err := ioutil.ReadAll(f)
 		if err != nil {
 			return nil, err
 		}

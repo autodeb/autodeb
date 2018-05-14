@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestJobsNextPostHandler(t *testing.T) {
@@ -49,7 +51,7 @@ func TestJobsNextPostHandlerNoJob(t *testing.T) {
 
 	assert.Equal(t, http.StatusNoContent, response.Result().StatusCode)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
-	assert.Equal(t, response.Body.String(), "")
+	assert.Equal(t, "", response.Body.String())
 }
 
 func TestJobGetHandler(t *testing.T) {
@@ -85,7 +87,7 @@ func TestJobGetHandlerNotFound(t *testing.T) {
 
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
-	assert.Equal(t, response.Body.String(), "")
+	assert.Equal(t, "", response.Body.String())
 }
 
 func TestJobStatusPostHandler(t *testing.T) {
@@ -113,4 +115,27 @@ func TestJobStatusPostHandler(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, models.JobStatusFailed, job.Status)
+}
+
+func TestJobLogTxtGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	err := testRouter.App.SaveJobLog(
+		uint(1),
+		strings.NewReader("hello"),
+	)
+	require.NoError(t, err)
+
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(
+		http.MethodGet,
+		"/api/jobs/1/log.txt",
+		nil,
+	)
+
+	testRouter.Router.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
+	assert.Equal(t, "hello", response.Body.String())
 }

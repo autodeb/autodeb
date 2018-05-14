@@ -45,6 +45,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}").Handler(api.JobGetHandler(app)).Methods(http.MethodGet)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/status/{jobStatus:[0-9]+}").Handler(api.JobStatusPostHandler(app)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/log").Handler(api.JobLogPostHandler(app)).Methods(http.MethodPost)
+	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/log.txt").Handler(api.JobLogTxtGetHandler(app)).Methods(http.MethodGet)
 
 	// ==== Uploads API ====
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/dsc").Handler(api.UploadDSCGetHandler(app)).Methods(http.MethodGet)

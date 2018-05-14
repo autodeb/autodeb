@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -76,6 +77,37 @@ func JobGetHandler(app *app.App) http.Handler {
 	}
 
 	handler = decorators.JSONHeaders(handler)
+
+	return http.HandlerFunc(handler)
+}
+
+//JobLogTxtGetHandler returns a handler that retrieves the log of a job
+func JobLogTxtGetHandler(app *app.App) http.Handler {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+
+		// Get input values
+		vars := mux.Vars(r)
+		jobID, err := strconv.Atoi(vars["jobID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		file, err := app.GetJobLog(uint(jobID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if file == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		defer file.Close()
+		io.Copy(w, file)
+	}
+
+	handler = decorators.TextPlainHeaders(handler)
 
 	return http.HandlerFunc(handler)
 }

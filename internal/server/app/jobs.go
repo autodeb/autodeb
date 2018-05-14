@@ -46,6 +46,22 @@ func (app *App) UpdateJob(job *models.Job) error {
 	return app.db.UpdateJob(job)
 }
 
+// GetJobLog returns the log of a job
+func (app *App) GetJobLog(jobID uint) (io.ReadCloser, error) {
+	logPath := filepath.Join(
+		app.JobsDirectory(),
+		fmt.Sprint(jobID),
+		"log.txt",
+	)
+
+	file, err := app.dataFS.Open(logPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
+}
+
 // SaveJobLog will save logs for a job
 func (app *App) SaveJobLog(jobID uint, content io.Reader) error {
 	jobDirectory := filepath.Join(

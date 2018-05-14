@@ -39,6 +39,27 @@ func TestSaveJobLog(t *testing.T) {
 	assert.NoError(t, err)
 
 	logFile, _ := fs.Open(logFilePath)
+	defer logFile.Close()
 	b, _ := ioutil.ReadAll(logFile)
+	assert.Equal(t, "Hello", string(b))
+}
+
+func TestGetJobLog(t *testing.T) {
+	testApp, _, _ := apptest.SetupTest(t)
+
+	err := testApp.SaveJobLog(
+		uint(1),
+		strings.NewReader("Hello"),
+	)
+	assert.NoError(t, err)
+
+	log, err := testApp.GetJobLog(uint(1))
+	defer log.Close()
+
+	assert.NoError(t, err)
+
+	b, err := ioutil.ReadAll(log)
+
+	assert.NoError(t, err)
 	assert.Equal(t, "Hello", string(b))
 }

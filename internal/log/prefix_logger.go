@@ -29,7 +29,7 @@ func (l *prefixLogger) PrefixLogger(prefix string) Logger {
 
 // SetLevel sets the logging level
 func (l *prefixLogger) SetLevel(level Level) {
-	l.SetLevel(level)
+	l.logger.SetLevel(level)
 }
 
 // Error logs an error message

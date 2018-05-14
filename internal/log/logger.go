@@ -25,9 +25,9 @@ type Level = logrus.Level
 
 // Logging levels
 const (
-	ErrorLevel  Level = logrus.ErrorLevel
-	WaningLevel Level = logrus.WarnLevel
-	InfoLevel   Level = logrus.InfoLevel
+	ErrorLevel   Level = logrus.ErrorLevel
+	WarningLevel Level = logrus.WarnLevel
+	InfoLevel    Level = logrus.InfoLevel
 )
 
 type logger struct {
@@ -53,7 +53,7 @@ func (l *logger) PrefixLogger(prefix string) Logger {
 
 // SetLevel sets the logging level
 func (l *logger) SetLevel(level Level) {
-	l.SetLevel(level)
+	l.logger.SetLevel(level)
 }
 
 // Error logs an error message

@@ -1,5 +1,9 @@
 package server
 
+import (
+	"salsa.debian.org/autodeb-team/autodeb/internal/log"
+)
+
 // Config contains configuration for Server
 type Config struct {
 	DB                    DBConfig
@@ -8,6 +12,7 @@ type Config struct {
 	TemplatesDirectory    string
 	StaticFilesDirectory  string
 	TemplatesCacheEnabled bool
+	LogLevel              log.Level
 }
 
 // HTTPServerConfig holds configuration related to the HTTP server

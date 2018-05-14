@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/worker"
 )
 
@@ -26,6 +27,9 @@ func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 
 	var workingDirectory string
 	fs.StringVar(&workingDirectory, "working-directory", "jobs", "working directory for jobs")
+
+	var logLevelString string
+	fs.StringVar(&logLevelString, "log-level", "info", "info, warning or error")
 
 	if err := fs.Parse(args); err != nil {
 		return nil, err
@@ -47,9 +51,22 @@ func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 		return nil, fmt.Errorf("missing argument: server-url")
 	}
 
+	var logLevel log.Level
+	switch logLevelString {
+	case "info":
+		logLevel = log.InfoLevel
+	case "warning":
+		logLevel = log.WarningLevel
+	case "error":
+		logLevel = log.ErrorLevel
+	default:
+		return nil, fmt.Errorf("unrecognized log level: %s", logLevelString)
+	}
+
 	cfg := &worker.Config{
 		ServerURL:        serverURL,
 		WorkingDirectory: workingDirectory,
+		LogLevel:         logLevel,
 	}
 
 	return cfg, nil

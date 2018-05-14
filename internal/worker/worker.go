@@ -67,10 +67,14 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 		return nil, err
 	}
 
+	// Create the logger
+	logger := log.New(loggingOutput)
+	logger.SetLevel(cfg.LogLevel)
+
 	worker := Worker{
 		apiClient:        apiClient,
 		workingDirectory: workingDirectory,
-		logger:           log.New(loggingOutput),
+		logger:           logger,
 		jobRunnerQueue:   make(chan chan *models.Job),
 		quit:             make(chan struct{}),
 		done:             make(chan struct{}),

@@ -40,3 +40,8 @@ func (app *App) UploadedFilesDirectory() string {
 func (app *App) UploadsDirectory() string {
 	return app.uploadsManager.UploadsDirectory()
 }
+
+// JobsDirectory contains saved data for jobs such as logs
+func (app *App) JobsDirectory() string {
+	return "/jobs"
+}

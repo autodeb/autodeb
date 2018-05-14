@@ -80,6 +80,49 @@ func JobGetHandler(app *app.App) http.Handler {
 	return http.HandlerFunc(handler)
 }
 
+//JobLogPostHandler returns a handler that saves a log for a job
+func JobLogPostHandler(app *app.App) http.Handler {
+	handler := func(w http.ResponseWriter, r *http.Request) {
+
+		// Get input values
+		vars := mux.Vars(r)
+		jobID, err := strconv.Atoi(vars["jobID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Get the job
+		job, err := app.GetJob(uint(jobID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if job == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		// Only accept logs on jobs that are completed
+		switch job.Status {
+		case models.JobStatusSuccess:
+		case models.JobStatusFailed:
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// Save the logs
+		if err := app.SaveJobLog(uint(jobID), r.Body); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+	}
+
+	return http.HandlerFunc(handler)
+}
+
 //JobStatusPostHandler returns a handler that sets the job status
 func JobStatusPostHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +162,15 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 		}
 		if job == nil {
 			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		// Validate the current status. We only accept status updates on
+		// jobs that were assigned
+		switch job.Status {
+		case models.JobStatusAssigned:
+		default:
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 

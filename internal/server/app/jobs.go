@@ -1,6 +1,10 @@
 package app
 
 import (
+	"fmt"
+	"io"
+	"path/filepath"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
@@ -40,4 +44,30 @@ func (app *App) GetJob(id uint) (*models.Job, error) {
 // UpdateJob will update a job
 func (app *App) UpdateJob(job *models.Job) error {
 	return app.db.UpdateJob(job)
+}
+
+// SaveJobLog will save logs for a job
+func (app *App) SaveJobLog(jobID uint, content io.Reader) error {
+	jobDirectory := filepath.Join(
+		app.JobsDirectory(),
+		fmt.Sprint(jobID),
+	)
+
+	if err := app.dataFS.Mkdir(jobDirectory, 0744); err != nil {
+		return err
+	}
+
+	logFilePath := filepath.Join(jobDirectory, "log.txt")
+
+	logFile, err := app.dataFS.Create(logFilePath)
+	if err != nil {
+		return err
+	}
+	defer logFile.Close()
+
+	if _, err := io.Copy(logFile, content); err != nil {
+		return err
+	}
+
+	return nil
 }

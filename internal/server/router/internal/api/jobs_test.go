@@ -95,6 +95,9 @@ func TestJobStatusPostHandler(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, models.JobStatusFailed, job.Status)
 
+	job.Status = models.JobStatusAssigned
+	testRouter.DB.UpdateJob(job)
+
 	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(
 		http.MethodPost,

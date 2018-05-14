@@ -24,5 +24,14 @@ func (app *App) setupDataDirectory() error {
 		return err
 	}
 
+	// JobsDirectory
+	if _, err := app.dataFS.Stat(app.JobsDirectory()); os.IsNotExist(err) {
+		if err := app.dataFS.Mkdir(app.JobsDirectory(), 0744); err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
 	return nil
 }

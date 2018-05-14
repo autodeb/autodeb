@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
@@ -159,9 +160,15 @@ func (w *Worker) Shutdown() error {
 	<-w.done
 
 	// Shutdown remaining runners
+	var wg sync.WaitGroup
 	for _, jobRunner := range w.jobRunners {
-		jobRunner.Shutdown()
+		wg.Add(1)
+		go func(jr *jobrunner.JobRunner) {
+			jr.Shutdown()
+			wg.Done()
+		}(jobRunner)
 	}
+	wg.Wait()
 
 	return nil
 }

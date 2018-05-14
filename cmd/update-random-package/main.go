@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -62,6 +63,7 @@ func main() {
 	}
 
 	if err := sbuild.Build(
+		context.TODO(),
 		packageDir,
 		os.Stdout,
 		os.Stderr,

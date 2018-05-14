@@ -4,21 +4,39 @@ package worker
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/worker/jobrunner"
 )
 
 // Worker is the autodeb worker. It retrieves jobs from the main
-// server and passes them to JobRunners that will execute them
+// server and passes them to JobRunners that will execute them.
+//
+// Workers are not safe for use by multiple goroutines.
 type Worker struct {
 	apiClient        *apiclient.APIClient
 	workingDirectory string
 	logger           log.Logger
+
+	// This slice contains all JobRunners that were started by this worker.
+	jobRunners []*jobrunner.JobRunner
+
+	// This is a queue of JobRunners waiting for a job
+	jobRunnerQueue chan chan *models.Job
+
+	// The quit channel is closed by Shutdown() to signal that we should quit
+	quit chan struct{}
+
+	// The done channel is closed by the main loop to signal that it has exited
+	done chan struct{}
 }
 
 // New creates a Worker
@@ -53,14 +71,93 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 		apiClient:        apiClient,
 		workingDirectory: workingDirectory,
 		logger:           log.New(loggingOutput),
+		jobRunnerQueue:   make(chan chan *models.Job),
+		quit:             make(chan struct{}),
+		done:             make(chan struct{}),
 	}
 
-	go worker.start()
+	worker.startJobRunners(1)
+
+	go worker.dispatchJobs()
 
 	return &worker, nil
 }
 
-// Close will shutdown the worker
-func (w *Worker) Close() error {
+func (w *Worker) startJobRunners(count int) {
+	for i := 0; i < count; i++ {
+		jobRunner := jobrunner.New(
+			w.jobRunnerQueue,
+			w.apiClient,
+			w.workingDirectory,
+			w.logger.PrefixLogger(
+				fmt.Sprintf("JobRunner#%d", count),
+			),
+		)
+
+		w.jobRunners = append(w.jobRunners, jobRunner)
+
+		w.logger.Infof("Starting JobRunner#%d", count)
+
+		go jobRunner.Start()
+	}
+}
+
+func (w *Worker) dispatchJobs() {
+DISPATCH_JOBS_LOOP:
+	for {
+		select {
+		case jobs := <-w.jobRunnerQueue: // Wait until a JobRunner asks for a job
+			// Loop until we are able to give a job to the runner
+			for {
+				if dispatched := w.dispatchJob(jobs); dispatched {
+					break
+				}
+
+				// Could not dispatch a job to the runner. Wait 10 seconds
+				// before trying again or quit if we are asked to.
+				select {
+				case <-w.quit:
+					break DISPATCH_JOBS_LOOP
+				case <-time.After(10 * time.Second):
+					continue
+				}
+			}
+		case <-w.quit:
+			break DISPATCH_JOBS_LOOP
+		}
+	}
+	w.logger.Infof("Quitting - no longer dispatching jobs")
+	close(w.done)
+}
+
+func (w *Worker) dispatchJob(jobs chan *models.Job) bool {
+	job, err := w.apiClient.UnqueueNextJob()
+	if err != nil {
+		w.logger.Errorf("Could not obtain new job: %v", err)
+		return false
+	}
+
+	if job == nil {
+		w.logger.Infof("No job available.")
+		return false
+	}
+
+	w.logger.Infof("Obtained job: %+v", job)
+	jobs <- job
+
+	return true
+}
+
+// Shutdown stop the worker gracefully.
+func (w *Worker) Shutdown() error {
+	// Stop dispatching jobs
+	close(w.quit)
+	<-w.done
+
+	// Shutdown remaining runners
+	for _, jobRunner := range w.jobRunners {
+		jobRunner.Shutdown()
+	}
+
 	return nil
 }

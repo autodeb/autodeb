@@ -33,12 +33,16 @@ func main() {
 		printErrorAndExit(err)
 	}
 
-	// Handle SIGINT
+	// Wait for SIGINT
 	sigchan := make(chan os.Signal)
 	signal.Notify(sigchan, os.Interrupt)
 	<-sigchan
-	fmt.Println("\nStopping worker...")
-	worker.Close()
+
+	fmt.Println("\nShutting down the worker.")
+
+	if err := worker.Shutdown(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func printErrorAndExit(err error) {

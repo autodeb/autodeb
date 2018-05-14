@@ -43,14 +43,15 @@ func main() {
 	fmt.Println("\nShutting down the server. Send SIGINT again to force quit.")
 
 	// Create a context, cancel it if we receive SIGINT again
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancelCtx := context.WithCancel(context.Background())
+	defer cancelCtx()
 	go func() {
 		sigchan := make(chan os.Signal)
 		signal.Notify(sigchan, os.Interrupt)
 		select {
 		case <-sigchan:
 			fmt.Println("\nForcing quit...")
-			cancel()
+			cancelCtx()
 		}
 	}()
 

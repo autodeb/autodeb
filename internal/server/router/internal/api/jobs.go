@@ -101,7 +101,11 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 		newStatus := models.JobStatus(jobStatus)
 		switch newStatus {
 		case models.JobStatusSuccess:
+			// The job was a success.
 		case models.JobStatusFailed:
+			// The job failed.
+		case models.JobStatusQueued:
+			// Allow workers to requeue jobs that they didn't complete.
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			return

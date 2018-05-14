@@ -12,7 +12,6 @@ import (
 
 type cliTest struct {
 	outputWriter bytes.Buffer
-	errorWriter  bytes.Buffer
 }
 
 func (cliTest *cliTest) Parse(args ...string) (*worker.Config, error) {

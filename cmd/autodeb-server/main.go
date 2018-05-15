@@ -48,7 +48,7 @@ func main() {
 	defer cancelCtx()
 	go func() {
 		sigchan := make(chan os.Signal)
-		signal.Notify(sigchan, os.Interrupt)
+		signal.Notify(sigchan, unix.SIGINT, unix.SIGTERM)
 		select {
 		case <-sigchan:
 			fmt.Println("\nForcing quit...")

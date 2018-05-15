@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/sys/unix" // "syscall" is deprecated
 	"os"
 	"os/signal"
 
@@ -33,9 +34,9 @@ func main() {
 		printErrorAndExit(err)
 	}
 
-	// Wait for SIGINT
+	// Wait for SIGINT/SIGTERM
 	sigchan := make(chan os.Signal)
-	signal.Notify(sigchan, os.Interrupt)
+	signal.Notify(sigchan, unix.SIGINT, unix.SIGTERM)
 	<-sigchan
 
 	fmt.Println("\nShutting down the worker.")

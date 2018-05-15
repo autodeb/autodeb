@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"golang.org/x/sys/unix" // "syscall" is deprecated
 	"os"
 	"os/signal"
 
@@ -34,13 +35,13 @@ func main() {
 		printErrorAndExit(err)
 	}
 
-	// Wait for SIGINT
+	// Wait for SIGINT/SIGTERM
 	sigchan := make(chan os.Signal)
-	signal.Notify(sigchan, os.Interrupt)
+	signal.Notify(sigchan, unix.SIGINT, unix.SIGTERM)
 	<-sigchan
 
-	// SIGINT received, shutdown...
-	fmt.Println("\nShutting down the server. Send SIGINT again to force quit.")
+	// SIGINT/SIGTERM received, shutdown...
+	fmt.Println("\nShutting down the server. Send SIGINT/SIGTERM again to force quit.")
 
 	// Create a context, cancel it if we receive SIGINT again
 	ctx, cancelCtx := context.WithCancel(context.Background())

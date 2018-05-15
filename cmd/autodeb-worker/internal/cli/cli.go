@@ -31,6 +31,9 @@ func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 	var logLevelString string
 	fs.StringVar(&logLevelString, "log-level", "info", "info, warning or error")
 
+	var runnerCount int
+	fs.IntVar(&runnerCount, "runner-count", 1, "number of job runners (concurrent jobs)")
+
 	if err := fs.Parse(args); err != nil {
 		return nil, err
 	}
@@ -67,6 +70,7 @@ func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 		ServerURL:        serverURL,
 		WorkingDirectory: workingDirectory,
 		LogLevel:         logLevel,
+		RunnerCount:      runnerCount,
 	}
 
 	return cfg, nil

@@ -50,6 +50,9 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 	if cfg.WorkingDirectory == "" {
 		return nil, errors.New("WorkingDirectory is empty")
 	}
+	if cfg.RunnerCount == 0 {
+		return nil, errors.New("RunnerCount cannot be 0")
+	}
 
 	// Create the apiClient
 	apiClient, err := apiclient.New(cfg.ServerURL, &http.Client{})
@@ -81,7 +84,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 		done:             make(chan struct{}),
 	}
 
-	worker.startJobRunners(1)
+	worker.startJobRunners(cfg.RunnerCount)
 
 	go worker.dispatchJobs()
 
@@ -95,13 +98,13 @@ func (w *Worker) startJobRunners(count int) {
 			w.apiClient,
 			w.workingDirectory,
 			w.logger.PrefixLogger(
-				fmt.Sprintf("JobRunner#%d", count),
+				fmt.Sprintf("JobRunner#%d", i),
 			),
 		)
 
 		w.jobRunners = append(w.jobRunners, jobRunner)
 
-		w.logger.Infof("Starting JobRunner#%d", count)
+		w.logger.Infof("Starting JobRunner#%d", i)
 
 		go jobRunner.Start()
 	}

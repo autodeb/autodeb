@@ -9,4 +9,5 @@ type Config struct {
 	ServerURL        string
 	WorkingDirectory string
 	LogLevel         log.Level
+	RunnerCount      int
 }

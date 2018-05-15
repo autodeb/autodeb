@@ -6,7 +6,7 @@
 
 autodeb tries to automatically update Debian packages to newer upstream versions or to backport them.
 
-autodeb is the concretization Lucas Nussbaum's GSOC 2018 proposed project titled "Automatic Packages for Everything (backports, new upstream versions, etc.)". The [project proposal](https://wiki.debian.org/SummerOfCode2018/Projects) can be found in the Debian Wiki. The project was [officialy accepted](https://summerofcode.withgoogle.com/projects/#5560246244737024).
+autodeb is the concretization Lucas Nussbaum's GSOC 2018 proposed project titled "Automatic Packages for Everything (backports, new upstream versions, etc.)". The [project proposal](https://wiki.debian.org/SummerOfCode2018/Projects) can be found in the Debian Wiki. The project was [officially accepted](https://summerofcode.withgoogle.com/projects/#5560246244737024).
 
 ## Getting in touch
 

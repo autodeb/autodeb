@@ -3,7 +3,6 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 
@@ -17,14 +16,12 @@ type Server struct {
 }
 
 // NewHTTPServer starts a logged http server on the given address
-func NewHTTPServer(address string, port int, router http.Handler, logger log.Logger) (*Server, error) {
+func NewHTTPServer(address string, router http.Handler, logger log.Logger) (*Server, error) {
 	// Create the logged handler
 	loggedHandler := logHandler(router, logger)
 
-	listenAddress := fmt.Sprintf("%s:%d", address, port)
-
 	// Listen on the given address
-	listener, err := net.Listen("tcp", listenAddress)
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		return nil, err
 	}

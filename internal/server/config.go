@@ -18,7 +18,6 @@ type Config struct {
 // HTTPServerConfig holds configuration related to the HTTP server
 type HTTPServerConfig struct {
 	Address string
-	Port    int
 }
 
 // DBConfig holds configuration related to the database

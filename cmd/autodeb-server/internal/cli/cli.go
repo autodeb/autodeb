@@ -23,10 +23,7 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	fs.BoolVar(&h, "h", false, "print usage information")
 
 	var address string
-	fs.StringVar(&address, "address", "0.0.0.0", "address to listen to")
-
-	var port int
-	fs.IntVar(&port, "port", 8080, "port to listen to")
+	fs.StringVar(&address, "address", ":8071", "address to listen to")
 
 	var templatesDirectory string
 	fs.StringVar(&templatesDirectory, "templates-directory", "web/templates", "templates directory")
@@ -80,7 +77,6 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	cfg := &server.Config{
 		HTTP: server.HTTPServerConfig{
 			Address: address,
-			Port:    port,
 		},
 		DB: server.DBConfig{
 			Driver:           databaseDriver,

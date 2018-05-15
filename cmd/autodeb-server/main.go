@@ -26,7 +26,7 @@ func main() {
 	}
 
 	fmt.Fprintln(os.Stdout, logo.Logo)
-	fmt.Fprintf(os.Stdout, "Starting autodeb API on %v:%d.\n", cfg.HTTP.Address, cfg.HTTP.Port)
+	fmt.Fprintf(os.Stdout, "Starting autodeb API on %s.\n", cfg.HTTP.Address)
 
 	// Start the server
 	srv, err := server.New(cfg, os.Stderr)

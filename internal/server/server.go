@@ -59,7 +59,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)
 
-	httpServer, err := http.NewHTTPServer(cfg.HTTP.Address, cfg.HTTP.Port, router, logger)
+	httpServer, err := http.NewHTTPServer(cfg.HTTP.Address, router, logger)
 	if err != nil {
 		return nil, err
 	}

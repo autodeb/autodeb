@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -30,6 +31,23 @@ func (c *APIClient) SetJobStatus(jobID uint, status models.JobStatus) error {
 	response, err := c.post(
 		fmt.Sprintf("/api/jobs/%d/status/%d", jobID, status),
 		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("Unexpected status code %v", response.Status)
+	}
+
+	return nil
+}
+
+// SubmitJobLog will submit logs for a job
+func (c *APIClient) SubmitJobLog(jobID uint, jobLog io.Reader) error {
+	response, err := c.post(
+		fmt.Sprintf("/api/jobs/%d/log", jobID),
+		jobLog,
 	)
 	if err != nil {
 		return err

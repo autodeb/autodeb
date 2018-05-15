@@ -10,6 +10,7 @@
         <th>Type</th>
         <th>Status</th>
         <th>Upload ID</th>
+        <th>Log</th>
     </tr>
 
     {{ range $.Jobs }}
@@ -18,6 +19,9 @@
         <td>{{ .Type }}</td>
         <td>{{ .Status }}</td>
         <td>{{ .UploadID }}</td>
+        <td>
+            <a href="/api/jobs/{{ .ID }}/log.txt">log (txt)</a>
+        </td>
     </tr>
     {{ end }}
 

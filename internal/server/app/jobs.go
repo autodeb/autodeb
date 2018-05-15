@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -55,6 +56,9 @@ func (app *App) GetJobLog(jobID uint) (io.ReadCloser, error) {
 	)
 
 	file, err := app.dataFS.Open(logPath)
+	if os.IsNotExist(err) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -139,3 +139,20 @@ func TestJobLogTxtGetHandler(t *testing.T) {
 	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "hello", response.Body.String())
 }
+
+func TestJobLogTxtGetHandlerNotFound(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(
+		http.MethodGet,
+		"/api/jobs/1/log.txt",
+		nil,
+	)
+
+	testRouter.Router.ServeHTTP(response, request)
+
+	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
+	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
+	assert.Equal(t, "", response.Body.String())
+}

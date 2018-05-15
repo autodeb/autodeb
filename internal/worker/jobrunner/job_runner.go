@@ -2,6 +2,9 @@ package jobrunner
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"os"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
@@ -52,7 +55,8 @@ JOB_LOOP:
 		// Wait for a job or quit
 		select {
 		case job := <-jobs:
-			jobRunner.execJob(job)
+			jobRunner.logger.Infof("Received job %+v", job)
+			jobRunner.setupAndExecJob(job)
 		case <-jobRunner.quit:
 			break JOB_LOOP
 		}
@@ -62,8 +66,16 @@ JOB_LOOP:
 	close(jobRunner.done)
 }
 
-func (jobRunner *JobRunner) execJob(job *models.Job) {
-	jobRunner.logger.Infof("Executing job %+v", job)
+func (jobRunner *JobRunner) setupAndExecJob(job *models.Job) {
+	// Setup the job
+	workingDirectory, logFile, err := jobRunner.setupJob(job)
+	if err != nil {
+		jobRunner.setJobStatus(job, models.JobStatusQueued)
+		jobRunner.logger.Errorf("failed job setup: %+v", err)
+		return
+	}
+	defer os.RemoveAll(workingDirectory)
+	defer logFile.Close()
 
 	// Create a cancelable context for the job
 	ctx, cancelCtx := context.WithCancel(context.Background())
@@ -79,11 +91,29 @@ func (jobRunner *JobRunner) execJob(job *models.Job) {
 		}
 	}()
 
+	jobError := jobRunner.execJob(ctx, job, workingDirectory, logFile)
+
+	// If we canceled the job, requeue
+	select {
+	case <-ctx.Done():
+		jobRunner.setJobStatus(job, models.JobStatusQueued)
+		return
+	default:
+		// Else, continue
+	}
+
+	// Submit the job result
+	logFile.Seek(0, 0)
+	jobRunner.submitResult(job, jobError, logFile)
+}
+
+func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, workingDirectory string, logFile io.Writer) error {
 	switch job.Type {
 	case models.JobTypeBuild:
-		jobRunner.execBuild(ctx, job)
+		return jobRunner.execBuild(ctx, job, workingDirectory, logFile)
 	default:
 		jobRunner.logger.Errorf("Unknown job type: %s", job.Type)
+		return fmt.Errorf("unknown job type: %s", job.Type)
 	}
 }
 

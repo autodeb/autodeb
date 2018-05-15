@@ -2,9 +2,8 @@ package jobrunner
 
 import (
 	"context"
-	"fmt"
+	"io"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/exec/dget"
@@ -12,53 +11,31 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-func (jobRunner *JobRunner) execBuild(ctx context.Context, job *models.Job) {
-	workingDirectory := filepath.Join(jobRunner.workingDirectory, fmt.Sprint(job.ID))
-	defer os.RemoveAll(workingDirectory)
-
-	// Create the job directory
-	if err := os.Mkdir(workingDirectory, 0755); err != nil {
-		jobRunner.submitFailure(ctx, job, err)
-		return
-	}
-
-	// Create log file
-	logFilePath := filepath.Join(workingDirectory, "build.log")
-	logFile, err := os.Create(logFilePath)
-	if err != nil {
-		jobRunner.submitFailure(ctx, job, err)
-		return
-	}
-	defer logFile.Close()
-
+func (jobRunner *JobRunner) execBuild(ctx context.Context, job *models.Job, workingDirectory string, logFile io.Writer) error {
 	// Get the .dsc URL
 	dscURL := jobRunner.apiClient.GetUploadDSCURL(job.UploadID)
 
 	// Download the source
 	if err := dget.Dget(dscURL.String(), workingDirectory); err != nil {
-		jobRunner.submitFailure(ctx, job, err)
-		return
+		return err
 	}
 
 	// Find the source directory
 	dirs, err := getDirectories(workingDirectory)
 	if err != nil {
-		jobRunner.submitFailure(ctx, job, err)
-		return
+		return err
 	}
 	if numDirs := len(dirs); numDirs != 1 {
-		jobRunner.submitFailure(ctx, job, err)
-		return
+		return err
 	}
 	sourceDirectory := filepath.Join(workingDirectory, dirs[0])
 
 	// Run sbuild
 	if err := sbuild.Build(ctx, sourceDirectory, logFile, logFile); err != nil {
-		jobRunner.submitFailure(ctx, job, err)
-		return
+		return err
 	}
 
-	jobRunner.submitSuccess(ctx, job)
+	return nil
 }
 
 //getDirectories returns a list of all directories in a directory

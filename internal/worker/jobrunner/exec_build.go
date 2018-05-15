@@ -22,6 +22,15 @@ func (jobRunner *JobRunner) execBuild(ctx context.Context, job *models.Job) {
 		return
 	}
 
+	// Create log file
+	logFilePath := filepath.Join(workingDirectory, "build.log")
+	logFile, err := os.Create(logFilePath)
+	if err != nil {
+		jobRunner.submitFailure(ctx, job, err)
+		return
+	}
+	defer logFile.Close()
+
 	// Get the .dsc URL
 	dscURL := jobRunner.apiClient.GetUploadDSCURL(job.UploadID)
 
@@ -44,7 +53,7 @@ func (jobRunner *JobRunner) execBuild(ctx context.Context, job *models.Job) {
 	sourceDirectory := filepath.Join(workingDirectory, dirs[0])
 
 	// Run sbuild
-	if err := sbuild.Build(ctx, sourceDirectory, os.Stdout, os.Stderr); err != nil {
+	if err := sbuild.Build(ctx, sourceDirectory, logFile, logFile); err != nil {
 		jobRunner.submitFailure(ctx, job, err)
 		return
 	}

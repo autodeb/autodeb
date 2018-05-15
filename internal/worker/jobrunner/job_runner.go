@@ -63,7 +63,7 @@ JOB_LOOP:
 }
 
 func (jobRunner *JobRunner) execJob(job *models.Job) {
-	jobRunner.logger.Infof("Executing job %v", job)
+	jobRunner.logger.Infof("Executing job %+v", job)
 
 	// Create a cancelable context for the job
 	ctx, cancelCtx := context.WithCancel(context.Background())

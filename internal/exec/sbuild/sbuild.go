@@ -3,7 +3,6 @@ package sbuild
 import (
 	"context"
 	"io"
-	"os"
 	"os/exec"
 )
 
@@ -13,11 +12,11 @@ func Build(ctx context.Context, directory string, outputWriter, errorWriter io.W
 		ctx,
 		"sbuild",
 		"--no-clean-source",
+		"--nolog",
 	)
 	command.Dir = directory
 	command.Stdout = outputWriter
 	command.Stderr = errorWriter
-	command.Stdin = os.Stdin // TODO: remove this
 
 	if err := command.Run(); err != nil {
 		return err

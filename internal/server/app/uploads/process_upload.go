@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/crypto/sha256"
@@ -40,16 +39,17 @@ func (man *Manager) ProcessUpload(uploadParameters *UploadParameters, content io
 	// that it isn't something shady like ../../filename.txt
 	_, uploadFileName := filepath.Split(uploadParameters.Filename)
 
-	// Check if this is a .changes upload
-	isChanges := strings.HasSuffix(uploadFileName, ".changes")
-
-	if isChanges {
+	switch ext := filepath.Ext(uploadFileName); ext {
+	case ".changes":
 		upload, err := man.processChangesUpload(uploadFileName, content)
 		return upload, err
+	case ".deb":
+		return nil, &uploadError{errors.New("only source uploads are accepted"), true}
+	default:
+		err := man.processFileUpload(uploadFileName, content)
+		return nil, err
 	}
 
-	err := man.processFileUpload(uploadFileName, content)
-	return nil, err
 }
 
 func (man *Manager) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
@@ -66,6 +66,8 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 	if err != nil {
 		return nil, &uploadError{err, true}
 	}
+
+	// Verify that the upload refers to at least one file
 	if len(changes.ChecksumsSha256) < 1 {
 		return nil, &uploadError{errors.New("changes has no SHA256 checksums"), true}
 	}

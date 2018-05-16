@@ -56,6 +56,20 @@ func TestProcessFileUpload(t *testing.T) {
 	assert.Equal(t, false, fileUpload.Completed)
 }
 
+func TestUploadDebRejected(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	request, _ := http.NewRequest(
+		http.MethodPut,
+		"/upload/test.deb",
+		strings.NewReader("this is a deb\n"),
+	)
+
+	response := testRouter.ServeHTTP(request)
+	assert.Equal(t, http.StatusBadRequest, response.Result().StatusCode)
+	assert.Equal(t, "", response.Body.String())
+}
+
 const dummyChangesFile = `Format: 1.8
 Date: Wed, 04 Apr 2018 14:28:29 -0400
 Source: autodeb

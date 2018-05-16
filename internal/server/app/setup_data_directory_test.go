@@ -15,4 +15,7 @@ func TestSetupDataDirectory(t *testing.T) {
 
 	_, err = fs.Stat(testApp.UploadsDirectory())
 	assert.NoError(t, err, "the directory should have been created")
+
+	_, err = fs.Stat(testApp.JobsDirectory())
+	assert.NoError(t, err, "the directory should have been created")
 }

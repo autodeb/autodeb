@@ -78,18 +78,8 @@ func (jobRunner *JobRunner) setupAndExecJob(job *models.Job) {
 	defer logFile.Close()
 
 	// Create a cancelable context for the job
-	ctx, cancelCtx := context.WithCancel(context.Background())
+	ctx, cancelCtx := jobRunner.getJobContext()
 	defer cancelCtx()
-
-	// Cancel the context if we should quit
-	go func() {
-		select {
-		case <-jobRunner.quit:
-			jobRunner.logger.Infof("Canceling the job context")
-			cancelCtx()
-		case <-ctx.Done():
-		}
-	}()
 
 	jobError := jobRunner.execJob(ctx, job, workingDirectory, logFile)
 
@@ -105,6 +95,25 @@ func (jobRunner *JobRunner) setupAndExecJob(job *models.Job) {
 	// Submit the job result
 	logFile.Seek(0, 0)
 	jobRunner.submitResult(job, jobError, logFile)
+}
+
+// getJobContext returns a context that will be canceled if the JobRunner
+// needs to quit. It is the caller's responsibility to cancel the context after
+// using it
+func (jobRunner *JobRunner) getJobContext() (context.Context, context.CancelFunc) {
+	ctx, cancelFunc := context.WithCancel(context.Background())
+
+	// Cancel the context if we should quit
+	go func() {
+		select {
+		case <-jobRunner.quit:
+			jobRunner.logger.Infof("Canceling the job context")
+			cancelFunc()
+		case <-ctx.Done():
+		}
+	}()
+
+	return ctx, cancelFunc
 }
 
 func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, workingDirectory string, logFile io.Writer) error {

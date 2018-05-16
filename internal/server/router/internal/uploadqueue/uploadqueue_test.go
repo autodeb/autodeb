@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 )
 
@@ -67,7 +68,10 @@ func TestUploadDebRejected(t *testing.T) {
 
 	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusBadRequest, response.Result().StatusCode)
-	assert.Equal(t, "", response.Body.String())
+
+	apiErr, err := api.ErrorFromJSON(response.Body.Bytes())
+	assert.NoError(t, err)
+	assert.Equal(t, "only source uploads are accepted", apiErr.Message)
 }
 
 const dummyChangesFile = `Format: 1.8
@@ -106,7 +110,9 @@ func TestProcessChangesBadFormatRejected(t *testing.T) {
 
 	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusBadRequest, response.Result().StatusCode)
-	assert.Equal(t, "", response.Body.String())
+
+	_, err := api.ErrorFromJSON(response.Body.Bytes())
+	assert.NoError(t, err)
 }
 
 func TestProcessChangesMissingFile(t *testing.T) {
@@ -120,7 +126,10 @@ func TestProcessChangesMissingFile(t *testing.T) {
 
 	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusBadRequest, response.Result().StatusCode)
-	assert.Equal(t, "", response.Body.String())
+
+	apiErr, err := api.ErrorFromJSON(response.Body.Bytes())
+	assert.NoError(t, err)
+	assert.Contains(t, apiErr.Message, "changes refers to unexisting file test.dsc")
 }
 
 func TestProcessChanges(t *testing.T) {

@@ -8,6 +8,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue/uploadparametersparser"
 )
 
@@ -26,6 +27,7 @@ func UploadHandler(app *app.App) http.Handler {
 		if err != nil {
 			if errorchecks.IsInputError(err) {
 				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprint(w, api.JSONError(err.Error()))
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
 			}

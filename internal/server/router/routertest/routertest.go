@@ -2,6 +2,7 @@ package routertest
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
@@ -47,4 +48,10 @@ func SetupTest(t *testing.T) *RouterTest {
 	}
 
 	return routerTest
+}
+
+func (routerTest *RouterTest) ServeHTTP(request *http.Request) *httptest.ResponseRecorder {
+	response := httptest.NewRecorder()
+	routerTest.Router.ServeHTTP(response, request)
+	return response
 }

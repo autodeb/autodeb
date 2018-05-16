@@ -1,9 +1,12 @@
 package uploadqueue
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue/uploadparametersparser"
 )
@@ -18,7 +21,9 @@ func UploadHandler(app *app.App) http.Handler {
 			return
 		}
 
-		if _, err := app.ProcessUpload(uploadParameters, r.Body); err != nil {
+		upload, err := app.ProcessUpload(uploadParameters, r.Body)
+
+		if err != nil {
 			if errorchecks.IsInputError(err) {
 				w.WriteHeader(http.StatusBadRequest)
 			} else {
@@ -27,7 +32,17 @@ func UploadHandler(app *app.App) http.Handler {
 			return
 		}
 
+		w.WriteHeader(http.StatusCreated)
+
+		if upload != nil {
+			b, _ := json.Marshal(upload)
+			jsonUpload := string(b)
+			fmt.Fprint(w, jsonUpload)
+		}
+
 	}
+
+	handler = decorators.JSONHeaders(handler)
 
 	return http.HandlerFunc(handler)
 }

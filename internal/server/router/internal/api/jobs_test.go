@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -19,11 +18,9 @@ func TestJobsNextPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	testRouter.DB.CreateJob(models.JobTypeBuild, uint(3))
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 
@@ -44,11 +41,9 @@ func TestJobsNextPostHandler(t *testing.T) {
 func TestJobsNextPostHandlerNoJob(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodPost, "/api/jobs/next", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusNoContent, response.Result().StatusCode)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "", response.Body.String())
@@ -60,11 +55,9 @@ func TestJobGetHandler(t *testing.T) {
 	_, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodGet, "/api/jobs/1", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 
@@ -80,11 +73,9 @@ func TestJobGetHandler(t *testing.T) {
 func TestJobGetHandlerNotFound(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodGet, "/api/jobs/1", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "", response.Body.String())
@@ -100,15 +91,13 @@ func TestJobStatusPostHandler(t *testing.T) {
 	job.Status = models.JobStatusAssigned
 	testRouter.DB.UpdateJob(job)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf("/api/jobs/1/status/%d", models.JobStatusFailed),
 		nil,
 	)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 
 	job, err = testRouter.App.GetJob(1)
@@ -126,15 +115,13 @@ func TestJobLogTxtGetHandler(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(
 		http.MethodGet,
 		"/api/jobs/1/log.txt",
 		nil,
 	)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "hello", response.Body.String())
@@ -143,15 +130,13 @@ func TestJobLogTxtGetHandler(t *testing.T) {
 func TestJobLogTxtGetHandlerNotFound(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(
 		http.MethodGet,
 		"/api/jobs/1/log.txt",
 		nil,
 	)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "", response.Body.String())

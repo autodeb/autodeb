@@ -3,7 +3,6 @@ package api_test
 import (
 	"encoding/json"
 	"net/http"
-	"net/http/httptest"
 	"path/filepath"
 	"testing"
 	"time"
@@ -37,11 +36,9 @@ func TestUploadDSCGetHandler(t *testing.T) {
 	err = testRouter.DB.UpdateFileUpload(fileUpload)
 	assert.NoError(t, err)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/1/dsc", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "Hello", response.Body.String())
@@ -50,11 +47,9 @@ func TestUploadDSCGetHandler(t *testing.T) {
 func TestUploadDSCGetHandlerNotFound(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/1/dsc", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 }
 
@@ -71,11 +66,9 @@ func TestUploadFileGetHandler(t *testing.T) {
 	dsc.Write([]byte("Hello"))
 	dsc.Close()
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/1/test.dsc", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "Hello", response.Body.String())
 }
@@ -91,11 +84,9 @@ func TestUploadFilesGetHandler(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	response := httptest.NewRecorder()
 	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/3/files", nil)
 
-	testRouter.Router.ServeHTTP(response, request)
-
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 

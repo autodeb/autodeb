@@ -22,7 +22,7 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 	// Upload Queue
 	router.PathPrefix("/upload/").Handler(
 		http.StripPrefix("/upload/", uploadqueue.UploadHandler(app)),
-	).Methods(http.MethodPut)
+	).Methods(http.MethodPut, http.MethodPost)
 
 	// Static files (for the web)
 	router.PathPrefix("/static/").Handler(

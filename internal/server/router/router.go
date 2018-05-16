@@ -8,14 +8,16 @@ import (
 	"github.com/gorilla/mux"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
+	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/webpages"
 )
 
 // NewRouter creates the main router for the application.
-func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *app.App) http.Handler {
+func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *app.App, oauthProvider oauth.Provider) http.Handler {
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -31,6 +33,10 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 			http.FileServer(staticFS),
 		),
 	).Methods(http.MethodGet)
+
+	// Authentification
+	router.Path("/auth/login").Handler(auth.LoginGetHandler(app, oauthProvider))
+	router.Path("/auth/callback").Handler(auth.CallbackGetHandler(app, oauthProvider))
 
 	// Web pages
 	router.Path("/").Handler(webpages.IndexGetHandler(renderer, app)).Methods(http.MethodGet)

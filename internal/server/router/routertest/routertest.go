@@ -36,6 +36,7 @@ func SetupTest(t *testing.T) *RouterTest {
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
 		testApp,
+		nil,
 	)
 
 	routerTest := &RouterTest{

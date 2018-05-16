@@ -5,11 +5,13 @@ package server
 import (
 	"context"
 	"io"
+	"net/url"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
+	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
@@ -50,10 +52,16 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
+	oauthProvider, err := getOAuthProvider(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	router := router.NewRouter(
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
 		app,
+		oauthProvider,
 	)
 
 	logger := log.New(loggingOutput)
@@ -69,6 +77,25 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	}
 
 	return &server, nil
+}
+
+func getOAuthProvider(cfg *Config) (oauth.Provider, error) {
+	baseURL, err := url.Parse(cfg.OAuth.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	provider, err := oauth.NewProvider(
+		cfg.OAuth.Provider,
+		baseURL,
+		cfg.OAuth.ClientID,
+		cfg.OAuth.ClientSecret,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return provider, nil
 }
 
 // Shutdown will gracefully stop the server

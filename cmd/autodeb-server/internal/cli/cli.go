@@ -46,6 +46,18 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	var logLevelString string
 	fs.StringVar(&logLevelString, "log-level", "info", "info, warning or error")
 
+	var oauthProvider string
+	fs.StringVar(&oauthProvider, "oauth-provider", "gitlab", "oauth provider")
+
+	var oauthBaseURL string
+	fs.StringVar(&oauthBaseURL, "oauth-base-url", "https://salsa.debian.org", "oauth base url")
+
+	var oauthClientID string
+	fs.StringVar(&oauthClientID, "oauth-client-id", "", "oauth client id")
+
+	var oauthClientSecret string
+	fs.StringVar(&oauthClientSecret, "oauth-client-secret", "", "oauth client secret")
+
 	if err := fs.Parse(args); err != nil {
 		return nil, err
 	}
@@ -81,6 +93,12 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 		DB: server.DBConfig{
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
+		},
+		OAuth: server.OAuthConfig{
+			Provider:     oauthProvider,
+			BaseURL:      oauthBaseURL,
+			ClientID:     oauthClientID,
+			ClientSecret: oauthClientSecret,
 		},
 		DataDirectory:         dataDirectory,
 		TemplatesDirectory:    templatesDirectory,

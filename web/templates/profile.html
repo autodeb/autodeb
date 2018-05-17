@@ -1,0 +1,16 @@
+{{ define "title" }}Profile{{ end }}
+
+{{ define "content" }}
+
+<table>
+    <tr>
+        <th>Username</th>
+        <td>{{ .User.Username }}</td>
+    </tr>
+    <tr>
+        <th>User ID</th>
+        <td>{{ .User.ID }}</td>
+    </tr>
+</table>
+
+{{ end }}

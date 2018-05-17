@@ -10,6 +10,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/uploads"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
@@ -23,7 +24,7 @@ type App struct {
 	oauthProvider  oauth.Provider
 	renderer       *htmltemplate.Renderer
 	staticFS       http.FileSystem
-	sessionsStore  sessions.Store
+	sessionStore   sessions.Store
 }
 
 // NewApp create an app from a configuration
@@ -44,7 +45,7 @@ func NewApp(
 		oauthProvider:  oauthProvider,
 		renderer:       renderer,
 		staticFS:       staticFS,
-		sessionsStore:  sessionsStore,
+		sessionStore:   sessionsStore,
 	}
 
 	if err := app.setupDataDirectory(); err != nil {
@@ -54,10 +55,9 @@ func NewApp(
 	return &app, nil
 }
 
-// Session returns the session for a request
-func (app *App) Session(r *http.Request) *sessions.Session {
-	session, _ := app.sessionsStore.Get(r, "autodeb")
-	return session
+// AuthService returns the authentification service
+func (app *App) AuthService() *auth.Service {
+	return auth.NewService(app.db, app.sessionStore)
 }
 
 // Config returns the app's config

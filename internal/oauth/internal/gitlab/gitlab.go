@@ -49,7 +49,7 @@ func (provider *OAuthProvider) Config() *oauth2.Config {
 }
 
 //UserInfo returns the user id and username
-func (provider *OAuthProvider) UserInfo(authToken string) (int, string, error) {
+func (provider *OAuthProvider) UserInfo(authToken string) (uint, string, error) {
 	userURL := provider.baseURL.ResolveReference(
 		&url.URL{Path: "/api/v4/user"},
 	).String()
@@ -67,7 +67,7 @@ func (provider *OAuthProvider) UserInfo(authToken string) (int, string, error) {
 	}
 
 	var apiUser struct {
-		ID       int    `json:"id"`
+		ID       uint   `json:"id"`
 		Username string `json:"username"`
 	}
 

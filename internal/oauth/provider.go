@@ -15,7 +15,7 @@ type Provider interface {
 	Config() *oauth2.Config
 
 	//UserInfo returns the user ID and username given an auth token
-	UserInfo(token string) (int, string, error)
+	UserInfo(token string) (uint, string, error)
 }
 
 //NewProvider creates a new OAuth Provider

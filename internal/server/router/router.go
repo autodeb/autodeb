@@ -40,6 +40,7 @@ func NewRouter(app *app.App) http.Handler {
 	router.Path("/").Handler(webpages.IndexGetHandler(app)).Methods(http.MethodGet)
 	router.Path("/uploads").Handler(webpages.UploadsGetHandler(app)).Methods(http.MethodGet)
 	router.Path("/jobs").Handler(webpages.JobsGetHandler(app)).Methods(http.MethodGet)
+	router.Path("/profile").Handler(webpages.ProfileGetHandler(app)).Methods(http.MethodGet)
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()

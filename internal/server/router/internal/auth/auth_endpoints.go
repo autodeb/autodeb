@@ -48,20 +48,19 @@ func CallbackGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		userID, _, err := app.OAuthProvider().UserInfo(token.AccessToken)
+		userID, username, err := app.OAuthProvider().UserInfo(token.AccessToken)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		// TODO: create user in our database
+		if err := app.AuthService().Login(r, w, userID, username); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-		session := app.Session(r)
-		setUserID(session, userID)
-		session.Save(r, w)
-
-		http.Redirect(w, r, "/account", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/profile", http.StatusTemporaryRedirect)
 	}
 
 	return http.HandlerFunc(handlerFunc)

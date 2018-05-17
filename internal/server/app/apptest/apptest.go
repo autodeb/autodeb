@@ -5,6 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/gorilla/sessions"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
@@ -21,6 +23,10 @@ type AppTest struct {
 
 //SetupTest will create a test App
 func SetupTest(t *testing.T) *AppTest {
+	config := &app.Config{
+		ServerURL: "https://test.auto.debian.net",
+	}
+
 	db, err := database.NewDatabase(
 		"sqlite3",
 		":memory:",
@@ -36,12 +42,16 @@ func SetupTest(t *testing.T) *AppTest {
 
 	staticFS := filesystem.NewMemMapFs()
 
+	sessionsStore := sessions.NewCookieStore([]byte("something-very-secret"))
+
 	app, err := app.NewApp(
+		config,
 		db,
 		dataFS,
 		nil,
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
+		sessionsStore,
 	)
 	require.NoError(t, err)
 

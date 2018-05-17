@@ -12,7 +12,13 @@ import (
 func IndexGetHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		rendered, err := app.TemplatesRenderer().RenderTemplate(nil, "base.html", "index.html")
+		data := struct {
+			ServerURL string
+		}{
+			ServerURL: app.Config().ServerURL,
+		}
+
+		rendered, err := app.TemplatesRenderer().RenderTemplate(data, "base.html", "index.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

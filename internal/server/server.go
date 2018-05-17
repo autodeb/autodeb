@@ -4,8 +4,11 @@ package server
 
 import (
 	"context"
+	"crypto/rand"
 	"io"
 	"net/url"
+
+	"github.com/gorilla/sessions"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
@@ -52,12 +55,19 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
+	sessionsStore, err := getSessionStore()
+	if err != nil {
+		return nil, err
+	}
+
 	app, err := app.NewApp(
+		cfg.AppConfig,
 		db,
 		dataFS,
 		oauthProvider,
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
+		sessionsStore,
 	)
 	if err != nil {
 		return nil, err
@@ -78,6 +88,20 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	}
 
 	return &server, nil
+}
+
+func getSessionStore() (sessions.Store, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Ask for the session secret in the CLI
+	// instead of generating a random one
+	store := sessions.NewCookieStore(b)
+
+	return store, nil
 }
 
 func getOAuthProvider(cfg *Config) (oauth.Provider, error) {

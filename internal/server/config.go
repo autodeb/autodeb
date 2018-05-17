@@ -2,13 +2,16 @@ package server
 
 import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
-// Config contains configuration for Server
+// Config holds configuration that is needed by Server to initialize all of its
+// dependencies.
 type Config struct {
-	DB                    DBConfig
-	HTTP                  HTTPServerConfig
-	OAuth                 OAuthConfig
+	DB                    *DBConfig
+	HTTP                  *HTTPServerConfig
+	OAuth                 *OAuthConfig
+	AppConfig             *app.Config
 	DataDirectory         string
 	TemplatesDirectory    string
 	StaticFilesDirectory  string

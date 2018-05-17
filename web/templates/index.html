@@ -8,18 +8,12 @@
 This server has a dput-compatible API. Try adding this to ~/.dput.cf:
 </p>
 
-<p>
-(replacing HOST and PORT to point to the server hosting this web page)
-</p>
-
 <pre>
 [autodeb]
-fqdn = HOST:PORT
+fqdn = {{ .ServerURL }}
 incoming = /upload
 method = http
 allow_unsigned_uploads = 1
-progress_indicator = 2
-# Allow uploads for UNRELEASED packages
 allowed_distributions = .
 </pre>
 

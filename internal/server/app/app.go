@@ -5,6 +5,8 @@ package app
 import (
 	"net/http"
 
+	"github.com/gorilla/sessions"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
@@ -15,28 +17,34 @@ import (
 // App is an autodeb server application
 type App struct {
 	db             *database.Database
+	config         *Config
 	dataFS         filesystem.FS
 	uploadsManager *uploads.Manager
 	oauthProvider  oauth.Provider
 	renderer       *htmltemplate.Renderer
 	staticFS       http.FileSystem
+	sessionsStore  sessions.Store
 }
 
 // NewApp create an app from a configuration
 func NewApp(
+	config *Config,
 	db *database.Database,
 	dataFS filesystem.FS,
 	oauthProvider oauth.Provider,
 	renderer *htmltemplate.Renderer,
-	staticFS http.FileSystem) (*App, error) {
+	staticFS http.FileSystem,
+	sessionsStore sessions.Store) (*App, error) {
 
 	app := App{
+		config:         config,
 		db:             db,
 		dataFS:         dataFS,
 		uploadsManager: uploads.NewManager(db, dataFS),
 		oauthProvider:  oauthProvider,
 		renderer:       renderer,
 		staticFS:       staticFS,
+		sessionsStore:  sessionsStore,
 	}
 
 	if err := app.setupDataDirectory(); err != nil {
@@ -44,6 +52,17 @@ func NewApp(
 	}
 
 	return &app, nil
+}
+
+// Session returns the session for a request
+func (app *App) Session(r *http.Request) *sessions.Session {
+	session, _ := app.sessionsStore.Get(r, "autodeb")
+	return session
+}
+
+// Config returns the app's config
+func (app *App) Config() *Config {
+	return app.config
 }
 
 // StaticFS contains static files to be served over http

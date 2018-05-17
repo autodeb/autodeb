@@ -10,6 +10,7 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
 // Parse reads arguments and creates an autodeb server config
@@ -58,6 +59,9 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	var oauthClientSecret string
 	fs.StringVar(&oauthClientSecret, "oauth-client-secret", "", "oauth client secret")
 
+	var serverURL string
+	fs.StringVar(&serverURL, "server-url", "http://localhost:8071", "public server url")
+
 	if err := fs.Parse(args); err != nil {
 		return nil, err
 	}
@@ -87,18 +91,21 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	}
 
 	cfg := &server.Config{
-		HTTP: server.HTTPServerConfig{
+		HTTP: &server.HTTPServerConfig{
 			Address: address,
 		},
-		DB: server.DBConfig{
+		DB: &server.DBConfig{
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},
-		OAuth: server.OAuthConfig{
+		OAuth: &server.OAuthConfig{
 			Provider:     oauthProvider,
 			BaseURL:      oauthBaseURL,
 			ClientID:     oauthClientID,
 			ClientSecret: oauthClientSecret,
+		},
+		AppConfig: &app.Config{
+			ServerURL: serverURL,
 		},
 		DataDirectory:         dataDirectory,
 		TemplatesDirectory:    templatesDirectory,

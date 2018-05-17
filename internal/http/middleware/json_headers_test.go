@@ -1,4 +1,4 @@
-package decorators_test
+package middleware_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,8 +26,8 @@ func TestJSONHeaders(t *testing.T) {
 	contentType := responseRecorder.Result().Header.Get("Content-Type")
 	assert.NotEqual(t, "application/json", contentType)
 
-	// Decorate the handler
-	handler = decorators.JSONHeaders(handler)
+	// Weap the handler
+	handler = middleware.JSONHeaders(handler)
 
 	// Test the decorated handler
 	request, _ = http.NewRequest("GET", "/", nil)

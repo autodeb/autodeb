@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
@@ -41,7 +41,7 @@ func UploadDSCGetHandler(app *app.App) http.Handler {
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
 
-	handler = decorators.TextPlainHeaders(handler)
+	handler = middleware.TextPlainHeaders(handler)
 
 	return handler
 }
@@ -76,7 +76,7 @@ func UploadFilesGetHandler(app *app.App) http.Handler {
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
 
-	handler = decorators.JSONHeaders(handler)
+	handler = middleware.JSONHeaders(handler)
 
 	return handler
 }

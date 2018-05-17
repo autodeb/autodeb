@@ -1,4 +1,4 @@
-package decorators
+package middleware
 
 import (
 	"net/http"

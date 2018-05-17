@@ -1,4 +1,4 @@
-package decorators_test
+package middleware_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 )
 
 func TestHTMLHeaders(t *testing.T) {
@@ -26,8 +26,8 @@ func TestHTMLHeaders(t *testing.T) {
 		t.Error("Content-Type should not be application/json yet")
 	}
 
-	// Decorate the handler
-	handler = decorators.HTMLHeaders(handler)
+	// Wrap the handler
+	handler = middleware.HTMLHeaders(handler)
 
 	// Test the decorated handler
 	request, _ = http.NewRequest("GET", "/", nil)

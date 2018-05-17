@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
@@ -29,7 +29,7 @@ func IndexGetHandler(app *app.App) http.Handler {
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
 
-	handler = decorators.HTMLHeaders(handler)
+	handler = middleware.HTMLHeaders(handler)
 
 	return handler
 }

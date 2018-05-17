@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
-	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue/uploadparametersparser"
@@ -46,7 +46,7 @@ func UploadHandler(app *app.App) http.Handler {
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
 
-	handler = decorators.JSONHeaders(handler)
+	handler = middleware.JSONHeaders(handler)
 
 	return handler
 }

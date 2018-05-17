@@ -36,7 +36,7 @@ func LoginGetHandler(app *app.App) http.Handler {
 	return http.HandlerFunc(handlerFunc)
 }
 
-//CallbackGetHandler returns a handlers that handles the oauth callback
+//CallbackGetHandler returns a handler that handles the oauth callback
 func CallbackGetHandler(app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		oauthCfg := oauthConfigWithRedirectURL(app)
@@ -61,6 +61,16 @@ func CallbackGetHandler(app *app.App) http.Handler {
 		}
 
 		http.Redirect(w, r, "/profile", http.StatusTemporaryRedirect)
+	}
+
+	return http.HandlerFunc(handlerFunc)
+}
+
+//LogoutGetHandler returns a handler that logs out the user
+func LogoutGetHandler(app *app.App) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		app.AuthService().Logout(r, w)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 
 	return http.HandlerFunc(handlerFunc)

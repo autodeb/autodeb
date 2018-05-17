@@ -8,10 +8,10 @@ import (
 	"github.com/gorilla/mux"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/webpages"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/auth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/uploadqueue"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/webpages"
 )
 
 // NewRouter creates the main router for the application.
@@ -34,6 +34,7 @@ func NewRouter(app *app.App) http.Handler {
 
 	// Authentification
 	router.Path("/auth/login").Handler(auth.LoginGetHandler(app))
+	router.Path("/auth/logout").Handler(auth.LogoutGetHandler(app))
 	router.Path("/auth/callback").Handler(auth.CallbackGetHandler(app))
 
 	// Web pages

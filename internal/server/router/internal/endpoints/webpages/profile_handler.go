@@ -7,21 +7,12 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
 )
 
 //ProfileGetHandler returns a handler that renders the profile page
 func ProfileGetHandler(app *app.App) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-
-		user, err := app.AuthService().GetUser(r)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		if user == nil {
-			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return
-		}
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		data := struct {
 			User *models.User
@@ -39,7 +30,7 @@ func ProfileGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, rendered)
 	}
 
-	handler := http.Handler(http.HandlerFunc(handlerFunc))
+	handler := auth.WithUser(handlerFunc, app)
 
 	handler = middleware.HTMLHeaders(handler)
 

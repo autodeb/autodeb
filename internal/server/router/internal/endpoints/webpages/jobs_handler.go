@@ -7,11 +7,12 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
 )
 
 //JobsGetHandler returns a handler that renders the jobs page
 func JobsGetHandler(app *app.App) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		jobs, err := app.GetAllJobs()
 		if err != nil {
@@ -20,8 +21,10 @@ func JobsGetHandler(app *app.App) http.Handler {
 		}
 
 		data := struct {
+			User *models.User
 			Jobs []*models.Job
 		}{
+			User: user,
 			Jobs: jobs,
 		}
 
@@ -34,7 +37,7 @@ func JobsGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, rendered)
 	}
 
-	handler := http.Handler(http.HandlerFunc(handlerFunc))
+	handler := auth.MaybeWithUser(handlerFunc, app)
 
 	handler = middleware.HTMLHeaders(handler)
 

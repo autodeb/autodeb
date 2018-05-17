@@ -7,11 +7,12 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
 )
 
 //UploadsGetHandler returns a handler that renders the uploads page
 func UploadsGetHandler(app *app.App) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		uploads, err := app.GetAllUploads()
 		if err != nil {
@@ -20,8 +21,10 @@ func UploadsGetHandler(app *app.App) http.Handler {
 		}
 
 		data := struct {
+			User    *models.User
 			Uploads []*models.Upload
 		}{
+			User:    user,
 			Uploads: uploads,
 		}
 
@@ -34,7 +37,7 @@ func UploadsGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, rendered)
 	}
 
-	handler := http.Handler(http.HandlerFunc(handlerFunc))
+	handler := auth.MaybeWithUser(handlerFunc, app)
 
 	handler = middleware.HTMLHeaders(handler)
 

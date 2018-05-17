@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 )
 

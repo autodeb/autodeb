@@ -65,3 +65,8 @@ func (service *Service) Login(r *http.Request, w http.ResponseWriter, id uint, u
 
 	return nil
 }
+
+// Logout logs out the user
+func (service *Service) Logout(r *http.Request, w http.ResponseWriter) {
+	service.clearSession(r, w)
+}

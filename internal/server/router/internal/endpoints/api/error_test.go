@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/api"
 )
 
 func TestJSONError(t *testing.T) {

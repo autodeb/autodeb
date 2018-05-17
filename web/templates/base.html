@@ -18,8 +18,12 @@
             <a href="/jobs">Jobs</a>
 
             <p>Account</p>
-            <a href="/auth/login">Login</a><br>
-            <a href="/profile">Profile</a>
+            {{ if .User }}
+                <a href="/profile">Profile ({{ .User.Username }})</a><br>
+                <a href="/auth/logout">logout</a><br>
+            {{ else }}
+                <a href="/auth/login">Login</a><br>
+            {{ end }}
         </aside>
 
         <main class="content">

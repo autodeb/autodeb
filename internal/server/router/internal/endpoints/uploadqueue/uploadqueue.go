@@ -8,8 +8,8 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/uploadqueue/uploadparametersparser"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/uploadqueue/uploadparametersparser"
 )
 
 //UploadHandler returns a handler that accepts http package uploads

@@ -14,6 +14,12 @@ func (service *Service) session(r *http.Request) *sessions.Session {
 	return session
 }
 
+func (service *Service) clearSession(r *http.Request, w http.ResponseWriter) {
+	session := service.session(r)
+	session.Options.MaxAge = -1
+	session.Save(r, w)
+}
+
 func (service *Service) getUserID(r *http.Request) (uint, error) {
 	session := service.session(r)
 

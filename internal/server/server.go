@@ -60,6 +60,9 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
+	logger := log.New(loggingOutput)
+	logger.SetLevel(cfg.LogLevel)
+
 	app, err := app.NewApp(
 		cfg.AppConfig,
 		db,
@@ -68,15 +71,13 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
 		sessionsStore,
+		logger,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	router := router.NewRouter(app)
-
-	logger := log.New(loggingOutput)
-	logger.SetLevel(cfg.LogLevel)
 
 	httpServer, err := http.NewHTTPServer(cfg.HTTP.Address, router, logger)
 	if err != nil {

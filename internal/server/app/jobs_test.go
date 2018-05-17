@@ -13,47 +13,47 @@ import (
 )
 
 func TestSaveJobLog(t *testing.T) {
-	testApp, fs, _ := apptest.SetupTest(t)
+	appTest := apptest.SetupTest(t)
 
 	jobDir := filepath.Join(
-		testApp.JobsDirectory(),
+		appTest.App.JobsDirectory(),
 		"1",
 	)
 
-	_, err := fs.Stat(jobDir)
+	_, err := appTest.DataFS.Stat(jobDir)
 	require.Error(t, err, "the job directory should not exist")
 
-	err = testApp.SaveJobLog(
+	err = appTest.App.SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(jobDir)
+	_, err = appTest.DataFS.Stat(jobDir)
 	assert.NoError(t, err)
 
 	logFilePath := filepath.Join(jobDir, "log.txt")
 
-	_, err = fs.Stat(logFilePath)
+	_, err = appTest.DataFS.Stat(logFilePath)
 	assert.NoError(t, err)
 
-	logFile, _ := fs.Open(logFilePath)
+	logFile, _ := appTest.DataFS.Open(logFilePath)
 	defer logFile.Close()
 	b, _ := ioutil.ReadAll(logFile)
 	assert.Equal(t, "Hello", string(b))
 }
 
 func TestGetJobLog(t *testing.T) {
-	testApp, _, _ := apptest.SetupTest(t)
+	appTest := apptest.SetupTest(t)
 
-	err := testApp.SaveJobLog(
+	err := appTest.App.SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 	assert.NoError(t, err)
 
-	log, err := testApp.GetJobLog(uint(1))
+	log, err := appTest.App.GetJobLog(uint(1))
 	defer log.Close()
 
 	assert.NoError(t, err)

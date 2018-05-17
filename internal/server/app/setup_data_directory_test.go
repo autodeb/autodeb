@@ -8,14 +8,14 @@ import (
 )
 
 func TestSetupDataDirectory(t *testing.T) {
-	testApp, fs, _ := apptest.SetupTest(t)
+	appTest := apptest.SetupTest(t)
 
-	_, err := fs.Stat(testApp.UploadedFilesDirectory())
+	_, err := appTest.DataFS.Stat(appTest.App.UploadedFilesDirectory())
 	assert.NoError(t, err, "the directory should have been created")
 
-	_, err = fs.Stat(testApp.UploadsDirectory())
+	_, err = appTest.DataFS.Stat(appTest.App.UploadsDirectory())
 	assert.NoError(t, err, "the directory should have been created")
 
-	_, err = fs.Stat(testApp.JobsDirectory())
+	_, err = appTest.DataFS.Stat(appTest.App.JobsDirectory())
 	assert.NoError(t, err, "the directory should have been created")
 }

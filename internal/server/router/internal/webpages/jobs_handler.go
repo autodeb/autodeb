@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/decorators"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
 //JobsGetHandler returns a handler that renders the jobs page
-func JobsGetHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler {
+func JobsGetHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
 		jobs, err := app.GetAllJobs()
@@ -26,7 +25,7 @@ func JobsGetHandler(renderer *htmltemplate.Renderer, app *app.App) http.Handler 
 			Jobs: jobs,
 		}
 
-		rendered, err := renderer.RenderTemplate(data, "base.html", "jobs.html")
+		rendered, err := app.TemplatesRenderer().RenderTemplate(data, "base.html", "jobs.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

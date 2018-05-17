@@ -6,16 +6,14 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
 //LoginGetHandler returns a handler that redirects to the oauth provider
-func LoginGetHandler(app *app.App, oauthProvider oauth.Provider) http.Handler {
+func LoginGetHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
-		// Get the oauth config and set the redirect url
-		oauthCfg := oauthProvider.Config()
+		oauthCfg := app.OAuthProvider().Config()
 		oauthCfg.RedirectURL = "http://localhost:8071/auth/callback"
 
 		// Get the url to redirect to
@@ -28,11 +26,11 @@ func LoginGetHandler(app *app.App, oauthProvider oauth.Provider) http.Handler {
 }
 
 //CallbackGetHandler returns a handlers that handles the oauth callback
-func CallbackGetHandler(app *app.App, oauthProvider oauth.Provider) http.Handler {
+func CallbackGetHandler(app *app.App) http.Handler {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get the oauth config and set the redirect url
-		oauthCfg := oauthProvider.Config()
+		oauthCfg := app.OAuthProvider().Config()
 		oauthCfg.RedirectURL = "http://localhost:8071/auth/callback"
 
 		// Obtain the auth token from the oauth provider
@@ -44,7 +42,7 @@ func CallbackGetHandler(app *app.App, oauthProvider oauth.Provider) http.Handler
 		}
 
 		// Obtain the user information from the oauth provider
-		userID, username, err := oauthProvider.UserInfo(token.AccessToken)
+		userID, username, err := app.OAuthProvider().UserInfo(token.AccessToken)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(http.StatusBadRequest)

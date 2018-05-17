@@ -35,7 +35,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
-	app, err := app.NewApp(db, dataFS)
+	oauthProvider, err := getOAuthProvider(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -52,17 +52,18 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
-	oauthProvider, err := getOAuthProvider(cfg)
+	app, err := app.NewApp(
+		db,
+		dataFS,
+		oauthProvider,
+		renderer,
+		filesystem.NewHTTPFS(staticFilesFS),
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	router := router.NewRouter(
-		renderer,
-		filesystem.NewHTTPFS(staticFilesFS),
-		app,
-		oauthProvider,
-	)
+	router := router.NewRouter(app)
 
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)

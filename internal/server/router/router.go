@@ -7,8 +7,6 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
-	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
@@ -17,7 +15,7 @@ import (
 )
 
 // NewRouter creates the main router for the application.
-func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *app.App, oauthProvider oauth.Provider) http.Handler {
+func NewRouter(app *app.App) http.Handler {
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -30,18 +28,18 @@ func NewRouter(renderer *htmltemplate.Renderer, staticFS http.FileSystem, app *a
 	router.PathPrefix("/static/").Handler(
 		http.StripPrefix(
 			"/static/",
-			http.FileServer(staticFS),
+			http.FileServer(app.StaticFS()),
 		),
 	).Methods(http.MethodGet)
 
 	// Authentification
-	router.Path("/auth/login").Handler(auth.LoginGetHandler(app, oauthProvider))
-	router.Path("/auth/callback").Handler(auth.CallbackGetHandler(app, oauthProvider))
+	router.Path("/auth/login").Handler(auth.LoginGetHandler(app))
+	router.Path("/auth/callback").Handler(auth.CallbackGetHandler(app))
 
 	// Web pages
-	router.Path("/").Handler(webpages.IndexGetHandler(renderer, app)).Methods(http.MethodGet)
-	router.Path("/uploads").Handler(webpages.UploadsGetHandler(renderer, app)).Methods(http.MethodGet)
-	router.Path("/jobs").Handler(webpages.JobsGetHandler(renderer, app)).Methods(http.MethodGet)
+	router.Path("/").Handler(webpages.IndexGetHandler(app)).Methods(http.MethodGet)
+	router.Path("/uploads").Handler(webpages.UploadsGetHandler(app)).Methods(http.MethodGet)
+	router.Path("/jobs").Handler(webpages.JobsGetHandler(app)).Methods(http.MethodGet)
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()

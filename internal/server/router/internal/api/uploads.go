@@ -16,7 +16,7 @@ import (
 
 //UploadDSCGetHandler returns handler the DSC of the upload
 func UploadDSCGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		uploadID, err := strconv.Atoi(vars["uploadID"])
@@ -39,14 +39,16 @@ func UploadDSCGetHandler(app *app.App) http.Handler {
 		io.Copy(w, dsc)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.TextPlainHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }
 
 //UploadFilesGetHandler returns a handler that lists all files for an upload
 func UploadFilesGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		uploadID, err := strconv.Atoi(vars["uploadID"])
@@ -72,14 +74,16 @@ func UploadFilesGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, jsonFileUploads)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.JSONHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }
 
 //UploadFileGetHandler returns a handler that returns upload files
 func UploadFileGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 
@@ -112,5 +116,5 @@ func UploadFileGetHandler(app *app.App) http.Handler {
 		io.Copy(w, file)
 	}
 
-	return http.HandlerFunc(handler)
+	return http.HandlerFunc(handlerFunc)
 }

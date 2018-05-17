@@ -11,7 +11,7 @@ import (
 
 //UploadsGetHandler returns a handler that renders the uploads page
 func UploadsGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		uploads, err := app.GetAllUploads()
 		if err != nil {
@@ -34,7 +34,9 @@ func UploadsGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, rendered)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.HTMLHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }

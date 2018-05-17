@@ -16,7 +16,7 @@ func TestJSONHeaders(t *testing.T) {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `{"hello": "world"}`)
 	}
-	handler := http.HandlerFunc(handlerFunc)
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
 
 	// Test the empty handler
 	request, _ := http.NewRequest("GET", "/", nil)
@@ -27,8 +27,7 @@ func TestJSONHeaders(t *testing.T) {
 	assert.NotEqual(t, "application/json", contentType)
 
 	// Decorate the handler
-	handlerFunc = decorators.JSONHeaders(handlerFunc)
-	handler = http.HandlerFunc(handlerFunc)
+	handler = decorators.JSONHeaders(handler)
 
 	// Test the decorated handler
 	request, _ = http.NewRequest("GET", "/", nil)

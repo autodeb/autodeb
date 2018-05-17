@@ -16,7 +16,7 @@ import (
 
 //JobsNextPostHandler returns a handler that find the next job to run
 func JobsNextPostHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		job, err := app.UnqueueNextJob()
 		if err != nil {
@@ -39,14 +39,16 @@ func JobsNextPostHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, jsonJob)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.JSONHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }
 
 //JobGetHandler returns a handler that returns a job
 func JobGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		jobID, err := strconv.Atoi(vars["jobID"])
@@ -76,14 +78,16 @@ func JobGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, jsonJob)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.JSONHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }
 
 //JobLogTxtGetHandler returns a handler that retrieves the log of a job
 func JobLogTxtGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get input values
 		vars := mux.Vars(r)
@@ -107,14 +111,16 @@ func JobLogTxtGetHandler(app *app.App) http.Handler {
 		io.Copy(w, file)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.TextPlainHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }
 
 //JobLogPostHandler returns a handler that saves a log for a job
 func JobLogPostHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get input values
 		vars := mux.Vars(r)
@@ -152,12 +158,12 @@ func JobLogPostHandler(app *app.App) http.Handler {
 
 	}
 
-	return http.HandlerFunc(handler)
+	return http.HandlerFunc(handlerFunc)
 }
 
 //JobStatusPostHandler returns a handler that sets the job status
 func JobStatusPostHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get input values
 		vars := mux.Vars(r)
@@ -215,5 +221,5 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 
 	}
 
-	return http.HandlerFunc(handler)
+	return http.HandlerFunc(handlerFunc)
 }

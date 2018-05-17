@@ -14,7 +14,7 @@ import (
 
 //UploadHandler returns a handler that accepts http package uploads
 func UploadHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		uploadParameters, err := uploadparametersparser.Parse(r)
 		if err != nil {
@@ -44,7 +44,9 @@ func UploadHandler(app *app.App) http.Handler {
 
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.JSONHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }

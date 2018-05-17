@@ -14,7 +14,7 @@ func TestHTMLHeaders(t *testing.T) {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `Hello World`)
 	}
-	handler := http.HandlerFunc(handlerFunc)
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
 
 	// Test the empty handler
 	request, _ := http.NewRequest("GET", "/", nil)
@@ -27,8 +27,7 @@ func TestHTMLHeaders(t *testing.T) {
 	}
 
 	// Decorate the handler
-	handlerFunc = decorators.HTMLHeaders(handlerFunc)
-	handler = http.HandlerFunc(handlerFunc)
+	handler = decorators.HTMLHeaders(handler)
 
 	// Test the decorated handler
 	request, _ = http.NewRequest("GET", "/", nil)

@@ -10,7 +10,7 @@ import (
 
 //IndexGetHandler returns a handler for the main page
 func IndexGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		data := struct {
 			ServerURL string
@@ -27,7 +27,9 @@ func IndexGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, rendered)
 	}
 
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
 	handler = decorators.HTMLHeaders(handler)
 
-	return http.HandlerFunc(handler)
+	return handler
 }

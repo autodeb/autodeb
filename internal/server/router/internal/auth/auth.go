@@ -23,7 +23,7 @@ func oauthConfigWithRedirectURL(app *app.App) *oauth2.Config {
 
 //LoginGetHandler returns a handler that redirects to the oauth provider
 func LoginGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		oauthCfg := oauthConfigWithRedirectURL(app)
 
@@ -33,12 +33,12 @@ func LoginGetHandler(app *app.App) http.Handler {
 
 	}
 
-	return http.HandlerFunc(handler)
+	return http.HandlerFunc(handlerFunc)
 }
 
 //CallbackGetHandler returns a handlers that handles the oauth callback
 func CallbackGetHandler(app *app.App) http.Handler {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 		oauthCfg := oauthConfigWithRedirectURL(app)
 
 		authCode := r.FormValue("code")
@@ -64,5 +64,5 @@ func CallbackGetHandler(app *app.App) http.Handler {
 		http.Redirect(w, r, "/account", http.StatusTemporaryRedirect)
 	}
 
-	return http.HandlerFunc(handler)
+	return http.HandlerFunc(handlerFunc)
 }

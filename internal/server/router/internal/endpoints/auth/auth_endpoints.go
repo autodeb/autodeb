@@ -39,9 +39,11 @@ func LoginGetHandler(app *app.App) http.Handler {
 //CallbackGetHandler returns a handler that handles the oauth callback
 func CallbackGetHandler(app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-		oauthCfg := oauthConfigWithRedirectURL(app)
 
 		authCode := r.FormValue("code")
+
+		oauthCfg := oauthConfigWithRedirectURL(app)
+
 		token, err := oauthCfg.Exchange(oauth2.NoContext, authCode)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)

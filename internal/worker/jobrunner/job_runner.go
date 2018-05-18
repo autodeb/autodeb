@@ -81,7 +81,13 @@ func (jobRunner *JobRunner) setupAndExecJob(job *models.Job) {
 	ctx, cancelCtx := jobRunner.getJobContext()
 	defer cancelCtx()
 
+	// Execute the job
 	jobError := jobRunner.execJob(ctx, job, workingDirectory, logFile)
+
+	// Include the job error at the end of the log
+	if jobError != nil {
+		fmt.Fprintf(logFile, "\nError: %+v", jobError)
+	}
 
 	// If we canceled the job, requeue
 	select {

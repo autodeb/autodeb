@@ -14,9 +14,6 @@ func (jobRunner *JobRunner) submitResult(job *models.Job, jobError error, jobLog
 	}
 	jobRunner.setJobStatus(job, jobStatus)
 
-	// TODO: do something with the error. For now, we will log it.
-	jobRunner.logger.Errorf("%+v", jobError)
-
 	// Submit the log
 	jobRunner.submitJobLog(job, jobLog)
 }

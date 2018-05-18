@@ -3,8 +3,9 @@ package udd
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 const (
@@ -27,11 +28,11 @@ type Package struct {
 func PackagesWithNewerUpstreamVersions() ([]*Package, error) {
 	resp, err := http.Get(upstreamStatusJSONURL)
 	if err != nil {
-		return nil, fmt.Errorf("getting %q: %v", upstreamStatusJSONURL, err)
+		return nil, errors.Errorf("getting %q: %v", upstreamStatusJSONURL, err)
 	}
 
 	if got, want := resp.StatusCode, http.StatusOK; got != want {
-		return nil, fmt.Errorf("unexpected HTTP status code: got %d, want %d", got, want)
+		return nil, errors.Errorf("unexpected HTTP status code: got %d, want %d", got, want)
 	}
 
 	var pkgs []*Package

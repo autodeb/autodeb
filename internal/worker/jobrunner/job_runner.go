@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
@@ -128,7 +129,7 @@ func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, workin
 		return jobRunner.execBuild(ctx, job, workingDirectory, logFile)
 	default:
 		jobRunner.logger.Errorf("Unknown job type: %s", job.Type)
-		return fmt.Errorf("unknown job type: %s", job.Type)
+		return errors.Errorf("unknown job type: %s", job.Type)
 	}
 }
 

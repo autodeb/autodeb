@@ -2,11 +2,11 @@ package jobrunner
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"path/filepath"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/exec"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
@@ -20,7 +20,7 @@ func (jobRunner *JobRunner) execBuild(ctx context.Context, job *models.Job, work
 		ctx, workingDirectory, logFile, logFile,
 		"dget", "--allow-unauthenticated", dscURL.String(),
 	); err != nil {
-		return fmt.Errorf("dget error: %s", err)
+		return errors.Errorf("dget error: %s", err)
 	}
 
 	// Find the source directory
@@ -38,7 +38,7 @@ func (jobRunner *JobRunner) execBuild(ctx context.Context, job *models.Job, work
 		ctx, sourceDirectory, logFile, logFile,
 		"sbuild", "--no-clean-source", "--nolog",
 	); err != nil {
-		return fmt.Errorf("sbuild error: %s", err)
+		return errors.Errorf("sbuild error: %s", err)
 	}
 
 	return nil

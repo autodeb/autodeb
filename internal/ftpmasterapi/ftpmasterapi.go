@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 const (
@@ -29,11 +31,11 @@ func GetDSCInSuite(pkg, distribution string) ([]*DSC, error) {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("GetSourceFtpMasterAPI error: %s", err)
+		return nil, errors.Errorf("GetSourceFtpMasterAPI error: %s", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected HTTP status code: got %d", resp.StatusCode)
+		return nil, errors.Errorf("unexpected HTTP status code: got %d", resp.StatusCode)
 	}
 
 	var dscs []*DSC

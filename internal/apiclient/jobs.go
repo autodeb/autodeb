@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
@@ -37,7 +38,7 @@ func (c *APIClient) SetJobStatus(jobID uint, status models.JobStatus) error {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("Unexpected status code %v", response.Status)
+		return errors.Errorf("Unexpected status code %v", response.Status)
 	}
 
 	return nil
@@ -54,7 +55,7 @@ func (c *APIClient) SubmitJobLog(jobID uint, jobLog io.Reader) error {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("Unexpected status code %v", response.Status)
+		return errors.Errorf("Unexpected status code %v", response.Status)
 	}
 
 	return nil

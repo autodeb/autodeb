@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/exec/tar"
 	"salsa.debian.org/autodeb-team/autodeb/internal/ftpmasterapi"
 )
@@ -21,12 +22,12 @@ const (
 func getSourceFtpMasterAPI(pkg, distribution, directory string) error {
 	dscs, err := ftpmasterapi.GetDSCInSuite(pkg, distribution)
 	if err != nil {
-		return fmt.Errorf("ftpmasterapi error: %s", err)
+		return errors.Errorf("ftpmasterapi error: %s", err)
 	}
 
 	numberOfDSC := len(dscs)
 	if numberOfDSC < 1 {
-		return fmt.Errorf("expected at least one dsc, got none")
+		return errors.Errorf("expected at least one dsc, got none")
 	}
 
 	dsc := dscs[numberOfDSC-1]
@@ -42,7 +43,7 @@ func getSourceFtpMasterAPI(pkg, distribution, directory string) error {
 	command.Dir = directory
 
 	if err := command.Run(); err != nil {
-		return fmt.Errorf("dget error: %s", err)
+		return errors.Errorf("dget error: %s", err)
 	}
 
 	return nil
@@ -90,5 +91,5 @@ func findDebianTarballInSourceDirectory(directory string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("could not find debian tarball in %s", directory)
+	return "", errors.Errorf("could not find debian tarball in %s", directory)
 }

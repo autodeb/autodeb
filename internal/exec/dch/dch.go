@@ -1,8 +1,9 @@
 package dch
 
 import (
-	"fmt"
 	"os/exec"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 //NewVersion creates a new version
@@ -16,7 +17,7 @@ func NewVersion(changelogPath, version, distribution, message string) error {
 	)
 
 	if err := command.Run(); err != nil {
-		return fmt.Errorf("dch error: %s", err)
+		return errors.Errorf("dch error: %s", err)
 	}
 
 	return nil

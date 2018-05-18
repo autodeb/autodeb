@@ -3,7 +3,6 @@ package uploads
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/crypto/sha256"
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 
 	"pault.ag/go/debian/control"
@@ -139,13 +139,13 @@ func (man *Manager) moveFileUpload(fileUpload *models.FileUpload, upload *models
 	)
 
 	if err := man.dataFS.Rename(source, dest); err != nil {
-		return fmt.Errorf("could not move %s to %s", source, dest)
+		return errors.Errorf("could not move %s to %s", source, dest)
 	}
 
 	fileUpload.Completed = true
 	fileUpload.UploadID = upload.ID
 	if err := man.db.UpdateFileUpload(fileUpload); err != nil {
-		return fmt.Errorf("could not mark fileUpload %v as completed", fileUpload.ID)
+		return errors.Errorf("could not mark fileUpload %v as completed", fileUpload.ID)
 	}
 
 	man.dataFS.RemoveAll(sourceDir)
@@ -169,7 +169,7 @@ func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.F
 
 		if fileUpload == nil {
 			return nil, &uploadError{
-				fmt.Errorf(
+				errors.Errorf(
 					"changes refers to unexisting file %s with hash %s",
 					file.Filename,
 					file.Hash,

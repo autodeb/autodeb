@@ -1,8 +1,9 @@
 package dget
 
 import (
-	"fmt"
 	"os/exec"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 //Dget the URL in the directory
@@ -14,7 +15,7 @@ func Dget(url, directory string) error {
 	command.Dir = directory
 
 	if err := command.Run(); err != nil {
-		return fmt.Errorf("dget error: %s", err)
+		return errors.Errorf("dget error: %s", err)
 	}
 
 	return nil

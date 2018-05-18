@@ -2,8 +2,9 @@ package uscan
 
 import (
 	"encoding/xml"
-	"fmt"
 	"os/exec"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 //Uscan runs uscan
@@ -16,7 +17,7 @@ func Uscan(directory string) (*Result, error) {
 
 	output, err := command.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("uscan error: %s", err)
+		return nil, errors.Errorf("uscan error: %s", err)
 	}
 
 	result := &Result{}

@@ -64,6 +64,6 @@ func main() {
 }
 
 func printErrorAndExit(err error) {
-	fmt.Fprintf(os.Stderr, "Error: %s.\n", err)
+	fmt.Fprintf(os.Stderr, "Error: %+v.\n", err)
 	os.Exit(1)
 }

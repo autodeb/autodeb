@@ -1,11 +1,11 @@
 package uploadparametersparser
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 )
 
@@ -44,10 +44,10 @@ func Parse(r *http.Request) (*app.UploadParameters, error) {
 			if forwardUpload, err := strconv.ParseBool(value[0]); err == nil {
 				uploadParameters.ForwardUpload = forwardUpload
 			} else {
-				return nil, fmt.Errorf("invalid value for forward_upload: %s", value[0])
+				return nil, errors.Errorf("invalid value for forward_upload: %s", value[0])
 			}
 		default:
-			return nil, fmt.Errorf("unrecognized upload parameter: %s", param)
+			return nil, errors.Errorf("unrecognized upload parameter: %s", param)
 		}
 
 	}
@@ -62,7 +62,7 @@ func splitURLPath(path string) (string, []string, error) {
 	)
 
 	if splitPath[0] == "" {
-		return "", nil, fmt.Errorf("upload parameters should atleast contain the filename")
+		return "", nil, errors.Errorf("upload parameters should atleast contain the filename")
 	}
 
 	// The file name is the last element of the path

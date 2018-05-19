@@ -20,9 +20,9 @@
             <p>Account</p>
             {{ if .User }}
                 <a href="/profile">Profile ({{ .User.Username }})</a><br>
-                <a href="/auth/logout">logout</a><br>
+                <a href="/logout">logout</a><br>
             {{ else }}
-                <a href="/auth/login">Login</a><br>
+                <a href="/login">Login</a><br>
             {{ end }}
         </aside>
 

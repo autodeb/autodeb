@@ -11,6 +11,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
@@ -43,7 +44,14 @@ func SetupTest(t *testing.T) *AppTest {
 
 	staticFS := filesystem.NewMemMapFs()
 
-	sessionsStore := sessions.NewCookieStore([]byte("something-very-secret"))
+	sessionStore := sessions.NewCookieStore([]byte("something-very-secret"))
+
+	authService := oauth.NewService(
+		db,
+		sessionStore,
+		nil,
+		config.ServerURL,
+	)
 
 	logger := log.New(ioutil.Discard)
 
@@ -51,10 +59,9 @@ func SetupTest(t *testing.T) *AppTest {
 		config,
 		db,
 		dataFS,
-		nil,
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
-		sessionsStore,
+		authService,
 		logger,
 	)
 	require.NoError(t, err)

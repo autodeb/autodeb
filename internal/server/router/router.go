@@ -9,7 +9,6 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/api"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/uploadqueue"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/webpages"
 )
@@ -33,9 +32,9 @@ func NewRouter(app *app.App) http.Handler {
 	).Methods(http.MethodGet)
 
 	// Authentification
-	router.Path("/auth/login").Handler(auth.LoginGetHandler(app))
-	router.Path("/auth/logout").Handler(auth.LogoutGetHandler(app))
-	router.Path("/auth/callback").Handler(auth.CallbackGetHandler(app))
+	router.Path("/login").Handler(app.AuthService().LoginHandler()).Methods(http.MethodGet)
+	router.Path("/logout").Handler(app.AuthService().LogoutHandler()).Methods(http.MethodGet)
+	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth/", app.AuthService().AuthHandler()))
 
 	// Web pages
 	router.Path("/").Handler(webpages.IndexGetHandler(app)).Methods(http.MethodGet)

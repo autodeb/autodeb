@@ -14,8 +14,8 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
-	"salsa.debian.org/autodeb-team/autodeb/internal/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 )
@@ -55,10 +55,17 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
-	sessionsStore, err := getSessionStore()
+	sessionStore, err := getSessionStore()
 	if err != nil {
 		return nil, err
 	}
+
+	authService := oauth.NewService(
+		db,
+		sessionStore,
+		oauthProvider,
+		cfg.AppConfig.ServerURL,
+	)
 
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)
@@ -67,10 +74,9 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		cfg.AppConfig,
 		db,
 		dataFS,
-		oauthProvider,
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
-		sessionsStore,
+		authService,
 		logger,
 	)
 	if err != nil {

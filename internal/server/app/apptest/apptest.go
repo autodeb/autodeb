@@ -12,31 +12,18 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	authDisabled "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/disabled"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
 //AppTest contains an app and all of its dependencies for testing
 type AppTest struct {
-	App      *app.App
-	DataFS   filesystem.FS
-	StaticFS filesystem.FS
-	DB       *database.Database
-}
-
-func projectDirectory() string {
-	_, sourceFile, _, _ := runtime.Caller(0)
-	// apptest
-	dir := filepath.Dir(sourceFile)
-	// app
-	dir = filepath.Dir(dir)
-	// server
-	dir = filepath.Dir(dir)
-	// internal
-	dir = filepath.Dir(dir)
-	// autodeb
-	dir = filepath.Dir(dir)
-	return dir
+	t           *testing.T
+	App         *app.App
+	DataFS      filesystem.FS
+	StaticFS    filesystem.FS
+	DB          *database.Database
+	authBackend *fakeAuthBackend
 }
 
 //SetupTest will create a test App
@@ -59,7 +46,7 @@ func SetupTest(t *testing.T) *AppTest {
 
 	staticFS := filesystem.NewMemMapFs()
 
-	authBackend := authDisabled.NewBackend()
+	authBackend := newFakeAuthBackend()
 
 	logger := log.New(ioutil.Discard)
 
@@ -75,11 +62,48 @@ func SetupTest(t *testing.T) *AppTest {
 	require.NoError(t, err)
 
 	appTest := &AppTest{
-		App:      app,
-		DataFS:   dataFS,
-		StaticFS: staticFS,
-		DB:       db,
+		t:           t,
+		App:         app,
+		DataFS:      dataFS,
+		StaticFS:    staticFS,
+		DB:          db,
+		authBackend: authBackend,
 	}
 
 	return appTest
+}
+
+// Login will create a test user and future requests will be authenticated
+// as this user
+func (appTest *AppTest) Login() *models.User {
+	user, err := appTest.DB.GetUser(uint(1))
+	require.NoError(appTest.t, err)
+
+	if user == nil {
+		user, err = appTest.DB.CreateUser(1, "testuser3579")
+	}
+
+	appTest.authBackend.User = user
+
+	return user
+}
+
+// Logout will logout the currently logged user
+func (appTest *AppTest) Logout() {
+	appTest.authBackend.User = nil
+}
+
+func projectDirectory() string {
+	_, sourceFile, _, _ := runtime.Caller(0)
+	// apptest
+	dir := filepath.Dir(sourceFile)
+	// app
+	dir = filepath.Dir(dir)
+	// server
+	dir = filepath.Dir(dir)
+	// internal
+	dir = filepath.Dir(dir)
+	// autodeb
+	dir = filepath.Dir(dir)
+	return dir
 }

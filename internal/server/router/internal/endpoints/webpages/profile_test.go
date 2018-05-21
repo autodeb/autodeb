@@ -19,4 +19,12 @@ func TestProfileGetHandlerAuthenticated(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Contains(t, response.Body.String(), user.Username)
+
+	testRouter.Logout()
+
+	request = httptest.NewRequest(http.MethodGet, "/profile", nil)
+	response = testRouter.ServeHTTP(request)
+
+	assert.Equal(t, http.StatusTemporaryRedirect, response.Result().StatusCode)
+	assert.NotContains(t, response.Body.String(), user.Username)
 }

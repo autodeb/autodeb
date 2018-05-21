@@ -2,16 +2,17 @@ package apptest
 
 import (
 	"io/ioutil"
+	"path/filepath"
+	"runtime"
 	"testing"
 
-	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
+	authDisabled "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/disabled"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 
@@ -23,35 +24,42 @@ type AppTest struct {
 	DB       *database.Database
 }
 
+func projectDirectory() string {
+	_, sourceFile, _, _ := runtime.Caller(0)
+	// apptest
+	dir := filepath.Dir(sourceFile)
+	// app
+	dir = filepath.Dir(dir)
+	// server
+	dir = filepath.Dir(dir)
+	// internal
+	dir = filepath.Dir(dir)
+	// autodeb
+	dir = filepath.Dir(dir)
+	return dir
+}
+
 //SetupTest will create a test App
 func SetupTest(t *testing.T) *AppTest {
 	config := &app.Config{
 		ServerURL: "https://test.auto.debian.net",
 	}
 
-	db, err := database.NewDatabase(
-		"sqlite3",
-		":memory:",
-	)
+	db, err := database.NewDatabase("sqlite3", ":memory:")
 	require.NoError(t, err)
 
 	dataFS := filesystem.NewMemMapFs()
 
-	tmplRenderer := htmltemplate.NewRenderer(
-		filesystem.NewMemMapFs(),
-		true,
+	templatesFS, err := filesystem.NewFS(
+		filepath.Join(projectDirectory(), "web", "templates"),
 	)
+	require.NoError(t, err)
+
+	tmplRenderer := htmltemplate.NewRenderer(templatesFS, true)
 
 	staticFS := filesystem.NewMemMapFs()
 
-	sessionStore := sessions.NewCookieStore([]byte("something-very-secret"))
-
-	authService := oauth.NewBackend(
-		db,
-		sessionStore,
-		nil,
-		config.ServerURL,
-	)
+	authBackend := authDisabled.NewBackend()
 
 	logger := log.New(ioutil.Discard)
 
@@ -61,7 +69,7 @@ func SetupTest(t *testing.T) *AppTest {
 		dataFS,
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
-		authService,
+		authBackend,
 		logger,
 	)
 	require.NoError(t, err)

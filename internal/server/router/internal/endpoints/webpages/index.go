@@ -24,6 +24,7 @@ func IndexGetHandler(app *app.App) http.Handler {
 
 		rendered, err := app.TemplatesRenderer().RenderTemplate(data, "base.html", "index.html")
 		if err != nil {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

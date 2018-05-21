@@ -43,7 +43,6 @@ func WithUser(fn UserHandlerFunc, app *app.App) http.Handler {
 		}
 
 		// Call the function
-
 		fn(w, r, user)
 	}
 

@@ -8,10 +8,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (service *service) oauthConfigWithRedirectURL() *oauth2.Config {
-	cfg := service.oauthProvider.Config()
+func (backend *backend) oauthConfigWithRedirectURL() *oauth2.Config {
+	cfg := backend.oauthProvider.Config()
 
-	url := strings.Trim(service.serverURL, "/")
+	url := strings.Trim(backend.serverURL, "/")
 	url = url + "/auth/callback"
 
 	cfg.RedirectURL = url
@@ -19,10 +19,10 @@ func (service *service) oauthConfigWithRedirectURL() *oauth2.Config {
 	return cfg
 }
 
-func (service *service) LoginHandler() http.Handler {
+func (backend *backend) LoginHandler() http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
-		oauthCfg := service.oauthConfigWithRedirectURL()
+		oauthCfg := backend.oauthConfigWithRedirectURL()
 
 		url := oauthCfg.AuthCodeURL("")
 
@@ -33,26 +33,26 @@ func (service *service) LoginHandler() http.Handler {
 	return http.HandlerFunc(handlerFunc)
 }
 
-func (service *service) LogoutHandler() http.Handler {
+func (backend *backend) LogoutHandler() http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-		service.logout(r, w)
+		backend.logout(r, w)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 
 	return http.HandlerFunc(handlerFunc)
 }
 
-func (service *service) AuthHandler() http.Handler {
+func (backend *backend) AuthHandler() http.Handler {
 	//TODO: setup a router so that we don't answer to all routes in /auth/
-	return service.callbackHandler()
+	return backend.callbackHandler()
 }
 
-func (service *service) callbackHandler() http.Handler {
+func (backend *backend) callbackHandler() http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		authCode := r.FormValue("code")
 
-		oauthCfg := service.oauthConfigWithRedirectURL()
+		oauthCfg := backend.oauthConfigWithRedirectURL()
 
 		token, err := oauthCfg.Exchange(oauth2.NoContext, authCode)
 		if err != nil {
@@ -60,14 +60,14 @@ func (service *service) callbackHandler() http.Handler {
 			return
 		}
 
-		userID, username, err := service.oauthProvider.UserInfo(token.AccessToken)
+		userID, username, err := backend.oauthProvider.UserInfo(token.AccessToken)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		if err := service.login(r, w, userID, username); err != nil {
+		if err := backend.login(r, w, userID, username); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

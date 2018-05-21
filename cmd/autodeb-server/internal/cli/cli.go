@@ -1,5 +1,8 @@
 // Package cli is responsible for parsing command line arguments and creating
 // a server config.
+//
+// It isn't this package's responsibility to ensure that the configuration is
+// valid.
 package cli
 
 import (
@@ -62,6 +65,9 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	var serverURL string
 	fs.StringVar(&serverURL, "server-url", "http://localhost:8071", "public server url")
 
+	var authentificationBackend string
+	fs.StringVar(&authentificationBackend, "authentification-backend", "disabled", "selected authentification backend")
+
 	if err := fs.Parse(args); err != nil {
 		return nil, err
 	}
@@ -91,18 +97,21 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 	}
 
 	cfg := &server.Config{
-		HTTP: &server.HTTPServerConfig{
-			Address: address,
-		},
 		DB: &server.DBConfig{
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},
-		OAuth: &server.OAuthConfig{
-			Provider:     oauthProvider,
-			BaseURL:      oauthBaseURL,
-			ClientID:     oauthClientID,
-			ClientSecret: oauthClientSecret,
+		HTTP: &server.HTTPServerConfig{
+			Address: address,
+		},
+		Auth: &server.AuthConfig{
+			AuthentificationBackend: authentificationBackend,
+			OAuth: &server.OAuthConfig{
+				Provider:     oauthProvider,
+				BaseURL:      oauthBaseURL,
+				ClientID:     oauthClientID,
+				ClientSecret: oauthClientSecret,
+			},
 		},
 		AppConfig: &app.Config{
 			ServerURL: serverURL,

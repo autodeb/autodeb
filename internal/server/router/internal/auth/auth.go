@@ -17,7 +17,7 @@ func MaybeWithUser(fn UserHandlerFunc, app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get the user
-		user, err := app.AuthService().GetUser(r)
+		user, err := app.AuthBackend().GetUser(r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}

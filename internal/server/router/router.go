@@ -32,9 +32,9 @@ func NewRouter(app *app.App) http.Handler {
 	).Methods(http.MethodGet)
 
 	// Authentification
-	router.Path("/login").Handler(app.AuthService().LoginHandler()).Methods(http.MethodGet)
-	router.Path("/logout").Handler(app.AuthService().LogoutHandler()).Methods(http.MethodGet)
-	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth/", app.AuthService().AuthHandler()))
+	router.Path("/login").Handler(app.AuthBackend().LoginHandler()).Methods(http.MethodGet)
+	router.Path("/logout").Handler(app.AuthBackend().LogoutHandler()).Methods(http.MethodGet)
+	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth/", app.AuthBackend().AuthHandler()))
 
 	// Web pages
 	router.Path("/").Handler(webpages.IndexGetHandler(app)).Methods(http.MethodGet)

@@ -9,19 +9,19 @@ import (
 
 const userIDSessionKey = "userid"
 
-func (service *service) session(r *http.Request) *sessions.Session {
-	session, _ := service.sessionStore.Get(r, "autodeb")
+func (backend *backend) session(r *http.Request) *sessions.Session {
+	session, _ := backend.sessionStore.Get(r, "autodeb")
 	return session
 }
 
-func (service *service) clearSession(r *http.Request, w http.ResponseWriter) {
-	session := service.session(r)
+func (backend *backend) clearSession(r *http.Request, w http.ResponseWriter) {
+	session := backend.session(r)
 	session.Options.MaxAge = -1
 	session.Save(r, w)
 }
 
-func (service *service) getUserID(r *http.Request) (uint, error) {
-	session := service.session(r)
+func (backend *backend) getUserID(r *http.Request) (uint, error) {
+	session := backend.session(r)
 
 	if userID, ok := session.Values[userIDSessionKey].(uint); ok {
 		return userID, nil
@@ -30,8 +30,8 @@ func (service *service) getUserID(r *http.Request) (uint, error) {
 	return 0, errors.New("no userid in session")
 }
 
-func (service *service) setUserID(r *http.Request, w http.ResponseWriter, id uint) {
-	session := service.session(r)
+func (backend *backend) setUserID(r *http.Request, w http.ResponseWriter, id uint) {
+	session := backend.session(r)
 	session.Values[userIDSessionKey] = id
 	session.Save(r, w)
 }

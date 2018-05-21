@@ -7,8 +7,8 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-//Service provides everything that is needed to perform authentification
-type Service interface {
+//Backend provides everything that is needed to perform authentification
+type Backend interface {
 	LoginHandler() http.Handler
 	LogoutHandler() http.Handler
 	AuthHandler() http.Handler

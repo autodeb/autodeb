@@ -10,13 +10,19 @@ import (
 type Config struct {
 	DB                    *DBConfig
 	HTTP                  *HTTPServerConfig
-	OAuth                 *OAuthConfig
+	Auth                  *AuthConfig
 	AppConfig             *app.Config
 	DataDirectory         string
 	TemplatesDirectory    string
 	StaticFilesDirectory  string
 	TemplatesCacheEnabled bool
 	LogLevel              log.Level
+}
+
+// AuthConfig holds configuration related to the authentification backend
+type AuthConfig struct {
+	AuthentificationBackend string
+	OAuth                   *OAuthConfig
 }
 
 // OAuthConfig holds configuration related to the OAuth provider

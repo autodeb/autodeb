@@ -20,7 +20,7 @@ type App struct {
 	dataFS         filesystem.FS
 	renderer       *htmltemplate.Renderer
 	staticFS       http.FileSystem
-	authService    auth.Service
+	authBackend    auth.Backend
 	uploadsManager *uploads.Manager
 	logger         log.Logger
 }
@@ -32,7 +32,7 @@ func NewApp(
 	dataFS filesystem.FS,
 	renderer *htmltemplate.Renderer,
 	staticFS http.FileSystem,
-	authService auth.Service,
+	authBackend auth.Backend,
 	logger log.Logger) (*App, error) {
 
 	app := App{
@@ -41,7 +41,7 @@ func NewApp(
 		dataFS:         dataFS,
 		renderer:       renderer,
 		staticFS:       staticFS,
-		authService:    authService,
+		authBackend:    authBackend,
 		uploadsManager: uploads.NewManager(db, dataFS),
 		logger:         logger,
 	}
@@ -58,9 +58,9 @@ func (app *App) Logger() log.Logger {
 	return app.logger
 }
 
-// AuthService returns the authentification service
-func (app *App) AuthService() auth.Service {
-	return app.authService
+// AuthBackend returns the authentification service
+func (app *App) AuthBackend() auth.Backend {
+	return app.authBackend
 }
 
 // Config returns the app's config

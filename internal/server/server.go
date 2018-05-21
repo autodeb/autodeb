@@ -10,12 +10,15 @@ import (
 
 	"github.com/gorilla/sessions"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
+	authDisabled "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/disabled"
+	authOAuth "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 )
@@ -38,11 +41,6 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
-	oauthProvider, err := getOAuthProvider(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	templatesFS, err := filesystem.NewFS(cfg.TemplatesDirectory)
 	if err != nil {
 		return nil, err
@@ -55,17 +53,10 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
-	sessionStore, err := getSessionStore()
+	authBackend, err := getAuthBackend(cfg, db)
 	if err != nil {
 		return nil, err
 	}
-
-	authService := oauth.NewService(
-		db,
-		sessionStore,
-		oauthProvider,
-		cfg.AppConfig.ServerURL,
-	)
 
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)
@@ -76,7 +67,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		dataFS,
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
-		authService,
+		authBackend,
 		logger,
 	)
 	if err != nil {
@@ -97,6 +88,48 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	return &server, nil
 }
 
+func getAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
+	switch cfg.Auth.AuthentificationBackend {
+	case "oauth":
+		return getOAuthBackend(cfg, db)
+	case "disabled":
+		return authDisabled.NewBackend(), nil
+	default:
+		return nil, errors.Errorf("unrecognized authentification backend: %s (use oauth or disabled)", cfg.Auth.AuthentificationBackend)
+	}
+}
+
+func getOAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
+	sessionStore, err := getSessionStore()
+	if err != nil {
+		return nil, err
+	}
+
+	baseURL, err := url.Parse(cfg.Auth.OAuth.BaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	oauthProvider, err := authOAuth.NewProvider(
+		cfg.Auth.OAuth.Provider,
+		baseURL,
+		cfg.Auth.OAuth.ClientID,
+		cfg.Auth.OAuth.ClientSecret,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	authBackend := authOAuth.NewBackend(
+		db,
+		sessionStore,
+		oauthProvider,
+		cfg.AppConfig.ServerURL,
+	)
+
+	return authBackend, nil
+}
+
 func getSessionStore() (sessions.Store, error) {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
@@ -109,25 +142,6 @@ func getSessionStore() (sessions.Store, error) {
 	store := sessions.NewCookieStore(b)
 
 	return store, nil
-}
-
-func getOAuthProvider(cfg *Config) (oauth.Provider, error) {
-	baseURL, err := url.Parse(cfg.OAuth.BaseURL)
-	if err != nil {
-		return nil, err
-	}
-
-	provider, err := oauth.NewProvider(
-		cfg.OAuth.Provider,
-		baseURL,
-		cfg.OAuth.ClientID,
-		cfg.OAuth.ClientSecret,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return provider, nil
 }
 
 // Shutdown will gracefully stop the server

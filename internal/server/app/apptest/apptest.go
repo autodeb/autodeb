@@ -46,7 +46,7 @@ func SetupTest(t *testing.T) *AppTest {
 
 	sessionStore := sessions.NewCookieStore([]byte("something-very-secret"))
 
-	authService := oauth.NewService(
+	authService := oauth.NewBackend(
 		db,
 		sessionStore,
 		nil,

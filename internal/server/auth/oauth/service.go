@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/sessions"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )

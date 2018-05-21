@@ -6,7 +6,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth/oauth/internal/gitlab"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth/internal/gitlab"
 )
 
 // Provider represents an oauth provider. It provides a config and a method to

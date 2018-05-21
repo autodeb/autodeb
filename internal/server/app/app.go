@@ -8,8 +8,8 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/uploads"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 )
 

@@ -15,7 +15,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/auth/oauth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 )

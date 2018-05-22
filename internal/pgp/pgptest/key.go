@@ -1,3 +1,4 @@
+//Package pgptest contains an armored PGP key to be used for testing.
 package pgptest
 
 //TestKeyFingerprint is the fingerprint of the key contaianed in this package.

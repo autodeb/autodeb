@@ -10,14 +10,14 @@ import (
 )
 
 func TestVerifyMesageSignature(t *testing.T) {
-	msg, entity, err := gpg.VerifySignatureClearsigned(
+	msg, entity, err := pgp.VerifySignatureClearsigned(
 		strings.NewReader(signedMessage),
 		strings.NewReader(testKeyPublic),
 	)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "this is a test\n", msg)
-	assert.Equal(t, "0x8B5F287532CF42DF1CF7F7EAD31EBBBFC2E40CF3", gpg.EntityFingerprint(entity))
+	assert.Equal(t, "0x8B5F287532CF42DF1CF7F7EAD31EBBBFC2E40CF3", pgp.EntityFingerprint(entity))
 }
 
 const signedMessage = `

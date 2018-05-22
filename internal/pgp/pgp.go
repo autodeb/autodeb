@@ -10,14 +10,16 @@ import (
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/clearsign"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 //VerifySignatureClearsigned verifies the signature of a clearsigned gpg
 //message, returning the message contents and the signer's entity.
 func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *openpgp.Entity, error) {
-	keyring, err := openpgp.ReadKeyRing(keys)
+	keyring, err := openpgp.ReadArmoredKeyRing(keys)
 	if err != nil {
-		return "", nil, err
+		return "", nil, errors.WithMessage(err, "could not read keyring")
 	}
 
 	msgBytes, err := ioutil.ReadAll(msg)
@@ -33,7 +35,7 @@ func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *openpgp
 		block.ArmoredSignature.Body,
 	)
 	if err != nil {
-		return "", nil, err
+		return "", nil, errors.WithMessage(err, "could not check signature")
 	}
 
 	messageText := string(block.Plaintext)

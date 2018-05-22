@@ -7,6 +7,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/jobs"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/pgp"
@@ -16,7 +17,7 @@ import (
 // Context is the application's context. It holds everityhing that is needed to
 // serve a request.
 type Context struct {
-	config      *Config
+	config      *config.Config
 	renderer    *htmltemplate.Renderer
 	staticFS    http.FileSystem
 	authBackend auth.Backend
@@ -26,7 +27,7 @@ type Context struct {
 
 // New create an application context
 func New(
-	config *Config,
+	config *config.Config,
 	renderer *htmltemplate.Renderer,
 	staticFS http.FileSystem,
 	authBackend auth.Backend,
@@ -56,7 +57,7 @@ func (ctx *Context) AuthBackend() auth.Backend {
 }
 
 // Config returns the context's config
-func (ctx *Context) Config() *Config {
+func (ctx *Context) Config() *config.Config {
 	return ctx.config
 }
 

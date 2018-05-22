@@ -12,12 +12,11 @@ import (
 	"io/ioutil"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 )
 
 // Parse reads arguments and creates an autodeb server config
-func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
+func Parse(args []string, writerOutput io.Writer) (*config.Config, error) {
 
 	fs := flag.NewFlagSet("autodeb-server", flag.ContinueOnError)
 	fs.SetOutput(ioutil.Discard)
@@ -96,26 +95,24 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 		return nil, fmt.Errorf("unrecognized log level: %s", logLevelString)
 	}
 
-	cfg := &server.Config{
-		DB: &server.DBConfig{
+	cfg := &config.Config{
+		DB: &config.DBConfig{
 			Driver:           databaseDriver,
 			ConnectionString: databaseConnectionString,
 		},
-		HTTP: &server.HTTPServerConfig{
+		HTTP: &config.HTTPServerConfig{
 			Address: address,
 		},
-		Auth: &server.AuthConfig{
+		Auth: &config.AuthConfig{
 			AuthentificationBackend: authentificationBackend,
-			OAuth: &server.OAuthConfig{
+			OAuth: &config.OAuthConfig{
 				Provider:     oauthProvider,
 				BaseURL:      oauthBaseURL,
 				ClientID:     oauthClientID,
 				ClientSecret: oauthClientSecret,
 			},
 		},
-		ContextConfig: &appctx.Config{
-			ServerURL: serverURL,
-		},
+		ServerURL:             serverURL,
 		DataDirectory:         dataDirectory,
 		TemplatesDirectory:    templatesDirectory,
 		StaticFilesDirectory:  staticFilesDirectory,

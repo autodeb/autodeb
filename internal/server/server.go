@@ -19,6 +19,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
 	authDisabled "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/disabled"
 	authOAuth "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
@@ -31,7 +32,7 @@ type Server struct {
 }
 
 // New creates a Server
-func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
+func New(cfg *config.Config, loggingOutput io.Writer) (*Server, error) {
 	db, err := database.NewDatabase(cfg.DB.Driver, cfg.DB.ConnectionString)
 	if err != nil {
 		return nil, err
@@ -51,13 +52,13 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)
 
-	services, err := services.New(db, dataFS, cfg.ContextConfig.ServerURL)
+	services, err := services.New(db, dataFS, cfg.ServerURL)
 	if err != nil {
 		return nil, err
 	}
 
 	appCtx := appctx.New(
-		cfg.ContextConfig,
+		cfg,
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
 		authBackend,
@@ -79,7 +80,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	return &server, nil
 }
 
-func getAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
+func getAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, error) {
 	switch cfg.Auth.AuthentificationBackend {
 	case "oauth":
 		return getOAuthBackend(cfg, db)
@@ -90,7 +91,7 @@ func getAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
 	}
 }
 
-func getOAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
+func getOAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, error) {
 	sessionStore, err := getSessionStore()
 	if err != nil {
 		return nil, err
@@ -115,7 +116,7 @@ func getOAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
 		db,
 		sessionStore,
 		oauthProvider,
-		cfg.ContextConfig.ServerURL,
+		cfg.ServerURL,
 	)
 
 	return authBackend, nil

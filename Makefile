@@ -31,7 +31,10 @@ data:
 
 .PHONY: test
 test:
-	go test -v ${GO_IMPORT_PATH}/...
+	go test \
+		-covermode=count \
+		-coverprofile=profile.cov \
+		-v ${GO_IMPORT_PATH}/...
 
 .PHONY: vet
 vet: install
@@ -62,6 +65,9 @@ clean:
 	rm -f autodeb-server
 	rm -f autodeb-worker
 	rm -rf update-random-package-output-*
+
+	# test coverage
+	rm -f profile.cov
 
 	# Other things created by this Makefile
 	rm -rf data

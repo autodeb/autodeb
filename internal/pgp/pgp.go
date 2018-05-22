@@ -14,8 +14,19 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
-//Clearsign will sign a message with a cleartext signature
-func Clearsign(msg io.Reader, key io.Reader, w io.Writer) error {
+//Clearsign will sign a message with a cleartext signature and return
+//it as a string
+func Clearsign(msg io.Reader, key io.Reader) (string, error) {
+	var buf bytes.Buffer
+	if err := clearsignWriter(msg, key, &buf); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+//clearsignWriter will sign a message with a cleartext signature and write it
+//to Writer.
+func clearsignWriter(msg io.Reader, key io.Reader, w io.Writer) error {
 	keyring, err := openpgp.ReadArmoredKeyRing(key)
 	if err != nil {
 		return errors.WithMessage(err, "could not read key")

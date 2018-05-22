@@ -1,7 +1,6 @@
 package webpages_test
 
 import (
-	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -44,16 +43,15 @@ func TestAddPGPKeyPostHandler(t *testing.T) {
 	assert.Equal(t, 0, len(keys))
 	assert.NoError(t, err)
 
-	var proof bytes.Buffer
-	pgp.Clearsign(
+	proof, err := pgp.Clearsign(
 		strings.NewReader(testRouter.App.ExpectedPGPKeyProofText(user.ID)),
 		strings.NewReader(pgptest.TestKeyPrivate),
-		&proof,
 	)
+	assert.NoError(t, err)
 
 	form := &url.Values{}
 	form.Add("key", pgptest.TestKeyPublic)
-	form.Add("proof", proof.String())
+	form.Add("proof", proof)
 
 	response := testRouter.PostForm("/profile/add-pgp-key", form)
 

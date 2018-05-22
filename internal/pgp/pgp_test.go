@@ -1,7 +1,6 @@
 package pgp_test
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -23,20 +22,17 @@ func TestVerifyMesageSignature(t *testing.T) {
 }
 
 func TestClearsignMessage(t *testing.T) {
-	var buf bytes.Buffer
-
-	err := pgp.Clearsign(
+	msg, err := pgp.Clearsign(
 		strings.NewReader("test message"),
 		strings.NewReader(pgptest.TestKeyPrivate),
-		&buf,
 	)
 
 	assert.NoError(t, err)
-	assert.Contains(t, buf.String(), "BEGIN PGP SIGNED MESSAGE", "the output should contaian the signed message")
-	assert.Contains(t, buf.String(), "BEGIN PGP SIGNATURE", "the output should contain the signature")
+	assert.Contains(t, msg, "BEGIN PGP SIGNED MESSAGE", "the output should contaian the signed message")
+	assert.Contains(t, msg, "BEGIN PGP SIGNATURE", "the output should contain the signature")
 
 	msg, entity, err := pgp.VerifySignatureClearsigned(
-		strings.NewReader(buf.String()),
+		strings.NewReader(msg),
 		strings.NewReader(pgptest.TestKeyPublic),
 	)
 

@@ -7,13 +7,13 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errorchecks"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/api"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/endpoints/uploadqueue/uploadparametersparser"
 )
 
 //UploadHandler returns a handler that accepts http package uploads
-func UploadHandler(app *app.App) http.Handler {
+func UploadHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		uploadParameters, err := uploadparametersparser.Parse(r)
@@ -22,7 +22,7 @@ func UploadHandler(app *app.App) http.Handler {
 			return
 		}
 
-		upload, err := app.UploadsService().ProcessUpload(uploadParameters, r.Body)
+		upload, err := appCtx.UploadsService().ProcessUpload(uploadParameters, r.Body)
 
 		if err != nil {
 			if errorchecks.IsInputError(err) {

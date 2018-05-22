@@ -13,7 +13,7 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 )
 
 // Parse reads arguments and creates an autodeb server config
@@ -113,7 +113,7 @@ func Parse(args []string, writerOutput io.Writer) (*server.Config, error) {
 				ClientSecret: oauthClientSecret,
 			},
 		},
-		AppConfig: &app.Config{
+		ContextConfig: &appctx.Config{
 			ServerURL: serverURL,
 		},
 		DataDirectory:         dataDirectory,

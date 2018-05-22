@@ -10,15 +10,15 @@ import (
 	"github.com/gorilla/mux"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
 //JobsNextPostHandler returns a handler that find the next job to run
-func JobsNextPostHandler(app *app.App) http.Handler {
+func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
-		job, err := app.JobsService().UnqueueNextJob()
+		job, err := appCtx.JobsService().UnqueueNextJob()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -47,7 +47,7 @@ func JobsNextPostHandler(app *app.App) http.Handler {
 }
 
 //JobGetHandler returns a handler that returns a job
-func JobGetHandler(app *app.App) http.Handler {
+func JobGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -57,7 +57,7 @@ func JobGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		job, err := app.JobsService().GetJob(uint(jobID))
+		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -86,7 +86,7 @@ func JobGetHandler(app *app.App) http.Handler {
 }
 
 //JobLogTxtGetHandler returns a handler that retrieves the log of a job
-func JobLogTxtGetHandler(app *app.App) http.Handler {
+func JobLogTxtGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get input values
@@ -97,7 +97,7 @@ func JobLogTxtGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		file, err := app.JobsService().GetJobLog(uint(jobID))
+		file, err := appCtx.JobsService().GetJobLog(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -119,7 +119,7 @@ func JobLogTxtGetHandler(app *app.App) http.Handler {
 }
 
 //JobLogPostHandler returns a handler that saves a log for a job
-func JobLogPostHandler(app *app.App) http.Handler {
+func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get input values
@@ -131,7 +131,7 @@ func JobLogPostHandler(app *app.App) http.Handler {
 		}
 
 		// Get the job
-		job, err := app.JobsService().GetJob(uint(jobID))
+		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -151,7 +151,7 @@ func JobLogPostHandler(app *app.App) http.Handler {
 		}
 
 		// Save the logs
-		if err := app.JobsService().SaveJobLog(uint(jobID), r.Body); err != nil {
+		if err := appCtx.JobsService().SaveJobLog(uint(jobID), r.Body); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -162,7 +162,7 @@ func JobLogPostHandler(app *app.App) http.Handler {
 }
 
 //JobStatusPostHandler returns a handler that sets the job status
-func JobStatusPostHandler(app *app.App) http.Handler {
+func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get input values
@@ -193,7 +193,7 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 		}
 
 		// Get the job
-		job, err := app.JobsService().GetJob(uint(jobID))
+		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -214,7 +214,7 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 
 		// Update the job
 		job.Status = newStatus
-		if err := app.JobsService().UpdateJob(job); err != nil {
+		if err := appCtx.JobsService().UpdateJob(job); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

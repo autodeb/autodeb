@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
@@ -12,12 +12,12 @@ type UserHandlerFunc = func(http.ResponseWriter, *http.Request, *models.User)
 
 // MaybeWithUser retrieves the connected user and calls the provided function
 // with the user. If the user is not connected, user is nil.
-func MaybeWithUser(fn UserHandlerFunc, app *app.App) http.Handler {
+func MaybeWithUser(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
 
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		// Get the user
-		user, err := app.AuthBackend().GetUser(r)
+		user, err := appCtx.AuthBackend().GetUser(r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
@@ -32,7 +32,7 @@ func MaybeWithUser(fn UserHandlerFunc, app *app.App) http.Handler {
 
 // WithUser promises to call the provided function with a non-nil user.
 // Other requests are redirected to the authentification page.
-func WithUser(fn UserHandlerFunc, app *app.App) http.Handler {
+func WithUser(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
 
 	userHandlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
@@ -46,7 +46,7 @@ func WithUser(fn UserHandlerFunc, app *app.App) http.Handler {
 		fn(w, r, user)
 	}
 
-	handler := MaybeWithUser(userHandlerFunc, app)
+	handler := MaybeWithUser(userHandlerFunc, appCtx)
 
 	return handler
 }

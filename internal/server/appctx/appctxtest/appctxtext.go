@@ -1,4 +1,4 @@
-package apptest
+package appctxtest
 
 import (
 	"io/ioutil"
@@ -11,31 +11,27 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/servicestest"
 )
 
-//AppTest contains an app and all of its dependencies for testing
-type AppTest struct {
+//AppCtxTest contains an app and all of its dependencies for testing
+type AppCtxTest struct {
+	*servicestest.ServicesTest
 	t           *testing.T
-	App         *app.App
-	DataFS      filesystem.FS
+	AppCtx      *appctx.Context
 	StaticFS    filesystem.FS
-	DB          *database.Database
 	authBackend *fakeAuthBackend
 }
 
 //SetupTest will create a test App
-func SetupTest(t *testing.T) *AppTest {
-	config := &app.Config{
-		ServerURL: "https://test.auto.debian.net",
+func SetupTest(t *testing.T) *AppCtxTest {
+	servicesTest := servicestest.SetupTest(t)
+
+	config := &appctx.Config{
+		ServerURL: servicesTest.ServerURL,
 	}
-
-	db, err := database.NewDatabase("sqlite3", ":memory:")
-	require.NoError(t, err)
-
-	dataFS := filesystem.NewMemMapFS()
 
 	templatesFS := filesystem.NewBasePathFS(
 		filesystem.NewOsFS(),
@@ -50,47 +46,44 @@ func SetupTest(t *testing.T) *AppTest {
 
 	logger := log.New(ioutil.Discard)
 
-	app, err := app.NewApp(
+	appCtx := appctx.New(
 		config,
-		db,
-		dataFS,
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
 		authBackend,
+		servicesTest.Services,
 		logger,
 	)
-	require.NoError(t, err)
 
-	appTest := &AppTest{
-		t:           t,
-		App:         app,
-		DataFS:      dataFS,
-		StaticFS:    staticFS,
-		DB:          db,
-		authBackend: authBackend,
+	appCtxTest := &AppCtxTest{
+		ServicesTest: servicesTest,
+		t:            t,
+		AppCtx:       appCtx,
+		StaticFS:     staticFS,
+		authBackend:  authBackend,
 	}
 
-	return appTest
+	return appCtxTest
 }
 
 // Login will create a test user and future requests will be authenticated
 // as this user
-func (appTest *AppTest) Login() *models.User {
-	user, err := appTest.DB.GetUser(uint(1))
-	require.NoError(appTest.t, err)
+func (appCtxTest *AppCtxTest) Login() *models.User {
+	user, err := appCtxTest.DB.GetUser(uint(1))
+	require.NoError(appCtxTest.t, err)
 
 	if user == nil {
-		user, err = appTest.DB.CreateUser(1, "testuser3579")
+		user, err = appCtxTest.DB.CreateUser(1, "testuser3579")
 	}
 
-	appTest.authBackend.User = user
+	appCtxTest.authBackend.User = user
 
 	return user
 }
 
 // Logout will logout the currently logged user
-func (appTest *AppTest) Logout() {
-	appTest.authBackend.User = nil
+func (appCtxTest *AppCtxTest) Logout() {
+	appCtxTest.authBackend.User = nil
 }
 
 func projectDirectory() string {

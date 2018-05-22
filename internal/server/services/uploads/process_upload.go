@@ -95,7 +95,7 @@ func (service *Service) processChangesUpload(filename string, content io.Reader)
 		bytes.NewReader(contentBytes),
 		filepath.Join(service.UploadsDirectory(), fmt.Sprint(upload.ID)),
 		filename,
-		service.dataFS,
+		service.fs,
 	); err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (service *Service) moveFileUpload(fileUpload *models.FileUpload, upload *mo
 		fileUpload.Filename,
 	)
 
-	if err := service.dataFS.Rename(source, dest); err != nil {
+	if err := service.fs.Rename(source, dest); err != nil {
 		return errors.Errorf("could not move %s to %s", source, dest)
 	}
 
@@ -148,7 +148,7 @@ func (service *Service) moveFileUpload(fileUpload *models.FileUpload, upload *mo
 		return errors.Errorf("could not mark fileUpload %v as completed", fileUpload.ID)
 	}
 
-	service.dataFS.RemoveAll(sourceDir)
+	service.fs.RemoveAll(sourceDir)
 
 	return nil
 }
@@ -217,7 +217,7 @@ func (service *Service) processFileUpload(filename string, content io.Reader) er
 		tmpFile,
 		destDir,
 		filename,
-		service.dataFS,
+		service.fs,
 	)
 
 	return err

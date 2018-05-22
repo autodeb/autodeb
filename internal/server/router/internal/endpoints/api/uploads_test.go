@@ -15,13 +15,14 @@ import (
 
 func TestUploadDSCGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
+	uploadsService := testRouter.AppCtx.UploadsService()
 
-	uploadDir := filepath.Join(testRouter.App.UploadsDirectory(), "1")
+	uploadDir := filepath.Join(uploadsService.UploadsDirectory(), "1")
 
-	err := testRouter.DataFS.MkdirAll(uploadDir, 0644)
+	err := uploadsService.FS().MkdirAll(uploadDir, 0644)
 	assert.NoError(t, err)
 
-	dsc, err := testRouter.DataFS.Create(filepath.Join(uploadDir, "test.dsc"))
+	dsc, err := uploadsService.FS().Create(filepath.Join(uploadDir, "test.dsc"))
 	assert.NoError(t, err)
 	dsc.Write([]byte("Hello"))
 	dsc.Close()
@@ -55,13 +56,14 @@ func TestUploadDSCGetHandlerNotFound(t *testing.T) {
 
 func TestUploadFileGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
+	uploadsService := testRouter.AppCtx.UploadsService()
 
-	uploadDir := filepath.Join(testRouter.App.UploadsDirectory(), "1")
+	uploadDir := filepath.Join(uploadsService.UploadsDirectory(), "1")
 
-	err := testRouter.DataFS.MkdirAll(uploadDir, 0644)
+	err := uploadsService.FS().MkdirAll(uploadDir, 0644)
 	assert.NoError(t, err)
 
-	dsc, err := testRouter.DataFS.Create(filepath.Join(uploadDir, "test.dsc"))
+	dsc, err := uploadsService.FS().Create(filepath.Join(uploadDir, "test.dsc"))
 	assert.NoError(t, err)
 	dsc.Write([]byte("Hello"))
 	dsc.Close()

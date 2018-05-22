@@ -13,17 +13,22 @@ import (
 
 //Service manages uploads
 type Service struct {
-	db     *database.Database
-	dataFS filesystem.FS
+	db *database.Database
+	fs filesystem.FS
 }
 
 //New creates a new upload service
-func New(db *database.Database, dataFS filesystem.FS) *Service {
+func New(db *database.Database, fs filesystem.FS) *Service {
 	service := &Service{
-		db:     db,
-		dataFS: dataFS,
+		db: db,
+		fs: fs,
 	}
 	return service
+}
+
+// FS returns the services's filesystem
+func (service *Service) FS() filesystem.FS {
+	return service.fs
 }
 
 // UploadedFilesDirectory contains files that are not yet associated
@@ -69,7 +74,7 @@ func (service *Service) GetUploadDSC(uploadID uint) (io.ReadCloser, error) {
 
 // GetUploadFile returns the file associated with the upload id and filename
 func (service *Service) GetUploadFile(uploadID uint, filename string) (io.ReadCloser, error) {
-	file, err := service.dataFS.Open(
+	file, err := service.fs.Open(
 		filepath.Join(
 			service.UploadsDirectory(),
 			fmt.Sprint(uploadID),

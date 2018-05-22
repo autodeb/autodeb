@@ -100,7 +100,7 @@ func TestJobStatusPostHandler(t *testing.T) {
 	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 
-	job, err = testRouter.App.JobsService().GetJob(1)
+	job, err = testRouter.AppCtx.JobsService().GetJob(1)
 
 	assert.NoError(t, err)
 	assert.Equal(t, models.JobStatusFailed, job.Status)
@@ -109,7 +109,7 @@ func TestJobStatusPostHandler(t *testing.T) {
 func TestJobLogTxtGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	err := testRouter.App.JobsService().SaveJobLog(
+	err := testRouter.AppCtx.JobsService().SaveJobLog(
 		uint(1),
 		strings.NewReader("hello"),
 	)

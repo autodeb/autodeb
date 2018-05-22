@@ -9,51 +9,51 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/apptest"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx/appctxtest"
 )
 
 func TestSaveJobLog(t *testing.T) {
-	appTest := apptest.SetupTest(t)
+	appCtxTest := appctxtest.SetupTest(t)
 
 	jobDir := filepath.Join(
-		appTest.App.JobsDirectory(),
+		appCtxTest.AppCtx.JobsService().JobsDirectory(),
 		"1",
 	)
 
-	_, err := appTest.DataFS.Stat(jobDir)
+	_, err := appCtxTest.AppCtx.JobsService().FS().Stat(jobDir)
 	require.Error(t, err, "the job directory should not exist")
 
-	err = appTest.App.JobsService().SaveJobLog(
+	err = appCtxTest.AppCtx.JobsService().SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 
 	assert.NoError(t, err)
 
-	_, err = appTest.DataFS.Stat(jobDir)
+	_, err = appCtxTest.AppCtx.JobsService().FS().Stat(jobDir)
 	assert.NoError(t, err)
 
 	logFilePath := filepath.Join(jobDir, "log.txt")
 
-	_, err = appTest.DataFS.Stat(logFilePath)
+	_, err = appCtxTest.AppCtx.JobsService().FS().Stat(logFilePath)
 	assert.NoError(t, err)
 
-	logFile, _ := appTest.DataFS.Open(logFilePath)
+	logFile, _ := appCtxTest.AppCtx.JobsService().FS().Open(logFilePath)
 	defer logFile.Close()
 	b, _ := ioutil.ReadAll(logFile)
 	assert.Equal(t, "Hello", string(b))
 }
 
 func TestGetJobLog(t *testing.T) {
-	appTest := apptest.SetupTest(t)
+	appCtxTest := appctxtest.SetupTest(t)
 
-	err := appTest.App.JobsService().SaveJobLog(
+	err := appCtxTest.AppCtx.JobsService().SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 	assert.NoError(t, err)
 
-	log, err := appTest.App.JobsService().GetJobLog(uint(1))
+	log, err := appCtxTest.AppCtx.JobsService().GetJobLog(uint(1))
 	defer log.Close()
 
 	assert.NoError(t, err)

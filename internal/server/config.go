@@ -2,7 +2,7 @@ package server
 
 import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 )
 
 // Config holds configuration that is needed by Server to initialize all of its
@@ -11,7 +11,7 @@ type Config struct {
 	DB                    *DBConfig
 	HTTP                  *HTTPServerConfig
 	Auth                  *AuthConfig
-	AppConfig             *app.Config
+	ContextConfig         *appctx.Config
 	DataDirectory         string
 	TemplatesDirectory    string
 	StaticFilesDirectory  string

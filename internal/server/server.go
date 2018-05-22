@@ -15,12 +15,13 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
 	authDisabled "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/disabled"
 	authOAuth "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
 )
 
 // Server is the main server. It has dput-compatible interface
@@ -50,20 +51,21 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)
 
-	app, err := app.NewApp(
-		cfg.AppConfig,
-		db,
-		dataFS,
-		renderer,
-		filesystem.NewHTTPFS(staticFilesFS),
-		authBackend,
-		logger,
-	)
+	services, err := services.New(db, dataFS, cfg.ContextConfig.ServerURL)
 	if err != nil {
 		return nil, err
 	}
 
-	router := router.NewRouter(app)
+	appCtx := appctx.New(
+		cfg.ContextConfig,
+		renderer,
+		filesystem.NewHTTPFS(staticFilesFS),
+		authBackend,
+		services,
+		logger,
+	)
+
+	router := router.NewRouter(appCtx)
 
 	httpServer, err := http.NewHTTPServer(cfg.HTTP.Address, router, logger)
 	if err != nil {
@@ -113,7 +115,7 @@ func getOAuthBackend(cfg *Config, db *database.Database) (auth.Backend, error) {
 		db,
 		sessionStore,
 		oauthProvider,
-		cfg.AppConfig.ServerURL,
+		cfg.ContextConfig.ServerURL,
 	)
 
 	return authBackend, nil

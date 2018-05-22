@@ -11,11 +11,11 @@ import (
 	"github.com/gorilla/mux"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 )
 
 //UploadDSCGetHandler returns handler the DSC of the upload
-func UploadDSCGetHandler(app *app.App) http.Handler {
+func UploadDSCGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -25,7 +25,7 @@ func UploadDSCGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		dsc, err := app.UploadsService().GetUploadDSC(uint(uploadID))
+		dsc, err := appCtx.UploadsService().GetUploadDSC(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -47,7 +47,7 @@ func UploadDSCGetHandler(app *app.App) http.Handler {
 }
 
 //UploadFilesGetHandler returns a handler that lists all files for an upload
-func UploadFilesGetHandler(app *app.App) http.Handler {
+func UploadFilesGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -57,7 +57,7 @@ func UploadFilesGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		fileUploads, err := app.UploadsService().GetAllFileUploadsByUploadID(uint(uploadID))
+		fileUploads, err := appCtx.UploadsService().GetAllFileUploadsByUploadID(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -82,7 +82,7 @@ func UploadFilesGetHandler(app *app.App) http.Handler {
 }
 
 //UploadFileGetHandler returns a handler that returns upload files
-func UploadFileGetHandler(app *app.App) http.Handler {
+func UploadFileGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -102,7 +102,7 @@ func UploadFileGetHandler(app *app.App) http.Handler {
 		// Clean the file name, keeping only the file name if it is a path
 		_, filename = filepath.Split(filename)
 
-		file, err := app.UploadsService().GetUploadFile(uint(uploadID), filename)
+		file, err := appCtx.UploadsService().GetUploadFile(uint(uploadID), filename)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

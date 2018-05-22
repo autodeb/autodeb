@@ -8,26 +8,26 @@ import (
 	"testing"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/apptest"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx/appctxtest"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
 )
 
 //RouterTest allows for testing the server's Router
 type RouterTest struct {
-	*apptest.AppTest
+	*appctxtest.AppCtxTest
 	TemplatesFS filesystem.FS
 	Router      http.Handler
 }
 
 // SetupTest returns a new RouterTest
 func SetupTest(t *testing.T) *RouterTest {
-	appTest := apptest.SetupTest(t)
+	appCtxTest := appctxtest.SetupTest(t)
 
-	router := router.NewRouter(appTest.App)
+	router := router.NewRouter(appCtxTest.AppCtx)
 
 	routerTest := &RouterTest{
-		AppTest: appTest,
-		Router:  router,
+		AppCtxTest: appCtxTest,
+		Router:     router,
 	}
 
 	return routerTest

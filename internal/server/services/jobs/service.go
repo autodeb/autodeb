@@ -13,22 +13,27 @@ import (
 
 //Service manages jobs
 type Service struct {
-	db     *database.Database
-	dataFS filesystem.FS
+	db *database.Database
+	fs filesystem.FS
 }
 
 //New creates a jobs service
-func New(db *database.Database, dataFS filesystem.FS) *Service {
+func New(db *database.Database, fs filesystem.FS) *Service {
 	service := &Service{
-		db:     db,
-		dataFS: dataFS,
+		db: db,
+		fs: fs,
 	}
 	return service
 }
 
+// FS returns the services's filesystem
+func (service *Service) FS() filesystem.FS {
+	return service.fs
+}
+
 // JobsDirectory contains saved data for jobs such as logs
 func (service *Service) JobsDirectory() string {
-	return "/jobs"
+	return "/"
 }
 
 // GetAllJobs returns all jobs
@@ -77,7 +82,7 @@ func (service *Service) GetJobLog(jobID uint) (io.ReadCloser, error) {
 		"log.txt",
 	)
 
-	file, err := service.dataFS.Open(logPath)
+	file, err := service.fs.Open(logPath)
 	if os.IsNotExist(err) {
 		return nil, nil
 	}
@@ -95,13 +100,13 @@ func (service *Service) SaveJobLog(jobID uint, content io.Reader) error {
 		fmt.Sprint(jobID),
 	)
 
-	if err := service.dataFS.Mkdir(jobDirectory, 0744); err != nil {
+	if err := service.fs.Mkdir(jobDirectory, 0744); err != nil {
 		return err
 	}
 
 	logFilePath := filepath.Join(jobDirectory, "log.txt")
 
-	logFile, err := service.dataFS.Create(logFilePath)
+	logFile, err := service.fs.Create(logFilePath)
 	if err != nil {
 		return err
 	}

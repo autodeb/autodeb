@@ -17,11 +17,11 @@ import (
 
 func TestProcessFileUpload(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
-	testApp := testRouter.App
-	fs := testRouter.DataFS
+	testAppCtx := testRouter.AppCtx
+	fs := testAppCtx.UploadsService().FS()
 	db := testRouter.DB
 
-	_, err := fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
+	_, err := fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadedFilesDirectory(), "1"))
 	require.Error(t, err, "the file directory should not exist")
 
 	request, _ := http.NewRequest(
@@ -34,10 +34,10 @@ func TestProcessFileUpload(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, response.Result().StatusCode)
 	assert.Equal(t, "", response.Body.String())
 
-	_, err = fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
+	_, err = fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadedFilesDirectory(), "1"))
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1", "test.dsc"))
+	_, err = fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadedFilesDirectory(), "1", "test.dsc"))
 	assert.NoError(t, err)
 
 	expectedSHASum := "b6668cf8c46c7075e18215d922e7812ca082fa6cc34668d00a6c20aee4551fb6"
@@ -134,8 +134,8 @@ func TestProcessChangesMissingFile(t *testing.T) {
 
 func TestProcessChanges(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
-	testApp := testRouter.App
-	fs := testRouter.DataFS
+	testAppCtx := testRouter.AppCtx
+	fs := testAppCtx.UploadsService().FS()
 	db := testRouter.DB
 
 	request, _ := http.NewRequest(
@@ -167,16 +167,16 @@ func TestProcessChanges(t *testing.T) {
 	assert.Equal(t, "Alexandre Viau <aviau@debian.org>", upload.Maintainer)
 	assert.Equal(t, "Changed By <changed.by@debian.org>", upload.ChangedBy)
 
-	_, err := fs.Stat(filepath.Join(testApp.UploadedFilesDirectory(), "1"))
+	_, err := fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadedFilesDirectory(), "1"))
 	assert.Error(t, err, "the uploaded files directory should be removed")
 
-	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1"))
+	_, err = fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadsDirectory(), "1"))
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1", "test.changes"))
+	_, err = fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadsDirectory(), "1", "test.changes"))
 	assert.NoError(t, err)
 
-	_, err = fs.Stat(filepath.Join(testApp.UploadsDirectory(), "1", "test.dsc"))
+	_, err = fs.Stat(filepath.Join(testAppCtx.UploadsService().UploadsDirectory(), "1", "test.dsc"))
 	assert.NoError(t, err)
 
 	fileUpload, err := db.GetFileUpload(uint(1))

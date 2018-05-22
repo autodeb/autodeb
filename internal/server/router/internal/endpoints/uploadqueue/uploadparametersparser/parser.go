@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/services/uploads"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/uploads"
 )
 
 //Parse an http request for upload parameters

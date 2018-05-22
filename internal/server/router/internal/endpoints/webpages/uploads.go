@@ -5,16 +5,16 @@ import (
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
 )
 
 //UploadsGetHandler returns a handler that renders the uploads page
-func UploadsGetHandler(app *app.App) http.Handler {
+func UploadsGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		uploads, err := app.UploadsService().GetAllUploads()
+		uploads, err := appCtx.UploadsService().GetAllUploads()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -28,7 +28,7 @@ func UploadsGetHandler(app *app.App) http.Handler {
 			Uploads: uploads,
 		}
 
-		rendered, err := app.TemplatesRenderer().RenderTemplate(data, "base.html", "uploads.html")
+		rendered, err := appCtx.TemplatesRenderer().RenderTemplate(data, "base.html", "uploads.html")
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -37,7 +37,7 @@ func UploadsGetHandler(app *app.App) http.Handler {
 		fmt.Fprint(w, rendered)
 	}
 
-	handler := auth.MaybeWithUser(handlerFunc, app)
+	handler := auth.MaybeWithUser(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 

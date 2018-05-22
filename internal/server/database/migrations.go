@@ -9,6 +9,7 @@ import (
 func runMigrations(gormDB *gorm.DB) {
 	gormDB.AutoMigrate(&models.Job{})
 	gormDB.AutoMigrate(&models.FileUpload{})
+	gormDB.AutoMigrate(&models.PGPKey{})
 	gormDB.AutoMigrate(&models.Upload{})
 	gormDB.AutoMigrate(&models.User{})
 }

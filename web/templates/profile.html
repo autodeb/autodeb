@@ -2,6 +2,7 @@
 
 {{ define "content" }}
 
+<h2>User information</h2>
 <table>
     <tr>
         <th>Username</th>
@@ -12,5 +13,36 @@
         <td>{{ .User.ID }}</td>
     </tr>
 </table>
+
+<h2>PGP Keys</h2>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Fingerprint</th>
+    </tr>
+
+    {{ range .PGPKeys }}
+    <tr>
+        <td>{{ .ID }}</td>
+        <td>{{ .Fingerprint }}</td>
+    </tr>
+    {{ end }}
+</table>
+
+<p>
+    To associate a PGP key to your account, you must submit an armored copy
+    your public key along with a signed proof.
+</p>
+
+<label>Public key (armored): $ gpg --export --armor &ltfingerprint&gt</label><br>
+<textarea name="key" form="add-pgp-key-form"></textarea><br>
+
+<label>Signed proof: $ echo "{{ .ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</label><br>
+<textarea name="proof" form="add-pgp-key-form"></textarea><br>
+
+<form action="/profile/add-pgp-key" id="add-pgp-key-form" method="post">
+    <input type="submit" value="Add PGP key"></input>
+</form>
 
 {{ end }}

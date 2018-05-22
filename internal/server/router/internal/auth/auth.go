@@ -38,7 +38,7 @@ func WithUser(fn UserHandlerFunc, app *app.App) http.Handler {
 
 		// Redirect if the user is not authenticated
 		if user == nil {
-			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 

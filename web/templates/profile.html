@@ -35,7 +35,7 @@
     your public key along with a signed proof.
 </p>
 
-<label>Public key (armored): $ gpg --export --armor &ltfingerprint&gt</label><br>
+<label>Public key (armored): $ gpg --armor --export-options export-clean,export-minimal --export &ltfingerprint&gt</label><br>
 <textarea name="key" form="add-pgp-key-form"></textarea><br>
 
 <label>Signed proof: $ echo "{{ .ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</label><br>

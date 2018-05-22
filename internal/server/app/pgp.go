@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp"
@@ -13,7 +14,8 @@ import (
 // for a given user.
 func (app *App) ExpectedPGPKeyProofText(userID uint) string {
 	expectedProofText := fmt.Sprintf(
-		"I am User ID %d on %s",
+		"As of %s, I am User ID %d on %s",
+		time.Now().Format("2006-01-02"),
 		userID,
 		app.config.ServerURL,
 	)

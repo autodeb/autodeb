@@ -22,7 +22,7 @@ func UploadHandler(app *app.App) http.Handler {
 			return
 		}
 
-		upload, err := app.ProcessUpload(uploadParameters, r.Body)
+		upload, err := app.UploadsService().ProcessUpload(uploadParameters, r.Body)
 
 		if err != nil {
 			if errorchecks.IsInputError(err) {

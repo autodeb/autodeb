@@ -9,7 +9,7 @@ import (
 )
 
 func setupTest() (*Renderer, filesystem.FS) {
-	fs := filesystem.NewMemMapFs()
+	fs := filesystem.NewMemMapFS()
 	renderer := NewRenderer(fs, true)
 	return renderer, fs
 }

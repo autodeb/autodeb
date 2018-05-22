@@ -1,4 +1,4 @@
-package app
+package pgp
 
 import (
 	"fmt"
@@ -7,23 +7,39 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
+//Service manages pgp keys and verification
+type Service struct {
+	db        *database.Database
+	serverURL string
+}
+
+//New creates a new pgp service
+func New(db *database.Database, serverURL string) *Service {
+	service := &Service{
+		db:        db,
+		serverURL: serverURL,
+	}
+	return service
+}
+
 // ExpectedPGPKeyProofText returns the expected PGP Key ownership proof text.
 // for a given user.
-func (app *App) ExpectedPGPKeyProofText(userID uint) string {
+func (service *Service) ExpectedPGPKeyProofText(userID uint) string {
 	expectedProofText := fmt.Sprintf(
 		"As of %s, I am User ID %d on %s",
 		time.Now().Format("2006-01-02"),
 		userID,
-		app.config.ServerURL,
+		service.serverURL,
 	)
 	return expectedProofText
 }
 
 // AddUserKey associates a PGP key with the user, if the proof is valid.
-func (app *App) AddUserKey(userID uint, key, proof string) error {
+func (service *Service) AddUserKey(userID uint, key, proof string) error {
 	signedProofText, entity, err := pgp.VerifySignatureClearsigned(
 		strings.NewReader(proof),
 		strings.NewReader(key),
@@ -34,13 +50,13 @@ func (app *App) AddUserKey(userID uint, key, proof string) error {
 
 	signedProofText = strings.TrimSpace(signedProofText)
 
-	if signedProofText != app.ExpectedPGPKeyProofText(userID) {
+	if signedProofText != service.ExpectedPGPKeyProofText(userID) {
 		return errors.Errorf("Signed proof text did not match the expected proof text")
 	}
 
 	fingerprint := pgp.EntityFingerprint(entity)
 
-	if _, err := app.db.CreatePGPKey(userID, fingerprint); err != nil {
+	if _, err := service.db.CreatePGPKey(userID, fingerprint); err != nil {
 		return err
 	}
 
@@ -48,8 +64,8 @@ func (app *App) AddUserKey(userID uint, key, proof string) error {
 }
 
 // GetUserPGPKeys returns all PGP Keys associated with a user
-func (app *App) GetUserPGPKeys(userID uint) ([]*models.PGPKey, error) {
-	keys, err := app.db.GetAllPGPKeysByUserID(userID)
+func (service *Service) GetUserPGPKeys(userID uint) ([]*models.PGPKey, error) {
+	keys, err := service.db.GetAllPGPKeysByUserID(userID)
 	if err != nil {
 		return nil, err
 	}

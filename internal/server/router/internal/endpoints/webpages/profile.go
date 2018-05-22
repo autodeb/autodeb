@@ -14,7 +14,7 @@ import (
 func ProfileGetHandler(app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		pgpKeys, err := app.GetUserPGPKeys(user.ID)
+		pgpKeys, err := app.PGPService().GetUserPGPKeys(user.ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -27,7 +27,7 @@ func ProfileGetHandler(app *app.App) http.Handler {
 		}{
 			User:                    user,
 			PGPKeys:                 pgpKeys,
-			ExpectedPGPKeyProofText: app.ExpectedPGPKeyProofText(user.ID),
+			ExpectedPGPKeyProofText: app.PGPService().ExpectedPGPKeyProofText(user.ID),
 		}
 
 		rendered, err := app.TemplatesRenderer().RenderTemplate(data, "base.html", "profile.html")
@@ -58,7 +58,7 @@ func AddPGPKeyPostHandler(app *app.App) http.Handler {
 		key := r.Form.Get("key")
 		proof := r.Form.Get("proof")
 
-		if err := app.AddUserKey(user.ID, key, proof); err != nil {
+		if err := app.PGPService().AddUserKey(user.ID, key, proof); err != nil {
 			app.Logger().Error(err)
 		}
 

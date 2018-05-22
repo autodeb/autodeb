@@ -38,13 +38,13 @@ func TestAddPGPKeyPostHandler(t *testing.T) {
 
 	user := testRouter.Login()
 
-	keys, err := testRouter.App.GetUserPGPKeys(user.ID)
+	keys, err := testRouter.App.PGPService().GetUserPGPKeys(user.ID)
 	assert.NotNil(t, keys)
 	assert.Equal(t, 0, len(keys))
 	assert.NoError(t, err)
 
 	proof, err := pgp.Clearsign(
-		strings.NewReader(testRouter.App.ExpectedPGPKeyProofText(user.ID)),
+		strings.NewReader(testRouter.App.PGPService().ExpectedPGPKeyProofText(user.ID)),
 		strings.NewReader(pgptest.TestKeyPrivate),
 	)
 	assert.NoError(t, err)
@@ -57,7 +57,7 @@ func TestAddPGPKeyPostHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusSeeOther, response.Result().StatusCode)
 
-	keys, err = testRouter.App.GetUserPGPKeys(user.ID)
+	keys, err = testRouter.App.PGPService().GetUserPGPKeys(user.ID)
 	assert.NotNil(t, keys)
 	assert.Equal(t, 1, len(keys))
 	assert.NoError(t, err)

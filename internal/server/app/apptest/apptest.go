@@ -35,16 +35,16 @@ func SetupTest(t *testing.T) *AppTest {
 	db, err := database.NewDatabase("sqlite3", ":memory:")
 	require.NoError(t, err)
 
-	dataFS := filesystem.NewMemMapFs()
+	dataFS := filesystem.NewMemMapFS()
 
-	templatesFS, err := filesystem.NewFS(
+	templatesFS := filesystem.NewBasePathFS(
+		filesystem.NewOsFS(),
 		filepath.Join(projectDirectory(), "web", "templates"),
 	)
-	require.NoError(t, err)
 
 	tmplRenderer := htmltemplate.NewRenderer(templatesFS, true)
 
-	staticFS := filesystem.NewMemMapFs()
+	staticFS := filesystem.NewMemMapFS()
 
 	authBackend := newFakeAuthBackend()
 

@@ -34,25 +34,25 @@ func (err *uploadError) IsInputError() bool {
 }
 
 // ProcessUpload receives uploaded files
-func (man *Manager) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) (*models.Upload, error) {
+func (service *Service) ProcessUpload(uploadParameters *UploadParameters, content io.Reader) (*models.Upload, error) {
 	// Clean the file name, ensure that it contains only a file name and
 	// that it isn't something shady like ../../filename.txt
 	_, uploadFileName := filepath.Split(uploadParameters.Filename)
 
 	switch ext := filepath.Ext(uploadFileName); ext {
 	case ".changes":
-		upload, err := man.processChangesUpload(uploadFileName, content)
+		upload, err := service.processChangesUpload(uploadFileName, content)
 		return upload, err
 	case ".deb":
 		return nil, &uploadError{errors.New("only source uploads are accepted"), true}
 	default:
-		err := man.processFileUpload(uploadFileName, content)
+		err := service.processFileUpload(uploadFileName, content)
 		return nil, err
 	}
 
 }
 
-func (man *Manager) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
+func (service *Service) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
 	contentBytes, err := ioutil.ReadAll(content)
 	if err != nil {
 		return nil, err
@@ -74,13 +74,13 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 
 	//Verify that we have all specified files
 	//otherwise, immediately reject the upload
-	fileUploads, err := man.getChangesFileUploads(changes)
+	fileUploads, err := service.getChangesFileUploads(changes)
 	if err != nil {
 		return nil, err
 	}
 
 	//Create the upload
-	upload, err := man.db.CreateUpload(
+	upload, err := service.db.CreateUpload(
 		changes.Source,
 		changes.Version.String(),
 		changes.Maintainer,
@@ -93,16 +93,16 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 	//Save the .changes file
 	if err := writeDataToDestInFS(
 		bytes.NewReader(contentBytes),
-		filepath.Join(man.UploadsDirectory(), fmt.Sprint(upload.ID)),
+		filepath.Join(service.UploadsDirectory(), fmt.Sprint(upload.ID)),
 		filename,
-		man.dataFS,
+		service.dataFS,
 	); err != nil {
 		return nil, err
 	}
 
 	//Move all files to the upload folder
 	for _, fileUpload := range fileUploads {
-		if err := man.moveFileUpload(fileUpload, upload); err != nil {
+		if err := service.moveFileUpload(fileUpload, upload); err != nil {
 			//At this point, it is too late to back down. We could have moved
 			//a FileUpload already so we better finish moving what we can
 			//and just log the error.
@@ -112,7 +112,7 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 
 	//Create jobs. We do this at only after moving files
 	//because the job could be picked-up immediately.
-	if _, err := man.db.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
+	if _, err := service.db.CreateJob(models.JobTypeBuild, upload.ID); err != nil {
 		return nil, err
 	}
 
@@ -121,9 +121,9 @@ func (man *Manager) processChangesUpload(filename string, content io.Reader) (*m
 
 //moveFileUpload will move a FileUpload to the upload directory
 //and mark the FileUpload as completed
-func (man *Manager) moveFileUpload(fileUpload *models.FileUpload, upload *models.Upload) error {
+func (service *Service) moveFileUpload(fileUpload *models.FileUpload, upload *models.Upload) error {
 	sourceDir := filepath.Join(
-		man.UploadedFilesDirectory(),
+		service.UploadedFilesDirectory(),
 		fmt.Sprint(fileUpload.ID),
 	)
 
@@ -133,32 +133,32 @@ func (man *Manager) moveFileUpload(fileUpload *models.FileUpload, upload *models
 	)
 
 	dest := filepath.Join(
-		man.UploadsDirectory(),
+		service.UploadsDirectory(),
 		fmt.Sprint(upload.ID),
 		fileUpload.Filename,
 	)
 
-	if err := man.dataFS.Rename(source, dest); err != nil {
+	if err := service.dataFS.Rename(source, dest); err != nil {
 		return errors.Errorf("could not move %s to %s", source, dest)
 	}
 
 	fileUpload.Completed = true
 	fileUpload.UploadID = upload.ID
-	if err := man.db.UpdateFileUpload(fileUpload); err != nil {
+	if err := service.db.UpdateFileUpload(fileUpload); err != nil {
 		return errors.Errorf("could not mark fileUpload %v as completed", fileUpload.ID)
 	}
 
-	man.dataFS.RemoveAll(sourceDir)
+	service.dataFS.RemoveAll(sourceDir)
 
 	return nil
 }
 
 //getChangedFileUploads returns the FileUploads associated with this changes file
-func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.FileUpload, error) {
+func (service *Service) getChangesFileUploads(changes *control.Changes) ([]*models.FileUpload, error) {
 	var fileUploads []*models.FileUpload
 
 	for _, file := range changes.ChecksumsSha256 {
-		fileUpload, err := man.db.GetFileUploadByFileNameSHASumCompleted(
+		fileUpload, err := service.db.GetFileUploadByFileNameSHASumCompleted(
 			file.Filename,
 			file.Hash,
 			false,
@@ -184,7 +184,7 @@ func (man *Manager) getChangesFileUploads(changes *control.Changes) ([]*models.F
 	return fileUploads, nil
 }
 
-func (man *Manager) processFileUpload(filename string, content io.Reader) error {
+func (service *Service) processFileUpload(filename string, content io.Reader) error {
 	// Save the upload to a temp file on the os's filesystem so that we can
 	// calculate the shasum
 	tmpfileName, err := writeToTempfile(content)
@@ -198,12 +198,12 @@ func (man *Manager) processFileUpload(filename string, content io.Reader) error 
 		return err
 	}
 
-	fileUpload, err := man.db.CreateFileUpload(filename, shasum, time.Now())
+	fileUpload, err := service.db.CreateFileUpload(filename, shasum, time.Now())
 	if err != nil {
 		return err
 	}
 
-	destDir := filepath.Join(man.UploadedFilesDirectory(), fmt.Sprint(fileUpload.ID))
+	destDir := filepath.Join(service.UploadedFilesDirectory(), fmt.Sprint(fileUpload.ID))
 
 	// Open the temporary file
 	tmpFile, err := os.Open(tmpfileName)
@@ -217,7 +217,7 @@ func (man *Manager) processFileUpload(filename string, content io.Reader) error 
 		tmpFile,
 		destDir,
 		filename,
-		man.dataFS,
+		service.dataFS,
 	)
 
 	return err

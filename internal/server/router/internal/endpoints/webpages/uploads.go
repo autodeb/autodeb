@@ -14,7 +14,7 @@ import (
 func UploadsGetHandler(app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		uploads, err := app.GetAllUploads()
+		uploads, err := app.UploadsService().GetAllUploads()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

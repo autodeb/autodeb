@@ -14,7 +14,7 @@ import (
 func JobsGetHandler(app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		jobs, err := app.GetAllJobs()
+		jobs, err := app.JobsService().GetAllJobs()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

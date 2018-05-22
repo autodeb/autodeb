@@ -18,7 +18,7 @@ import (
 func JobsNextPostHandler(app *app.App) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 
-		job, err := app.UnqueueNextJob()
+		job, err := app.JobsService().UnqueueNextJob()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -57,7 +57,7 @@ func JobGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		job, err := app.GetJob(uint(jobID))
+		job, err := app.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -97,7 +97,7 @@ func JobLogTxtGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		file, err := app.GetJobLog(uint(jobID))
+		file, err := app.JobsService().GetJobLog(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -131,7 +131,7 @@ func JobLogPostHandler(app *app.App) http.Handler {
 		}
 
 		// Get the job
-		job, err := app.GetJob(uint(jobID))
+		job, err := app.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -151,7 +151,7 @@ func JobLogPostHandler(app *app.App) http.Handler {
 		}
 
 		// Save the logs
-		if err := app.SaveJobLog(uint(jobID), r.Body); err != nil {
+		if err := app.JobsService().SaveJobLog(uint(jobID), r.Body); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -193,7 +193,7 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 		}
 
 		// Get the job
-		job, err := app.GetJob(uint(jobID))
+		job, err := app.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -214,7 +214,7 @@ func JobStatusPostHandler(app *app.App) http.Handler {
 
 		// Update the job
 		job.Status = newStatus
-		if err := app.UpdateJob(job); err != nil {
+		if err := app.JobsService().UpdateJob(job); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

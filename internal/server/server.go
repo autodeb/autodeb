@@ -36,22 +36,11 @@ func New(cfg *Config, loggingOutput io.Writer) (*Server, error) {
 		return nil, err
 	}
 
-	dataFS, err := filesystem.NewFS(cfg.DataDirectory)
-	if err != nil {
-		return nil, err
-	}
-
-	templatesFS, err := filesystem.NewFS(cfg.TemplatesDirectory)
-	if err != nil {
-		return nil, err
-	}
+	dataFS := filesystem.NewBasePathFS(filesystem.NewOsFS(), cfg.DataDirectory)
+	staticFilesFS := filesystem.NewBasePathFS(filesystem.NewOsFS(), cfg.StaticFilesDirectory)
+	templatesFS := filesystem.NewBasePathFS(filesystem.NewOsFS(), cfg.TemplatesDirectory)
 
 	renderer := htmltemplate.NewRenderer(templatesFS, cfg.TemplatesCacheEnabled)
-
-	staticFilesFS, err := filesystem.NewFS(cfg.StaticFilesDirectory)
-	if err != nil {
-		return nil, err
-	}
 
 	authBackend, err := getAuthBackend(cfg, db)
 	if err != nil {

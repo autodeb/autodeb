@@ -25,7 +25,7 @@ func UploadDSCGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		dsc, err := app.GetUploadDSC(uint(uploadID))
+		dsc, err := app.UploadsService().GetUploadDSC(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -57,7 +57,7 @@ func UploadFilesGetHandler(app *app.App) http.Handler {
 			return
 		}
 
-		fileUploads, err := app.GetAllFileUploadsByUploadID(uint(uploadID))
+		fileUploads, err := app.UploadsService().GetAllFileUploadsByUploadID(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -102,7 +102,7 @@ func UploadFileGetHandler(app *app.App) http.Handler {
 		// Clean the file name, keeping only the file name if it is a path
 		_, filename = filepath.Split(filename)
 
-		file, err := app.GetUploadFile(uint(uploadID), filename)
+		file, err := app.UploadsService().GetUploadFile(uint(uploadID), filename)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

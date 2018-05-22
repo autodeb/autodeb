@@ -14,19 +14,18 @@ type FS = afero.Fs
 // File represents a file on the file system
 type File = afero.File
 
-//NewFS creates a new file system
-func NewFS(basepath string) (FS, error) {
-	// TODO: Fow now, we hardcode BasePathFs. In the future,
-	// the function could accept some sort of ConnectionString
-	// that can be used to select a specific backend.
-
-	basePathFs := afero.NewBasePathFs(afero.NewOsFs(), basepath)
-
-	return basePathFs, nil
+//NewOsFS returns a file system that uses the os
+func NewOsFS() FS {
+	return afero.NewOsFs()
 }
 
-//NewMemMapFs creates a memory-based file system
-func NewMemMapFs() FS {
+//NewBasePathFS returns a file system based on the given path
+func NewBasePathFS(fs FS, basepath string) FS {
+	return afero.NewBasePathFs(fs, basepath)
+}
+
+//NewMemMapFS creates a memory-based file system
+func NewMemMapFS() FS {
 	return afero.NewMemMapFs()
 }
 

@@ -1,4 +1,4 @@
-package app_test
+package jobs_test
 
 import (
 	"io/ioutil"
@@ -23,7 +23,7 @@ func TestSaveJobLog(t *testing.T) {
 	_, err := appTest.DataFS.Stat(jobDir)
 	require.Error(t, err, "the job directory should not exist")
 
-	err = appTest.App.SaveJobLog(
+	err = appTest.App.JobsService().SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
@@ -47,13 +47,13 @@ func TestSaveJobLog(t *testing.T) {
 func TestGetJobLog(t *testing.T) {
 	appTest := apptest.SetupTest(t)
 
-	err := appTest.App.SaveJobLog(
+	err := appTest.App.JobsService().SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 	assert.NoError(t, err)
 
-	log, err := appTest.App.GetJobLog(uint(1))
+	log, err := appTest.App.JobsService().GetJobLog(uint(1))
 	defer log.Close()
 
 	assert.NoError(t, err)

@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/app"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/app/services/uploads"
 )
 
 //Parse an http request for upload parameters
-func Parse(r *http.Request) (*app.UploadParameters, error) {
+func Parse(r *http.Request) (*uploads.UploadParameters, error) {
 	// Upload parameters can be set in two ways
 	//
 	// 1. /<filename>?param1=value1&param2=value2
@@ -24,7 +24,7 @@ func Parse(r *http.Request) (*app.UploadParameters, error) {
 		return nil, err
 	}
 
-	uploadParameters := app.UploadParameters{
+	uploadParameters := uploads.UploadParameters{
 		Filename: filename,
 	}
 

@@ -58,7 +58,7 @@ func AddPGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 		key := r.Form.Get("key")
 		proof := r.Form.Get("proof")
 
-		if err := appCtx.PGPService().AddUserKey(user.ID, key, proof); err != nil {
+		if err := appCtx.PGPService().AddUserPGPKey(user.ID, key, proof); err != nil {
 			appCtx.Logger().Error(err)
 		}
 

@@ -5,10 +5,11 @@ import (
 )
 
 // CreatePGPKey will create PGP Key
-func (db *Database) CreatePGPKey(userID uint, fingerprint string) (*models.PGPKey, error) {
+func (db *Database) CreatePGPKey(userID uint, fingerprint, publicKey string) (*models.PGPKey, error) {
 	pgpKey := &models.PGPKey{
 		UserID:      userID,
 		Fingerprint: fingerprint,
+		PublicKey:   publicKey,
 	}
 
 	if err := db.gormDB.Create(pgpKey).Error; err != nil {

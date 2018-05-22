@@ -38,8 +38,8 @@ func (service *Service) ExpectedPGPKeyProofText(userID uint) string {
 	return expectedProofText
 }
 
-// AddUserKey associates a PGP key with the user, if the proof is valid.
-func (service *Service) AddUserKey(userID uint, key, proof string) error {
+// AddUserPGPKey associates a PGP key with the user, if the proof is valid.
+func (service *Service) AddUserPGPKey(userID uint, key, proof string) error {
 	signedProofText, entity, err := pgp.VerifySignatureClearsigned(
 		strings.NewReader(proof),
 		strings.NewReader(key),
@@ -56,7 +56,7 @@ func (service *Service) AddUserKey(userID uint, key, proof string) error {
 
 	fingerprint := pgp.EntityFingerprint(entity)
 
-	if _, err := service.db.CreatePGPKey(userID, fingerprint); err != nil {
+	if _, err := service.db.CreatePGPKey(userID, fingerprint, key); err != nil {
 		return err
 	}
 

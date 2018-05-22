@@ -64,4 +64,5 @@ func TestAddPGPKeyPostHandler(t *testing.T) {
 
 	key := keys[0]
 	assert.Equal(t, pgptest.TestKeyFingerprint, key.Fingerprint)
+	assert.Equal(t, pgptest.TestKeyPublic, key.PublicKey)
 }

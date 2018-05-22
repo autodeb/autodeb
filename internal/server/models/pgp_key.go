@@ -5,4 +5,5 @@ type PGPKey struct {
 	ID          uint
 	UserID      uint
 	Fingerprint string
+	PublicKey   string
 }

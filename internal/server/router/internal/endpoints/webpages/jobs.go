@@ -1,7 +1,6 @@
 package webpages
 
 import (
-	"fmt"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
@@ -21,20 +20,12 @@ func JobsGetHandler(appCtx *appctx.Context) http.Handler {
 		}
 
 		data := struct {
-			User *models.User
 			Jobs []*models.Job
 		}{
-			User: user,
 			Jobs: jobs,
 		}
 
-		rendered, err := appCtx.TemplatesRenderer().RenderTemplate(data, "base.html", "jobs.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		fmt.Fprint(w, rendered)
+		renderWithBase(r, w, appCtx, user, "jobs.html", data)
 	}
 
 	handler := auth.MaybeWithUser(handlerFunc, appCtx)

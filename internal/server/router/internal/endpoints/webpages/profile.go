@@ -1,7 +1,6 @@
 package webpages
 
 import (
-	"fmt"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
@@ -21,22 +20,14 @@ func ProfileGetHandler(appCtx *appctx.Context) http.Handler {
 		}
 
 		data := struct {
-			User                    *models.User
 			PGPKeys                 []*models.PGPKey
 			ExpectedPGPKeyProofText string
 		}{
-			User:                    user,
 			PGPKeys:                 pgpKeys,
 			ExpectedPGPKeyProofText: appCtx.PGPService().ExpectedPGPKeyProofText(user.ID),
 		}
 
-		rendered, err := appCtx.TemplatesRenderer().RenderTemplate(data, "base.html", "profile.html")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		fmt.Fprint(w, rendered)
+		renderWithBase(r, w, appCtx, user, "profile.html", data)
 	}
 
 	handler := auth.WithUser(handlerFunc, appCtx)

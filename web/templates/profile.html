@@ -22,7 +22,7 @@
         <th>Fingerprint</th>
     </tr>
 
-    {{ range .PGPKeys }}
+    {{ range .Data.PGPKeys }}
     <tr>
         <td>{{ .ID }}</td>
         <td>{{ .Fingerprint }}</td>
@@ -38,7 +38,7 @@
 <label>Public key (armored): $ gpg --armor --export-options export-clean,export-minimal --export &ltfingerprint&gt</label><br>
 <textarea name="key" form="add-pgp-key-form"></textarea><br>
 
-<label>Signed proof: $ echo "{{ .ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</label><br>
+<label>Signed proof: $ echo "{{ $.Data.ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</label><br>
 <textarea name="proof" form="add-pgp-key-form"></textarea><br>
 
 <form action="/profile/add-pgp-key" id="add-pgp-key-form" method="post">

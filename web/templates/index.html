@@ -10,7 +10,7 @@ This server has a dput-compatible API. Try adding this to ~/.dput.cf:
 
 <pre>
 [autodeb]
-fqdn = {{ .ServerURL }}
+fqdn = {{ .Data.ServerURL }}
 incoming = /upload
 method = http
 allow_unsigned_uploads = 1

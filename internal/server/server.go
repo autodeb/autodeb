@@ -8,12 +8,13 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/gorilla/sessions"
+	gorillaSessions "github.com/gorilla/sessions"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
@@ -44,7 +45,12 @@ func New(cfg *config.Config, loggingOutput io.Writer) (*Server, error) {
 
 	renderer := htmltemplate.NewRenderer(templatesFS, cfg.TemplatesCacheEnabled)
 
-	authBackend, err := getAuthBackend(cfg, db)
+	sessionsManager, err := getSessionManager()
+	if err != nil {
+		return nil, err
+	}
+
+	authBackend, err := getAuthBackend(cfg, db, sessionsManager)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +68,7 @@ func New(cfg *config.Config, loggingOutput io.Writer) (*Server, error) {
 		renderer,
 		filesystem.NewHTTPFS(staticFilesFS),
 		authBackend,
+		sessionsManager,
 		services,
 		logger,
 	)
@@ -80,10 +87,10 @@ func New(cfg *config.Config, loggingOutput io.Writer) (*Server, error) {
 	return &server, nil
 }
 
-func getAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, error) {
+func getAuthBackend(cfg *config.Config, db *database.Database, sessionsManager *sessions.Manager) (auth.Backend, error) {
 	switch cfg.Auth.AuthentificationBackend {
 	case "oauth":
-		return getOAuthBackend(cfg, db)
+		return getOAuthBackend(cfg, db, sessionsManager)
 	case "disabled":
 		return authDisabled.NewBackend(), nil
 	default:
@@ -91,12 +98,7 @@ func getAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, er
 	}
 }
 
-func getOAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, error) {
-	sessionStore, err := getSessionStore()
-	if err != nil {
-		return nil, err
-	}
-
+func getOAuthBackend(cfg *config.Config, db *database.Database, sessionsManager *sessions.Manager) (auth.Backend, error) {
 	baseURL, err := url.Parse(cfg.Auth.OAuth.BaseURL)
 	if err != nil {
 		return nil, err
@@ -114,7 +116,7 @@ func getOAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, e
 
 	authBackend := authOAuth.NewBackend(
 		db,
-		sessionStore,
+		sessionsManager,
 		oauthProvider,
 		cfg.ServerURL,
 	)
@@ -122,18 +124,20 @@ func getOAuthBackend(cfg *config.Config, db *database.Database) (auth.Backend, e
 	return authBackend, nil
 }
 
-func getSessionStore() (sessions.Store, error) {
+func getSessionManager() (*sessions.Manager, error) {
+	// TODO: Ask for the session secret in the CLI
+	// instead of generating a random one
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: Ask for the session secret in the CLI
-	// instead of generating a random one
-	store := sessions.NewCookieStore(b)
+	sessionStore := gorillaSessions.NewCookieStore(b)
 
-	return store, nil
+	sessionsManager := sessions.NewManager(sessionStore, "autodeb")
+
+	return sessionsManager, nil
 }
 
 // Shutdown will gracefully stop the server

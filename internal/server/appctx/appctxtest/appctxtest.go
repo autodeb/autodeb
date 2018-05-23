@@ -6,10 +6,12 @@ import (
 	"runtime"
 	"testing"
 
+	gorillaSessions "github.com/gorilla/sessions"
 	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
@@ -45,6 +47,11 @@ func SetupTest(t *testing.T) *AppCtxTest {
 
 	authBackend := newFakeAuthBackend()
 
+	sessionsManager := sessions.NewManager(
+		gorillaSessions.NewCookieStore([]byte("autodeb-tests")),
+		"autodeb-tests",
+	)
+
 	logger := log.New(ioutil.Discard)
 
 	appCtx := appctx.New(
@@ -52,6 +59,7 @@ func SetupTest(t *testing.T) *AppCtxTest {
 		tmplRenderer,
 		filesystem.NewHTTPFS(staticFS),
 		authBackend,
+		sessionsManager,
 		servicesTest.Services,
 		logger,
 	)

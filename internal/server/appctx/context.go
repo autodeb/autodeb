@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
+	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
@@ -17,12 +18,13 @@ import (
 // Context is the application's context. It holds everityhing that is needed to
 // serve a request.
 type Context struct {
-	config      *config.Config
-	renderer    *htmltemplate.Renderer
-	staticFS    http.FileSystem
-	authBackend auth.Backend
-	services    *services.Services
-	logger      log.Logger
+	config          *config.Config
+	renderer        *htmltemplate.Renderer
+	staticFS        http.FileSystem
+	authBackend     auth.Backend
+	sessionsManager *sessions.Manager
+	services        *services.Services
+	logger          log.Logger
 }
 
 // New create an application context
@@ -31,19 +33,26 @@ func New(
 	renderer *htmltemplate.Renderer,
 	staticFS http.FileSystem,
 	authBackend auth.Backend,
+	sessionsManager *sessions.Manager,
 	services *services.Services,
 	logger log.Logger) *Context {
 
 	context := &Context{
-		config:      config,
-		renderer:    renderer,
-		staticFS:    staticFS,
-		authBackend: authBackend,
-		logger:      logger,
-		services:    services,
+		config:          config,
+		renderer:        renderer,
+		staticFS:        staticFS,
+		authBackend:     authBackend,
+		sessionsManager: sessionsManager,
+		services:        services,
+		logger:          logger,
 	}
 
 	return context
+}
+
+// Sessions returns the sessions manager
+func (ctx *Context) Sessions() *sessions.Manager {
+	return ctx.sessionsManager
 }
 
 // Logger returns the logger

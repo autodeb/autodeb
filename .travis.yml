@@ -12,7 +12,7 @@ install:
 
 script:
   - make test
-  - $GOPATH/bin/goveralls -coverprofile=profile.cov -service=travis-pro
+  - $GOPATH/bin/goveralls -coverprofile=profile.cov -service=travis-ci
 
 notifications:
   email: false

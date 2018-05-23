@@ -40,22 +40,42 @@ func (service *Service) ExpectedPGPKeyProofText(userID uint) string {
 
 // AddUserPGPKey associates a PGP key with the user, if the proof is valid.
 func (service *Service) AddUserPGPKey(userID uint, key, proof string) error {
-	signedProofText, entity, err := pgp.VerifySignatureClearsigned(
+
+	// Read the provided keyring
+	keyring, err := pgp.ReadArmoredKeyRing(strings.NewReader(key))
+	if err != nil {
+		return errors.WithMessage(err, "could not read the provided key")
+	}
+
+	// The keyring should only contain one key
+	if numKeys := len(keyring); numKeys != 1 {
+		return errors.Errorf("expected 1 key, %d were provided", numKeys)
+	}
+
+	// The key should have no signatures on it
+	if numSignatures := len(pgp.EntitySignatures(keyring[0])); numSignatures > 0 {
+		return errors.Errorf("the provided key should be clean but it has %d signatures on it", numSignatures)
+	}
+
+	// Verify the signature on the proof
+	signedProofText, entity, err := pgp.VerifySignatureClearsignedKeyRing(
 		strings.NewReader(proof),
-		strings.NewReader(key),
+		keyring,
 	)
 	if err != nil {
 		return errors.WithMessage(err, "couldn't verify signature")
 	}
 
+	// Verify that the signed proof matches the expected proof text
 	signedProofText = strings.TrimSpace(signedProofText)
-
 	if signedProofText != service.ExpectedPGPKeyProofText(userID) {
 		return errors.Errorf("Signed proof text did not match the expected proof text")
 	}
 
+	// Get the fingerpring of the key
 	fingerprint := pgp.EntityFingerprint(entity)
 
+	// Add the key to the database
 	if _, err := service.db.CreatePGPKey(userID, fingerprint, key); err != nil {
 		return err
 	}

@@ -10,6 +10,7 @@ import (
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/clearsign"
+	"golang.org/x/crypto/openpgp/packet"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
@@ -51,14 +52,9 @@ func clearsignWriter(msg io.Reader, key io.Reader, w io.Writer) error {
 	return nil
 }
 
-//VerifySignatureClearsigned verifies the signature of a clearsigned gpg
+//VerifySignatureClearsignedKeyRing verifies the signature of a clearsigned gpg
 //message, returning the message contents and the signer's entity.
-func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *openpgp.Entity, error) {
-	keyring, err := openpgp.ReadArmoredKeyRing(keys)
-	if err != nil {
-		return "", nil, errors.WithMessage(err, "could not read keyring")
-	}
-
+func VerifySignatureClearsignedKeyRing(msg io.Reader, keyring openpgp.KeyRing) (string, *openpgp.Entity, error) {
 	msgBytes, err := ioutil.ReadAll(msg)
 	if err != nil {
 		return "", nil, err
@@ -78,6 +74,30 @@ func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *openpgp
 	messageText := string(block.Plaintext)
 
 	return messageText, signer, nil
+}
+
+//VerifySignatureClearsigned verifies the signature of a clearsigned gpg
+//message, returning the message contents and the signer's entity.
+func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *openpgp.Entity, error) {
+	keyring, err := openpgp.ReadArmoredKeyRing(keys)
+	if err != nil {
+		return "", nil, errors.WithMessage(err, "could not read keyring")
+	}
+	return VerifySignatureClearsignedKeyRing(msg, keyring)
+}
+
+//ReadArmoredKeyRing retrieves a keyring from a reader
+func ReadArmoredKeyRing(r io.Reader) (openpgp.EntityList, error) {
+	return openpgp.ReadArmoredKeyRing(r)
+}
+
+//EntitySignatures returns all signatures of an entity
+func EntitySignatures(entity *openpgp.Entity) []*packet.Signature {
+	var signatures []*packet.Signature
+	for _, identity := range entity.Identities {
+		signatures = append(signatures, identity.Signatures...)
+	}
+	return signatures
 }
 
 //EntityFingerprint returns the hex representation of the

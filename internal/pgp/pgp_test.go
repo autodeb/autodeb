@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/crypto/openpgp"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp"
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp/pgptest"
 
@@ -39,6 +41,30 @@ func TestClearsignMessage(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "test message", strings.TrimSpace(msg))
 	assert.Equal(t, pgptest.TestKeyFingerprint, pgp.EntityFingerprint(entity))
+}
+
+func TestEntitySignatures(t *testing.T) {
+	keyring, err := openpgp.ReadArmoredKeyRing(
+		strings.NewReader(pgptest.TestKeyPublicSigned),
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(keyring))
+
+	signatures := pgp.EntitySignatures(keyring[0])
+
+	assert.Equal(t, 1, len(signatures), "the key should signatures on it")
+}
+
+func TestEntitySignaturesNoSignatures(t *testing.T) {
+	keyring, err := openpgp.ReadArmoredKeyRing(
+		strings.NewReader(pgptest.TestKeyPublic),
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(keyring))
+
+	signatures := pgp.EntitySignatures(keyring[0])
+
+	assert.Equal(t, 0, len(signatures), "the key should have no signatures on it")
 }
 
 const signedMessage = `

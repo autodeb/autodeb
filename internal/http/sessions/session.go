@@ -54,12 +54,12 @@ func (s *Session) Save(r *http.Request, w http.ResponseWriter) error {
 const flashPrefix = "_flash_"
 
 //Flash will add a message to a category of flashes
-func (s *Session) Flash(r *http.Request, w http.ResponseWriter, category, message string) {
+func (s *Session) Flash(category, message string) {
 	s.gorillaSession.AddFlash(message, flashPrefix+category)
 }
 
 //Flashes will return all flashes and removes them from the request
-func (s *Session) Flashes(r *http.Request) map[string][]string {
+func (s *Session) Flashes() map[string][]string {
 	flashes := make(map[string][]string)
 
 	// Browse all session keys

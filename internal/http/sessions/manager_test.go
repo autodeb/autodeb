@@ -35,9 +35,9 @@ func TestFlash(t *testing.T) {
 
 	// Add flashes
 	session, _ := manager.Get(request)
-	session.Flash(request, response, "error", "this is an error")
-	session.Flash(request, response, "error", "this is a second error")
-	session.Flash(request, response, "info", "this is information")
+	session.Flash("error", "this is an error")
+	session.Flash("error", "this is a second error")
+	session.Flash("info", "this is information")
 	session.Save(request, response)
 
 	// Second request
@@ -45,7 +45,7 @@ func TestFlash(t *testing.T) {
 	session, _ = manager.Get(request)
 
 	// Get flashes
-	flashes := session.Flashes(request)
+	flashes := session.Flashes()
 
 	assert.Equal(t, 2, len(flashes))
 	assert.Equal(t, []string{"this is an error", "this is a second error"}, flashes["error"])

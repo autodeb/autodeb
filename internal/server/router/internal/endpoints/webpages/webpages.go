@@ -17,12 +17,19 @@ func renderWithBase(
 	template string,
 	data interface{}) {
 
+	// Retrieve the flashes and save the session
+	session, _ := appCtx.Sessions().Get(r)
+	flashes := session.Flashes()
+	session.Save(r, w)
+
 	completeData := struct {
-		User *models.User
-		Data interface{}
+		User    *models.User
+		Flashes map[string][]string
+		Data    interface{}
 	}{
-		User: user,
-		Data: data,
+		Flashes: flashes,
+		User:    user,
+		Data:    data,
 	}
 
 	rendered, err := appCtx.TemplatesRenderer().RenderTemplate(completeData, "base.html", template)

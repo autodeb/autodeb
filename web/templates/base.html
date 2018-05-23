@@ -27,6 +27,13 @@
         </aside>
 
         <main class="content">
+            {{/* FLASHES */}}
+            {{ range $category, $messages := $.Flashes }}
+                {{ range $_, $message := $messages }}
+                    <p>{{ $category}}: {{ $message }}</p>
+                {{ end }}
+            {{ end }}
+
             {{ template "content" . }}
         </main>
 

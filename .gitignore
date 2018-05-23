@@ -8,9 +8,6 @@
 /data
 /dependency-graph-*.svg
 
-# Test coverage
-/profile.cov
-
 # stuff created at runtime
 /jobs
 /update-random-package-output-*

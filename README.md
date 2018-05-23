@@ -3,8 +3,6 @@
 [![godoc reference](https://godoc.org/salsa.debian.org/autodeb-team/autodeb?status.svg)](http://godoc.org/salsa.debian.org/autodeb-team/autodeb)
 [![pipeline status](https://salsa.debian.org/autodeb-team/autodeb/badges/master/pipeline.svg)](https://salsa.debian.org/autodeb-team/autodeb/commits/master)
 [![go report card](https://goreportcard.com/badge/salsa.debian.org/autodeb-team/autodeb)](https://goreportcard.com/report/salsa.debian.org/autodeb-team/autodeb)
-[![Build Status](https://travis-ci.com/autodeb/autodeb.svg?branch=master)](https://travis-ci.com/autodeb/autodeb)
-[![Coverage Status](https://coveralls.io/repos/github/autodeb/autodeb/badge.svg?branch=master)](https://coveralls.io/github/autodeb/autodeb?branch=master)
 
 autodeb tries to automatically update Debian packages to newer upstream versions or to backport them.
 

@@ -52,7 +52,7 @@ func (service *Service) AddUserPGPKey(userID uint, key, proof string) error {
 		return errors.Errorf("expected 1 key, %d were provided", numKeys)
 	}
 
-	// The key should have no signatures on it
+	// The key can have one self-sig, nothing more.
 	if numSignatures := len(pgp.EntitySignatures(keyring[0])); numSignatures > 1 {
 		return errors.Errorf("the provided key should be minimal but it has %d signatures on it", numSignatures)
 	}

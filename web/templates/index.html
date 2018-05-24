@@ -2,10 +2,45 @@
 
 {{ define "content" }}
 
-<p>Hello, World!</p>
+<h2>Introduction</h2>
+<hr>
 
 <p>
-This server has a dput-compatible API. Try adding this to ~/.dput.cf:
+    Autodeb is a service that provides a way to test Debian source packages.
+    It empowers Debian Developers by giving them easy access to more rigorous
+    testing before they upload a package to the archive. It runs tests that
+    Debian Developers don’t necessarily run because of lack of time and
+    resources.
+</p>
+
+<p>
+    In the future, Autodeb will also  attempt to automatically update Debian
+    packages to newer upstream versions or to backport them. Resulting
+    packages will be distributed in apt repositories.
+</p>
+
+<h2>Getting started with the service</h2>
+<hr>
+
+<p>
+   <strong>1. Associating a PGP key to your account</strong>
+</p>
+
+<p>
+    To get started with using Autodeb, the first thing that you need to do is
+    log into the service and associate a PGP key with your account. This is
+    done from the <a href="/profile">profile page</a>.
+</p>
+
+<p>
+    <strong>2. Adding autodeb to your dput configuration</strong>
+</p>
+
+<p>
+    This server has a REST API that can be very useful if you want to build
+    automated tools to interact with it. However, it also accepts uploads via
+    dput. You can add autodeb to your configured dput hosts by adding the
+    following lines to <span class="font-italic">~/.dput.cf</span>:
 </p>
 
 <pre>
@@ -14,25 +49,72 @@ This server has a dput-compatible API. Try adding this to ~/.dput.cf:
 fqdn = {{ .Data.ServerURL }}
 incoming = /upload
 method = http
-allow_unsigned_uploads = 1
 allowed_distributions = .
 </code>
 </pre>
 
 <p>
-    Then, upload a package: "dput autodeb package.changes"
+    <strong>3. Uploading a package</strong>
 </p>
 
 <p>
-    If you have access to the server. Confirm that the files were received by
-    looking at the "data" directory.
+    Before you upload a package, you should know that autodeb only accepts
+    signed source uploads. Anything other than that will be rejected with an
+    error message.
 </p>
 
 <p>
-    Now, head over to /uploads and confirm that your upload is listed.
-<p>
+    You may upload a package to autodeb with the following command:
+</p>
+
+<pre>
+    <code>$ dput autodeb &ltpackage.changes&gt</code>
+</pre>
+
+
+</p>
+    Note that neither dput nor dput-ng display http error messages, they only
+    display the error code. Autodeb always tries to return a 4XX error code
+    when there is something wrong with the upload. If your uploads yields a 5XX
+    code, it might be a good idea to get in touch with us so that we can fix
+    the bug.
+</p>
 
 <p>
-    This is it for now, but there is more to come.
+    If your upload was rejected, you can obtain the error message by
+    re-uploading the failed file with curl:
 </p>
+
+<pre>
+    <code>$ FILE=&ltfilename&gt ; curl -w "\n" -X PUT -T $FILE {{ .Data.ServerURL }}/upload/$FILE</code>
+</pre>
+
+<p>
+    <strong>4. Obtaining logs</strong>
+</p>
+
+<p>
+    Now that you have completed an upload, your it will be visible in the
+    <a href="/uploads">uploads page</a> with a dget-compatible
+    <span class="font-italic">.dsc</span> link. A build job will also be
+    created and it will be visible in the <a href="/jobs">jobs page</a>. As
+    soon as the job is completed by one of the autodeb workers, the logs will
+    be available for download.
+</p>
+
+<h2>What's next</h2>
+
+<p>
+    In the future, Autodeb will:
+
+    <ul>
+        <li>generate autopkgtests jobs for both the uploaded package</li>
+        <li>generate autopkgtests jobs for the package's dependencies</li>
+        <li>host the resulting <span class="font-italic">.debs</span></li>
+        <li>provide a range of controls for the build environment</li>
+        <li>automatically backport and/or update packages from the Debian archive to new upstream versions</li>
+    </ul>
+</p>
+
+
 {{ end }}

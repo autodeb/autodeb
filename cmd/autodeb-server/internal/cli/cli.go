@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
@@ -61,8 +62,8 @@ func Parse(args []string, writerOutput io.Writer) (*config.Config, error) {
 	var oauthClientSecret string
 	fs.StringVar(&oauthClientSecret, "oauth-client-secret", "", "oauth client secret")
 
-	var serverURL string
-	fs.StringVar(&serverURL, "server-url", "http://localhost:8071", "public server url")
+	var serverURLString string
+	fs.StringVar(&serverURLString, "server-url", "http://localhost:8071", "public server url")
 
 	var authentificationBackend string
 	fs.StringVar(&authentificationBackend, "authentification-backend", "disabled", "selected authentification backend")
@@ -81,6 +82,11 @@ func Parse(args []string, writerOutput io.Writer) (*config.Config, error) {
 		fs.SetOutput(writerOutput)
 		fs.Usage()
 		return nil, nil
+	}
+
+	serverURL, err := url.Parse(serverURLString)
+	if err != nil {
+		return nil, fmt.Errorf("invalid server url %s", serverURLString)
 	}
 
 	var logLevel log.Level

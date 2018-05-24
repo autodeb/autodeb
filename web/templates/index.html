@@ -46,9 +46,9 @@
 <pre>
 <code>
 [autodeb]
-fqdn = {{ .Data.ServerURL }}
+fqdn = {{ .Data.ServerHostnamePort }}
 incoming = /upload
-method = http
+method = {{ .Data.ServerScheme }}
 allowed_distributions = .
 </code>
 </pre>

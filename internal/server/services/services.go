@@ -2,6 +2,8 @@
 package services
 
 import (
+	"net/url"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
@@ -18,7 +20,7 @@ type Services struct {
 }
 
 // New returns a new set of services
-func New(db *database.Database, dataFS filesystem.FS, serverURL string) (*Services, error) {
+func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Services, error) {
 
 	// PGP
 	pgpService := pgp.New(db, serverURL)

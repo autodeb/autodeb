@@ -4,6 +4,7 @@ package oauth
 
 import (
 	"net/http"
+	"net/url"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
@@ -15,11 +16,11 @@ type backend struct {
 	db              *database.Database
 	sessionsManager *sessions.Manager
 	oauthProvider   Provider
-	serverURL       string
+	serverURL       *url.URL
 }
 
 // NewBackend returns a new oauth authentification backend
-func NewBackend(db *database.Database, sessionsManager *sessions.Manager, oauthProvider Provider, serverURL string) auth.Backend {
+func NewBackend(db *database.Database, sessionsManager *sessions.Manager, oauthProvider Provider, serverURL *url.URL) auth.Backend {
 	backend := &backend{
 		db:              db,
 		sessionsManager: sessionsManager,

@@ -1,6 +1,7 @@
 package pgp
 
 import (
+	"net/url"
 	"strings"
 	"testing"
 
@@ -9,11 +10,15 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database/databasetest"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func setupTest(t *testing.T) *Service {
 	db := databasetest.SetupTest(t)
-	serverURL := "http://pgptests:8080"
+
+	serverURL, err := url.Parse("http://pgptests:8080")
+	require.NoError(t, err)
+
 	service := New(db, serverURL)
 	return service
 }

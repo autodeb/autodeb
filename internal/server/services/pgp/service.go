@@ -3,6 +3,7 @@ package pgp
 import (
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 	"time"
 
@@ -17,11 +18,11 @@ import (
 //Service manages pgp keys and verification
 type Service struct {
 	db        *database.Database
-	serverURL string
+	serverURL *url.URL
 }
 
 //New creates a new pgp service
-func New(db *database.Database, serverURL string) *Service {
+func New(db *database.Database, serverURL *url.URL) *Service {
 	service := &Service{
 		db:        db,
 		serverURL: serverURL,
@@ -36,7 +37,7 @@ func (service *Service) ExpectedPGPKeyProofText(userID uint) string {
 		"As of %s, I am User ID %d on %s",
 		time.Now().Format("2006-01-02"),
 		userID,
-		service.serverURL,
+		service.serverURL.String(),
 	)
 	return expectedProofText
 }

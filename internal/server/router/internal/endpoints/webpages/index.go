@@ -13,10 +13,26 @@ import (
 func IndexGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
+		serverURL := appCtx.Config().ServerURL
+
+		serverScheme := "http"
+		if serverURL.Scheme != "" {
+			serverScheme = serverURL.Scheme
+		}
+
+		serverHostnamePort := serverURL.Hostname()
+		if port := serverURL.Port(); port != "" {
+			serverHostnamePort = serverHostnamePort + ":" + port
+		}
+
 		data := struct {
-			ServerURL string
+			ServerURL          string
+			ServerHostnamePort string
+			ServerScheme       string
 		}{
-			ServerURL: appCtx.Config().ServerURL,
+			ServerURL:          serverURL.String(),
+			ServerHostnamePort: serverHostnamePort,
+			ServerScheme:       serverScheme,
 		}
 
 		renderWithBase(r, w, appCtx, user, "index.html", data)

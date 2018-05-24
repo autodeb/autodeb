@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/url"
+
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
 )
 
@@ -10,7 +12,7 @@ type Config struct {
 	DB                    *DBConfig
 	HTTP                  *HTTPServerConfig
 	Auth                  *AuthConfig
-	ServerURL             string
+	ServerURL             *url.URL
 	DataDirectory         string
 	TemplatesDirectory    string
 	StaticFilesDirectory  string

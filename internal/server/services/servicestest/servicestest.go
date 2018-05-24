@@ -1,6 +1,7 @@
 package servicestest
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -18,13 +19,14 @@ type ServicesTest struct {
 	t         *testing.T
 	DataFS    filesystem.FS
 	DB        *database.Database
-	ServerURL string
+	ServerURL *url.URL
 	Services  *services.Services
 }
 
 //SetupTest will create a test App
 func SetupTest(t *testing.T) *ServicesTest {
-	serverURL := "https://test.auto.debian.net"
+	serverURL, err := url.Parse("https://test.auto.debian.net")
+	require.NoError(t, err)
 
 	db := databasetest.SetupTest(t)
 

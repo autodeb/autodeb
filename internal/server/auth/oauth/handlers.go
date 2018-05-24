@@ -11,7 +11,7 @@ import (
 func (backend *backend) oauthConfigWithRedirectURL() *oauth2.Config {
 	cfg := backend.oauthProvider.Config()
 
-	url := strings.Trim(backend.serverURL, "/")
+	url := strings.Trim(backend.serverURL.String(), "/")
 	url = url + "/auth/callback"
 
 	cfg.RedirectURL = url

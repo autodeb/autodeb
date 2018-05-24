@@ -9,12 +9,14 @@ This server has a dput-compatible API. Try adding this to ~/.dput.cf:
 </p>
 
 <pre>
+<code>
 [autodeb]
 fqdn = {{ .Data.ServerURL }}
 incoming = /upload
 method = http
 allow_unsigned_uploads = 1
 allowed_distributions = .
+</code>
 </pre>
 
 <p>

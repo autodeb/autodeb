@@ -51,7 +51,7 @@ func AddPGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 
 		if err := appCtx.PGPService().AddUserPGPKey(user.ID, key, proof); err != nil {
 			session, _ := appCtx.Sessions().Get(r)
-			session.Flash("error", err.Error())
+			session.Flash("danger", err.Error())
 			session.Save(r, w)
 		}
 

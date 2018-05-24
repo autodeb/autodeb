@@ -2,47 +2,85 @@
 
 {{ define "content" }}
 
-<h2>User information</h2>
-<table>
-    <tr>
-        <th>Username</th>
-        <td>{{ .User.Username }}</td>
-    </tr>
-    <tr>
-        <th>User ID</th>
-        <td>{{ .User.ID }}</td>
-    </tr>
-</table>
+<div class="row">
+    <div class="col">
+        <h2>User information</h2>
+    </div>
+</div>
 
-<h2>PGP Keys</h2>
+<div class="row">
+    <div class="col-2">
+        <table class="table table-bordered table-hover table-condensed">
+            <tr>
+                <th>Username</th>
+                <td>{{ .User.Username }}</td>
+            </tr>
+            <tr>
+                <th>User ID</th>
+                <td>{{ .User.ID }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Fingerprint</th>
-    </tr>
+<div class="row">
+    <div class="col">
+        <h2>PGP Keys</h2>
+    </div>
+</div>
 
-    {{ range .Data.PGPKeys }}
-    <tr>
-        <td>{{ .ID }}</td>
-        <td>{{ .Fingerprint }}</td>
-    </tr>
-    {{ end }}
-</table>
+<div class="row">
+    <div class="col">
+        <table class="table table-bordered table-hover table-condensed">
+            <tr>
+                <th>ID</th>
+                <th>Fingerprint</th>
+            </tr>
 
-<p>
-    To associate a PGP key to your account, you must submit an armored copy
-    your public key along with a signed proof.
-</p>
+            {{ range .Data.PGPKeys }}
+            <tr>
+                <td>{{ .ID }}</td>
+                <td>{{ .Fingerprint }}</td>
+            </tr>
+            {{ end }}
+        </table>
+    </div>
+</div>
 
-<label>Public key (armored): $ gpg --armor --export-options export-clean,export-minimal --export &ltfingerprint&gt</label><br>
-<textarea name="key" form="add-pgp-key-form"></textarea><br>
+<div class="row">
+    <div class="col">
+        <h3>Add a PGP key</h3>
+    </div>
+</div>
 
-<label>Signed proof: $ echo "{{ $.Data.ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</label><br>
-<textarea name="proof" form="add-pgp-key-form"></textarea><br>
+<div class="row">
+    <div class="col">
+        <p>
+            To associate a PGP key to your account, you must submit an armored copy
+            your public key along with a signed proof.
+        </p>
+    </div>
+</div>
 
-<form action="/profile/add-pgp-key" id="add-pgp-key-form" method="post">
-    <input type="submit" value="Add PGP key"></input>
-</form>
+<div class="row">
+    <div class="col">
+
+        <div class="form-group">
+            <label><strong>Public key (armored):</strong></label>
+            <pre><code>$ gpg --armor --export-options export-clean,export-minimal --export &ltfingerprint&gt</code></pre>
+            <textarea name="key" form="form-add-pgp-key" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label><strong>Signed proof:</strong></label>
+            <pre><code>$ echo "{{ $.Data.ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</code></pre>
+            <textarea name="proof" form="form-add-pgp-key" class="form-control"></textarea>
+        </div>
+
+        <form action="/profile/add-pgp-key" id="form-add-pgp-key" method="post">
+            <input type="submit" value="Add PGP key" class="btn btn-primary"></input>
+        </form>
+    </div>
+</div>
 
 {{ end }}

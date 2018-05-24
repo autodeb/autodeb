@@ -2,43 +2,74 @@
 <html>
     <head>
         <title>{{ block "title" . }}{{ end }}</title>
+        <!-- Bootstrap -->
+        <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Custom CSS -->
         <link rel="stylesheet" type="text/css" href="/static/style.css">
     </head>
     <body>
+        <div class="container">
 
-        <header class="main-header">
-            <h1>autodeb</h1>
-        </header>
 
-        <aside class="primary-sidebar">
+            <!-- Row1: HEADER -->
+            <div class="row">
+                <div class="col-12 text-center">
+                    <header>
+                            <h1>autodeb</h1>
+                    </header>
+                </div>
+            </div>
 
-            <p>Main</p>
-            <a href="/">Home</a><br>
-            <a href="/uploads">Uploads</a><br>
-            <a href="/jobs">Jobs</a>
+            <!-- Row2: [ SIDEBAR | CONTENT ] -->
+            <div class="row">
 
-            <p>Account</p>
-            {{ if .User }}
-                <a href="/profile">Profile ({{ .User.Username }})</a><br>
-                <a href="/logout">logout</a><br>
-            {{ else }}
-                <a href="/login">Login</a><br>
-            {{ end }}
-        </aside>
+                <!-- SIDEBAR -->
+                <div class="col-sm-2">
+                    <aside>
+                        <p>Main</p>
+                        <p>
+                            <a href="/">Home</a><br>
+                            <a href="/uploads">Uploads</a><br>
+                            <a href="/jobs">Jobs</a>
+                        </p>
 
-        <main class="content">
-            {{/* FLASHES */}}
-            {{ range $category, $messages := $.Flashes }}
-                {{ range $_, $message := $messages }}
-                    <p>{{ $category}}: {{ $message }}</p>
-                {{ end }}
-            {{ end }}
+                        <p>Account</p>
+                        {{ if .User }}
+                            <a href="/profile">Profile ({{ .User.Username }})</a><br>
+                            <a href="/logout">logout</a><br>
+                        {{ else }}
+                            <a href="/login">Login</a><br>
+                        {{ end }}
+                    </aside>
+                </div>
 
-            {{ template "content" . }}
-        </main>
+                <!-- CONTENT -->
+                <div class="col-sm-10">
+                    <main>
+                        {{/* FLASHES */}}
+                        {{ range $category, $messages := $.Flashes }}
+                            {{ range $_, $message := $messages }}
+                                <div class="alert alert-{{ $category }}">{{ $message }}</div>
+                            {{ end }}
+                        {{ end }}
 
-        <footer class="main-footer">
-        </footer>
+                        {{ template "content" . }}
+                    </main>
+                </div>
+
+            </div>
+
+            <!-- Row3: Footer -->
+            <div class="row">
+                <div class="col-12 text-center">
+                    <footer>
+                        Footer
+                    </footer>
+                </div>
+            </div>
+
+    </div>
 
     </body>
 </html>

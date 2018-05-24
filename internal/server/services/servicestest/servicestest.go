@@ -7,6 +7,7 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/database/databasetest"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
 )
 
@@ -22,8 +23,7 @@ type ServicesTest struct {
 func SetupTest(t *testing.T) *ServicesTest {
 	serverURL := "https://test.auto.debian.net"
 
-	db, err := database.NewDatabase("sqlite3", ":memory:")
-	require.NoError(t, err)
+	db := databasetest.SetupTest(t)
 
 	dataFS := filesystem.NewMemMapFS()
 

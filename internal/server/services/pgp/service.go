@@ -2,8 +2,11 @@ package pgp
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/openpgp"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp"
@@ -81,6 +84,58 @@ func (service *Service) AddUserPGPKey(userID uint, key, proof string) error {
 	}
 
 	return nil
+}
+
+// IdentifySigner will identify the user that has signed the given clearsigned
+// message.
+func (service *Service) IdentifySigner(message io.Reader) (*models.User, error) {
+	keyRing, err := service.keyRing()
+	if err != nil {
+		return nil, err
+	}
+
+	_, entity, err := pgp.VerifySignatureClearsignedKeyRing(message, keyRing)
+	if err != nil {
+		return nil, err
+	}
+
+	keys, err := service.db.GetAllPGPKeysByFingerprint(
+		pgp.EntityFingerprint(entity),
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(keys) == 0 {
+		return nil, nil
+	}
+
+	return service.db.GetUser(keys[0].UserID)
+}
+
+// keyRing returns keyring that contains all known public keys
+func (service *Service) keyRing() (openpgp.EntityList, error) {
+	pgpKeys, err := service.db.GetAllPGPKeys()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(pgpKeys) == 0 {
+		var keyring []*openpgp.Entity
+		return keyring, nil
+	}
+
+	var readers []io.Reader
+	for _, pgpKey := range pgpKeys {
+		readers = append(readers, strings.NewReader(pgpKey.PublicKey))
+	}
+	multiReader := io.MultiReader(readers...)
+
+	keyring, err := pgp.ReadArmoredKeyRing(multiReader)
+	if err != nil {
+		return nil, err
+	}
+
+	return keyring, err
 }
 
 // GetUserPGPKeys returns all PGP Keys associated with a user

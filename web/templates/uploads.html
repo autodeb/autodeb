@@ -4,9 +4,10 @@
 
 <p>This page lists all uploads:</p>
 
-<table class="table table-bordered table-hover table-condensed">
+<table class="table table-sm table-bordered table-hover table-condensed">
     <tr>
         <th>ID</th>
+        <th>Uploader ID</th>
         <th>Source Package</th>
         <th>Version</th>
         <th>Maintainer</th>
@@ -17,6 +18,7 @@
     {{ range $.Data.Uploads }}
     <tr>
         <td>{{ .ID }}</td>
+        <td>{{ .UserID }}</td>
         <td>{{ .Source }}</td>
         <td>{{ .Version }}</td>
         <td>{{ .Maintainer }}</td>

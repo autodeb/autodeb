@@ -30,6 +30,7 @@ func UploadHandler(appCtx *appctx.Context) http.Handler {
 				fmt.Fprint(w, api.JSONError(err.Error()))
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprint(w, api.JSONError(err.Error()))
 			}
 			return
 		}

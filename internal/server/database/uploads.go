@@ -7,8 +7,9 @@ import (
 )
 
 // CreateUpload will create an upload
-func (db *Database) CreateUpload(source, version, maintainer, changedBy string) (*models.Upload, error) {
+func (db *Database) CreateUpload(userID uint, source, version, maintainer, changedBy string) (*models.Upload, error) {
 	upload := &models.Upload{
+		UserID:     userID,
 		Source:     source,
 		Version:    version,
 		Maintainer: maintainer,

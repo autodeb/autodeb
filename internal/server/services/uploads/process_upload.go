@@ -58,6 +58,14 @@ func (service *Service) processChangesUpload(filename string, content io.Reader)
 		return nil, err
 	}
 
+	// Find the signer
+	signerID, err := service.pgpService.IdentifySigner(
+		bytes.NewReader(contentBytes),
+	)
+	if err != nil {
+		return nil, &uploadError{errors.WithMessage(err, "could not identify the signer"), true}
+	}
+
 	//Parse the changes file
 	changes, err := control.ParseChanges(
 		bufio.NewReader(bytes.NewReader(contentBytes)),
@@ -81,6 +89,7 @@ func (service *Service) processChangesUpload(filename string, content io.Reader)
 
 	//Create the upload
 	upload, err := service.db.CreateUpload(
+		signerID,
 		changes.Source,
 		changes.Version.String(),
 		changes.Maintainer,

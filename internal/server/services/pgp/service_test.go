@@ -60,9 +60,9 @@ func TestAddPGPKey(t *testing.T) {
 	assert.Equal(t, 1, len(keyring))
 
 	// Identify the signer of the proof
-	signer, err := service.IdentifySigner(strings.NewReader(proof))
+	signerID, err := service.IdentifySigner(strings.NewReader(proof))
 	assert.NoError(t, err)
-	assert.Equal(t, user.ID, signer.ID)
+	assert.Equal(t, user.ID, signerID)
 }
 
 func TestKeyRingEmpty(t *testing.T) {

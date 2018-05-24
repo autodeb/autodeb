@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	gorillaSessions "github.com/gorilla/sessions"
-	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
@@ -78,15 +77,8 @@ func SetupTest(t *testing.T) *AppCtxTest {
 // Login will create a test user and future requests will be authenticated
 // as this user
 func (appCtxTest *AppCtxTest) Login() *models.User {
-	user, err := appCtxTest.DB.GetUser(uint(1))
-	require.NoError(appCtxTest.t, err)
-
-	if user == nil {
-		user, err = appCtxTest.DB.CreateUser(1, "testuser3579")
-	}
-
+	user := appCtxTest.GetOrCreateTestUser()
 	appCtxTest.authBackend.User = user
-
 	return user
 }
 

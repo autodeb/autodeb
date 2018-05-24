@@ -88,28 +88,28 @@ func (service *Service) AddUserPGPKey(userID uint, key, proof string) error {
 
 // IdentifySigner will identify the user that has signed the given clearsigned
 // message.
-func (service *Service) IdentifySigner(message io.Reader) (*models.User, error) {
+func (service *Service) IdentifySigner(message io.Reader) (uint, error) {
 	keyRing, err := service.keyRing()
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	_, entity, err := pgp.VerifySignatureClearsignedKeyRing(message, keyRing)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	keys, err := service.db.GetAllPGPKeysByFingerprint(
 		pgp.EntityFingerprint(entity),
 	)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	if len(keys) == 0 {
-		return nil, nil
+		return 0, errors.New("could not find key matching the signer")
 	}
 
-	return service.db.GetUser(keys[0].UserID)
+	return keys[0].UserID, nil
 }
 
 // keyRing returns keyring that contains all known public keys

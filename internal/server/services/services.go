@@ -20,17 +20,18 @@ type Services struct {
 // New returns a new set of services
 func New(db *database.Database, dataFS filesystem.FS, serverURL string) (*Services, error) {
 
+	// PGP
+	pgpService := pgp.New(db, serverURL)
+
 	// Uploads
 	if err := dataFS.MkdirAll("uploads", 0744); err != nil {
 		return nil, errors.WithMessage(err, "could not create uploads folder")
 	}
 	uploadsService := uploads.New(
 		db,
+		pgpService,
 		filesystem.NewBasePathFS(dataFS, "uploads"),
 	)
-
-	// PGP
-	pgpService := pgp.New(db, serverURL)
 
 	// Jobs
 	if err := dataFS.MkdirAll("jobs", 0744); err != nil {

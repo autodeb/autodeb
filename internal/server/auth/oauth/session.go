@@ -1,9 +1,10 @@
 package oauth
 
 import (
-	"errors"
 	"net/http"
+	"strconv"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 )
 
@@ -23,16 +24,21 @@ func (backend *backend) clearSession(r *http.Request, w http.ResponseWriter) {
 func (backend *backend) getUserID(r *http.Request) (uint, error) {
 	session := backend.session(r)
 
-	userID, _ := session.Get(userIDSessionKey)
-	if userID, ok := userID.(uint); ok {
-		return userID, nil
+	userIDString, err := session.Get(userIDSessionKey)
+	if err != nil {
+		return 0, err
 	}
 
-	return 0, errors.New("no userid in session")
+	userID, err := strconv.Atoi(userIDString)
+
+	return uint(userID), errors.WithMessage(err, "could not cast user id to int")
 }
 
 func (backend *backend) setUserID(r *http.Request, w http.ResponseWriter, id uint) {
 	session := backend.session(r)
-	session.Set(userIDSessionKey, id)
+	session.Set(
+		userIDSessionKey,
+		strconv.Itoa(int(id)),
+	)
 	session.Save(r, w)
 }

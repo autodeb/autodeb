@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	gorillaSessions "github.com/gorilla/sessions"
+
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
 //Session stores values
@@ -20,13 +22,22 @@ func newSession(gorillaSession *gorillaSessions.Session) *Session {
 }
 
 // Get will return the value associated with a key
-func (s *Session) Get(key string) (interface{}, bool) {
+func (s *Session) Get(key string) (string, error) {
 	value, ok := s.gorillaSession.Values[key]
-	return value, ok
+	if !ok {
+		return "", nil
+	}
+
+	switch value := value.(type) {
+	case string:
+		return value, nil
+	default:
+		return "", errors.New("could not cast the value to a string")
+	}
 }
 
 // Set will set the value of a key
-func (s *Session) Set(key string, value interface{}) {
+func (s *Session) Set(key string, value string) {
 	s.gorillaSession.Values[key] = value
 }
 

@@ -1,8 +1,7 @@
 //Package sessions is wrapper around github.com/gorilla/sessions.
 //
 // Dfferences include:
-//  - keys can only be strings
-//  - flashes are strings
+//  - keys and values can only be strings
 //  - way less exposed API surface
 package sessions
 

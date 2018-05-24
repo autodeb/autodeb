@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerifyMesageSignature(t *testing.T) {
+func TestVerifySignatureClearsigned(t *testing.T) {
 	msg, entity, err := pgp.VerifySignatureClearsigned(
 		strings.NewReader(signedMessage),
 		strings.NewReader(pgptest.TestKeyPublic),
@@ -21,6 +21,17 @@ func TestVerifyMesageSignature(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "this is a test\n", msg)
 	assert.Equal(t, pgptest.TestKeyFingerprint, pgp.EntityFingerprint(entity))
+}
+
+func TestVerfySignatureClearsignedError(t *testing.T) {
+	msg, entity, err := pgp.VerifySignatureClearsigned(
+		strings.NewReader("POTATOOOO"),
+		strings.NewReader(pgptest.TestKeyPublic),
+	)
+
+	assert.Error(t, err)
+	assert.Equal(t, "", msg)
+	assert.Nil(t, entity)
 }
 
 func TestClearsignMessage(t *testing.T) {

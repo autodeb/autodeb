@@ -50,9 +50,7 @@ func AddPGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 		proof := r.Form.Get("proof")
 
 		if err := appCtx.PGPService().AddUserPGPKey(user.ID, key, proof); err != nil {
-			session, _ := appCtx.Sessions().Get(r)
-			session.Flash("danger", err.Error())
-			session.Save(r, w)
+			appCtx.Sessions().Flash(r, w, "danger", err.Error())
 		}
 
 		http.Redirect(w, r, "/profile", http.StatusSeeOther)

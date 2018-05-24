@@ -20,9 +20,9 @@ func setupTest() *sessions.Manager {
 }
 
 func getRequestWithResponseCookies(w http.ResponseWriter) *http.Request {
-	cookie := w.Header()["Set-Cookie"][0]
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
-	request.Header.Add("Cookie", cookie)
+	cookies := w.Header()["Set-Cookie"]
+	request.Header.Add("Cookie", cookies[len(cookies)-1])
 	return request
 }
 
@@ -33,11 +33,14 @@ func TestFlash(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/", nil)
 	response := httptest.NewRecorder()
 
-	// Add flashes
+	// Add flashes trough the session
 	session, _ := manager.Get(request)
 	session.Flash("error", "this is an error")
 	session.Flash("error", "this is a second error")
-	session.Flash("info", "this is information")
+	session.Save(request, response)
+
+	// Add flashes trough the manager
+	manager.Flash(request, response, "info", "this is information")
 	session.Save(request, response)
 
 	// Second request

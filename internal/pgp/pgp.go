@@ -61,6 +61,9 @@ func VerifySignatureClearsignedKeyRing(msg io.Reader, keyring openpgp.KeyRing) (
 	}
 
 	block, _ := clearsign.Decode(msgBytes)
+	if block == nil {
+		return "", nil, errors.New("could not decode clearsigned message")
+	}
 
 	signer, err := openpgp.CheckDetachedSignature(
 		keyring,

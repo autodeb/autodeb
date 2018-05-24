@@ -27,6 +27,14 @@ func NewManager(store gorillaSessions.Store, name string) *Manager {
 	return manager
 }
 
+//Flash is a utility function that gets the session, adds a flash message
+//and saves the session
+func (m *Manager) Flash(r *http.Request, w http.ResponseWriter, category, message string) {
+	session, _ := m.Get(r)
+	session.Flash(category, message)
+	session.Save(r, w)
+}
+
 //Get returns the session associated with the given request
 func (m *Manager) Get(r *http.Request) (*Session, error) {
 	gorillaSession, err := m.store.Get(r, m.name)

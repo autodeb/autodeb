@@ -53,8 +53,8 @@ func (service *Service) AddUserPGPKey(userID uint, key, proof string) error {
 	}
 
 	// The key should have no signatures on it
-	if numSignatures := len(pgp.EntitySignatures(keyring[0])); numSignatures > 0 {
-		return errors.Errorf("the provided key should be clean but it has %d signatures on it", numSignatures)
+	if numSignatures := len(pgp.EntitySignatures(keyring[0])); numSignatures > 1 {
+		return errors.Errorf("the provided key should be minimal but it has %d signatures on it", numSignatures)
 	}
 
 	// Verify the signature on the proof

@@ -3,7 +3,7 @@
     <head>
         <title>{{ block "title" . }}{{ end }}</title>
         <!-- Bootstrap -->
-        <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap/bootstrap.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Custom CSS -->
         <link rel="stylesheet" type="text/css" href="/static/style.css">
@@ -14,10 +14,13 @@
 
             <!-- Row1: HEADER -->
             <div class="row">
-                <div class="col text-center">
-                    <header>
-                            <h1>autodeb</h1>
-                    </header>
+                <div class="col">
+                    <a href="/">
+                        <img class="float-left" src="/static/vendor/debian/openlogo-nd.svg" alt="Autodeb" title="Visit the main page">
+                    </a>
+                    <div class="h-100 d-flex justify-content-center align-items-center ">
+                        <h1>autodeb</h1>
+                    </div>
                 </div>
             </div>
 
@@ -25,7 +28,7 @@
             <div class="row">
 
                 <!-- SIDEBAR -->
-                <div class="col-sm-2">
+                <div class="col-sm-2 pt-5">
                     <aside>
                         <p>Main</p>
                         <p>

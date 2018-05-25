@@ -30,28 +30,28 @@
                 <!-- SIDEBAR -->
                 <div class="col-sm-2 pt-5">
                     <aside>
-                        <div class="card">
+                        <div class="card my-3">
                             <div class="card-header">
                                 Main
                             </div>
-                            <div class="card-body">
-                                <a href="/">Home</a><br>
-                                <a href="/uploads">Uploads</a><br>
-                                <a href="/jobs">Jobs</a>
-                            </div>
+                            <ul class="list-group list-group-flush">
+                                <a class="list-group-item" href="/">Home</a>
+                                <a class="list-group-item" href="/uploads">Uploads</a>
+                                <a class="list-group-item" href="/jobs">Jobs</a>
+                            </ul>
                         </div>
-                        <div class="card">
+                        <div class="card my-3">
                             <div class="card-header">
                                 Account
                             </div>
-                            <div class="card-body">
+                            <ul class="list-group list-group-flush">
                                 {{ if .User }}
-                                    <a href="/profile">Profile ({{ .User.Username }})</a><br>
-                                    <a href="/logout">logout</a><br>
+                                    <a class="list-group-item" href="/profile">Profile ({{ .User.Username }})</a>
+                                    <a class="list-group-item" href="/logout">logout</a>
                                 {{ else }}
-                                    <a href="/login">Login</a><br>
+                                    <a class="list-group-item" href="/login">Login</a>
                                 {{ end }}
-                            </div>
+                            </ul>
                     </aside>
                 </div>
 

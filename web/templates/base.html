@@ -14,7 +14,7 @@
 
             <!-- Row1: HEADER -->
             <div class="row">
-                <div class="col">
+                <div class="col pl-5">
                     <a href="/">
                         <img class="float-left" src="/static/vendor/debian/openlogo-nd.svg" alt="Autodeb" title="Visit the main page">
                     </a>
@@ -30,20 +30,28 @@
                 <!-- SIDEBAR -->
                 <div class="col-sm-2 pt-5">
                     <aside>
-                        <p>Main</p>
-                        <p>
-                            <a href="/">Home</a><br>
-                            <a href="/uploads">Uploads</a><br>
-                            <a href="/jobs">Jobs</a>
-                        </p>
-
-                        <p>Account</p>
-                        {{ if .User }}
-                            <a href="/profile">Profile ({{ .User.Username }})</a><br>
-                            <a href="/logout">logout</a><br>
-                        {{ else }}
-                            <a href="/login">Login</a><br>
-                        {{ end }}
+                        <div class="card">
+                            <div class="card-header">
+                                Main
+                            </div>
+                            <div class="card-body">
+                                <a href="/">Home</a><br>
+                                <a href="/uploads">Uploads</a><br>
+                                <a href="/jobs">Jobs</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                Account
+                            </div>
+                            <div class="card-body">
+                                {{ if .User }}
+                                    <a href="/profile">Profile ({{ .User.Username }})</a><br>
+                                    <a href="/logout">logout</a><br>
+                                {{ else }}
+                                    <a href="/login">Login</a><br>
+                                {{ end }}
+                            </div>
                     </aside>
                 </div>
 

@@ -30,7 +30,7 @@ data:
 	mkdir data
 
 .PHONY: test-coverage
-test-coverage: GO_TEST_ARGS=-covermode=count -coverprofile=coverage.txt
+test-coverage: GO_TEST_ARGS=-covermode=atomic -coverprofile=coverage.txt
 test-coverage: test
 
 .PHONY: test

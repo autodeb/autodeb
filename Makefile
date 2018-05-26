@@ -29,9 +29,13 @@ autodeb-worker: $(SOURCES) install
 data:
 	mkdir data
 
+.PHONY: test-coverage
+test-coverage: GO_TEST_ARGS=-covermode=count -coverprofile=coverage.txt
+test-coverage: test
+
 .PHONY: test
 test:
-	go test -v ${GO_IMPORT_PATH}/...
+	go test ${GO_TEST_ARGS} -v ${GO_IMPORT_PATH}/...
 
 .PHONY: vet
 vet: install
@@ -62,6 +66,9 @@ clean:
 	rm -f autodeb-server
 	rm -f autodeb-worker
 	rm -rf update-random-package-output-*
+
+	# test coverage
+	rm -f coverage.txt
 
 	# Other things created by this Makefile
 	rm -rf data

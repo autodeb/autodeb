@@ -4,6 +4,9 @@
 /autodeb-server
 /autodeb-worker
 
+# test coverage
+/coverage.txt
+
 # Other things created by the Makefile
 /data
 /dependency-graph-*.svg

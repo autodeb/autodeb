@@ -30,7 +30,7 @@ data:
 	mkdir data
 
 .PHONY: test-coverage
-test-coverage: GO_TEST_ARGS=-covermode=atomic -coverprofile=coverage.txt
+test-coverage: GO_TEST_ARGS=-coverpkg=${GO_IMPORT_PATH}/... -covermode=atomic -coverprofile=coverage.txt
 test-coverage: test
 
 .PHONY: test

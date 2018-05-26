@@ -49,6 +49,24 @@ func (db *Database) GetAllPGPKeysByFingerprint(fingerprint string) ([]*models.PG
 	return pgpKeys, nil
 }
 
+// RemovePGPKey removes all matching pgp keys
+func (db *Database) RemovePGPKey(id, userID uint) error {
+	query := db.gormDB.Model(
+		&models.PGPKey{},
+	).Where(
+		&models.PGPKey{
+			ID:     id,
+			UserID: userID,
+		},
+	)
+
+	if err := query.Delete(&models.PGPKey{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // GetAllPGPKeysByUserID returns all PGPKeys that match the userID
 func (db *Database) GetAllPGPKeysByUserID(userID uint) ([]*models.PGPKey, error) {
 	var pgpKeys []*models.PGPKey

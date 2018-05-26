@@ -35,12 +35,19 @@
             <tr>
                 <th>ID</th>
                 <th>Fingerprint</th>
+                <th>Remove</th>
             </tr>
 
             {{ range .Data.PGPKeys }}
             <tr>
                 <td>{{ .ID }}</td>
                 <td>{{ .Fingerprint }}</td>
+                <td class="text-center">
+                    <form action="/profile/remove-pgp-key" method="post">
+                        <input type="hidden" name="keyid" value="{{ .ID }}"></input>
+                        <input type="submit" value="x" class="btn btn-outline-danger"></input>
+                    </form>
+                </td>
             </tr>
             {{ end }}
         </table>

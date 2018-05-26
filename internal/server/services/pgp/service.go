@@ -146,6 +146,11 @@ func (service *Service) keyRing() (openpgp.EntityList, error) {
 	return keyring, err
 }
 
+// RemovePGPKey removes the PGP Key with a matching userID and ID
+func (service *Service) RemovePGPKey(id uint, userID uint) error {
+	return service.db.RemovePGPKey(id, userID)
+}
+
 // GetUserPGPKeys returns all PGP Keys associated with a user
 func (service *Service) GetUserPGPKeys(userID uint) ([]*models.PGPKey, error) {
 	keys, err := service.db.GetAllPGPKeysByUserID(userID)

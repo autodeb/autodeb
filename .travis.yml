@@ -10,7 +10,7 @@ install:
   - go get -u github.com/golang/lint/golint
 
 script:
-  - make test
+  - make test-coverage
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

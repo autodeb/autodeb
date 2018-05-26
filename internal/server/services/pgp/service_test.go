@@ -70,6 +70,29 @@ func TestAddPGPKey(t *testing.T) {
 	assert.Equal(t, user.ID, signerID)
 }
 
+func TestAddPGPKeyAlreadyRegistered(t *testing.T) {
+	service := setupTest(t)
+
+	user, err := service.db.CreateUser(33, "testUser")
+	assert.NoError(t, err)
+
+	// Sign the proof
+	proof, err := pgp.Clearsign(
+		strings.NewReader(service.ExpectedPGPKeyProofText(user.ID)),
+		strings.NewReader(pgptest.TestKeyPrivate),
+	)
+	assert.NoError(t, err)
+
+	// Add the key
+	err = service.AddUserPGPKey(user.ID, pgptest.TestKeyPublic, proof)
+	assert.NoError(t, err)
+
+	// Add the key again
+	err = service.AddUserPGPKey(user.ID, pgptest.TestKeyPublic, proof)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "is already registered to user")
+}
+
 func TestKeyRingEmpty(t *testing.T) {
 	service := setupTest(t)
 	keyring, err := service.keyRing()

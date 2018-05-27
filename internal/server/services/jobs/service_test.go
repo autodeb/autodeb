@@ -44,6 +44,33 @@ func TestSaveJobLog(t *testing.T) {
 	assert.Equal(t, "Hello", string(b))
 }
 
+func TestSaveJobArtifact(t *testing.T) {
+	appCtxTest := appctxtest.SetupTest(t)
+	jobsService := appCtxTest.AppCtx.JobsService()
+
+	jobArtifactsDirectory := filepath.Join(
+		jobsService.JobsDirectory(),
+		"1",
+		"artifacts",
+	)
+	_, err := jobsService.FS().Stat(jobArtifactsDirectory)
+	require.Error(t, err, "the job artifacts directory should not exist")
+
+	err = jobsService.SaveJobArtifact(
+		uint(1),
+		"artifact.txt",
+		strings.NewReader("job artifact"),
+	)
+
+	_, err = jobsService.FS().Stat(jobArtifactsDirectory)
+	require.NoError(t, err, "the job artifacts directory should exist")
+
+	artifact, _ := jobsService.GetJobArtifact(uint(1), "artifact.txt")
+	defer artifact.Close()
+	b, _ := ioutil.ReadAll(artifact)
+	assert.Equal(t, "job artifact", string(b))
+}
+
 func TestGetJobLog(t *testing.T) {
 	appCtxTest := appctxtest.SetupTest(t)
 

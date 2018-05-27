@@ -26,20 +26,15 @@ func New(db *database.Database, fs filesystem.FS) *Service {
 	return service
 }
 
-// FS returns the services's filesystem
-func (service *Service) FS() filesystem.FS {
-	return service.fs
-}
-
-// JobsDirectory contains saved data for jobs such as logs
-func (service *Service) JobsDirectory() string {
+// jobsDirectory contains saved data for jobs such as logs
+func (service *Service) jobsDirectory() string {
 	return "/"
 }
 
 // jobDirectory returns the directory name for a job id
 func (service *Service) jobDirectory(jobID uint) string {
 	jobDirectory := filepath.Join(
-		service.JobsDirectory(),
+		service.jobsDirectory(),
 		fmt.Sprint(jobID),
 	)
 	return jobDirectory

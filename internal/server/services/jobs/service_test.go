@@ -1,4 +1,4 @@
-package jobs_test
+package jobs
 
 import (
 	"io/ioutil"
@@ -9,51 +9,58 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx/appctxtest"
+	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/database/databasetest"
 )
 
+func setupTest(t *testing.T) *Service {
+	db := databasetest.SetupTest(t)
+	fs := filesystem.NewMemMapFS()
+	service := New(db, fs)
+	return service
+}
+
 func TestSaveJobLog(t *testing.T) {
-	appCtxTest := appctxtest.SetupTest(t)
+	jobsService := setupTest(t)
 
 	jobDir := filepath.Join(
-		appCtxTest.AppCtx.JobsService().JobsDirectory(),
+		jobsService.jobsDirectory(),
 		"1",
 	)
 
-	_, err := appCtxTest.AppCtx.JobsService().FS().Stat(jobDir)
+	_, err := jobsService.fs.Stat(jobDir)
 	require.Error(t, err, "the job directory should not exist")
 
-	err = appCtxTest.AppCtx.JobsService().SaveJobLog(
+	err = jobsService.SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 
 	assert.NoError(t, err)
 
-	_, err = appCtxTest.AppCtx.JobsService().FS().Stat(jobDir)
+	_, err = jobsService.fs.Stat(jobDir)
 	assert.NoError(t, err)
 
 	logFilePath := filepath.Join(jobDir, "log.txt")
 
-	_, err = appCtxTest.AppCtx.JobsService().FS().Stat(logFilePath)
+	_, err = jobsService.fs.Stat(logFilePath)
 	assert.NoError(t, err)
 
-	logFile, _ := appCtxTest.AppCtx.JobsService().FS().Open(logFilePath)
+	logFile, _ := jobsService.fs.Open(logFilePath)
 	defer logFile.Close()
 	b, _ := ioutil.ReadAll(logFile)
 	assert.Equal(t, "Hello", string(b))
 }
 
 func TestSaveJobArtifact(t *testing.T) {
-	appCtxTest := appctxtest.SetupTest(t)
-	jobsService := appCtxTest.AppCtx.JobsService()
+	jobsService := setupTest(t)
 
 	jobArtifactsDirectory := filepath.Join(
-		jobsService.JobsDirectory(),
+		jobsService.jobsDirectory(),
 		"1",
 		"artifacts",
 	)
-	_, err := jobsService.FS().Stat(jobArtifactsDirectory)
+	_, err := jobsService.fs.Stat(jobArtifactsDirectory)
 	require.Error(t, err, "the job artifacts directory should not exist")
 
 	err = jobsService.SaveJobArtifact(
@@ -62,7 +69,7 @@ func TestSaveJobArtifact(t *testing.T) {
 		strings.NewReader("job artifact"),
 	)
 
-	_, err = jobsService.FS().Stat(jobArtifactsDirectory)
+	_, err = jobsService.fs.Stat(jobArtifactsDirectory)
 	require.NoError(t, err, "the job artifacts directory should exist")
 
 	artifact, _ := jobsService.GetJobArtifact(uint(1), "artifact.txt")
@@ -72,15 +79,15 @@ func TestSaveJobArtifact(t *testing.T) {
 }
 
 func TestGetJobLog(t *testing.T) {
-	appCtxTest := appctxtest.SetupTest(t)
+	jobsService := setupTest(t)
 
-	err := appCtxTest.AppCtx.JobsService().SaveJobLog(
+	err := jobsService.SaveJobLog(
 		uint(1),
 		strings.NewReader("Hello"),
 	)
 	assert.NoError(t, err)
 
-	log, err := appCtxTest.AppCtx.JobsService().GetJobLog(uint(1))
+	log, err := jobsService.GetJobLog(uint(1))
 	defer log.Close()
 
 	assert.NoError(t, err)

@@ -225,3 +225,53 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 
 	return http.HandlerFunc(handlerFunc)
 }
+
+//JobArtifactPostHandler returns a handler that saves job artifacts
+func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+
+		// Get input values
+		vars := mux.Vars(r)
+		jobID, err := strconv.Atoi(vars["jobID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		filename, ok := vars["filename"]
+		if !ok {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Get the job
+		job, err := appCtx.JobsService().GetJob(uint(jobID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if job == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		// Only accept logs on jobs that are completed
+		switch job.Status {
+		case models.JobStatusSuccess:
+		case models.JobStatusFailed:
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// Save the artifact
+		if err := appCtx.JobsService().SaveJobArtifact(uint(jobID), filename, r.Body); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+
+	}
+
+	return http.HandlerFunc(handlerFunc)
+}

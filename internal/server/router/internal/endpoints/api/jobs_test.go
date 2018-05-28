@@ -136,6 +136,35 @@ func TestJobLogPostHandler(t *testing.T) {
 	assert.Equal(t, "log content test", string(b))
 }
 
+func TestJobArtifactPostHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	assert.NoError(t, err)
+
+	job.Status = models.JobStatusSuccess
+	err = testRouter.DB.UpdateJob(job)
+	assert.NoError(t, err)
+
+	request, _ := http.NewRequest(
+		http.MethodPost,
+		"/api/jobs/1/artifacts/test.txt",
+		strings.NewReader("test txt content"),
+	)
+
+	response := testRouter.ServeHTTP(request)
+
+	assert.Equal(t, http.StatusCreated, response.Result().StatusCode)
+	assert.Equal(t, "", response.Body.String())
+
+	log, err := testRouter.AppCtx.JobsService().GetJobArtifact(uint(1), "test.txt")
+	assert.NoError(t, err)
+	defer log.Close()
+
+	b, err := ioutil.ReadAll(log)
+	assert.Equal(t, "test txt content", string(b))
+}
+
 func TestJobLogTxtGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 

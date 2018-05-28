@@ -118,6 +118,42 @@ func JobLogTxtGetHandler(appCtx *appctx.Context) http.Handler {
 	return handler
 }
 
+//JobArtifactsGetHandler returns a handler that prints all artifacts of a job
+func JobArtifactsGetHandler(appCtx *appctx.Context) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+
+		// Get input values
+		vars := mux.Vars(r)
+		jobID, err := strconv.Atoi(vars["jobID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		jobArtifacts, err := appCtx.JobsService().GetAllJobArtifactsByJobID(uint(jobID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		b, err := json.Marshal(jobArtifacts)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		jsonJobArtifacts := string(b)
+
+		fmt.Fprint(w, jsonJobArtifacts)
+	}
+
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
+	handler = middleware.JSONHeaders(handler)
+
+	return handler
+}
+
 //JobArtifactGetHandler returns a handler that retrieves the artifact of a job
 func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {

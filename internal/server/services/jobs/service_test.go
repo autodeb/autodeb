@@ -55,12 +55,16 @@ func TestSaveJobLog(t *testing.T) {
 func TestSaveJobArtifact(t *testing.T) {
 	jobsService := setupTest(t)
 
+	artifacts, err := jobsService.GetAllJobArtifactsByJobID(uint(1))
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(artifacts))
+
 	jobArtifactsDirectory := filepath.Join(
 		jobsService.jobsDirectory(),
 		"1",
 		"artifacts",
 	)
-	_, err := jobsService.fs.Stat(jobArtifactsDirectory)
+	_, err = jobsService.fs.Stat(jobArtifactsDirectory)
 	require.Error(t, err, "the job artifacts directory should not exist")
 
 	err = jobsService.SaveJobArtifact(
@@ -79,6 +83,10 @@ func TestSaveJobArtifact(t *testing.T) {
 	defer artifact.Close()
 	b, _ := ioutil.ReadAll(artifact)
 	assert.Equal(t, "job artifact", string(b))
+
+	artifacts, err = jobsService.GetAllJobArtifactsByJobID(uint(1))
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(artifacts))
 }
 
 func TestGetJobLog(t *testing.T) {

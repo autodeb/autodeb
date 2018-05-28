@@ -186,7 +186,7 @@ func TestJobLogTxtGetHandler(t *testing.T) {
 	assert.Equal(t, "hello", response.Body.String())
 }
 
-func TestJobLogArtifactGetHandler(t *testing.T) {
+func TestJobArtifactGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
 	err := testRouter.AppCtx.JobsService().SaveJobArtifact(
@@ -207,6 +207,38 @@ func TestJobLogArtifactGetHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "test content", response.Body.String())
+}
+
+func TestJobsArtifactsGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+	err := testRouter.AppCtx.JobsService().SaveJobArtifact(
+		uint(1),
+		"test.txt",
+		strings.NewReader("test content"),
+	)
+	require.NoError(t, err)
+
+	request, _ := http.NewRequest(
+		http.MethodGet,
+		"/api/jobs/1/artifacts",
+		nil,
+	)
+
+	response := testRouter.ServeHTTP(request)
+	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+
+	var jobArtifacts []*models.JobArtifact
+	err = json.Unmarshal(response.Body.Bytes(), &jobArtifacts)
+	assert.NoError(t, err)
+
+	expected := &models.JobArtifact{
+		ID:       uint(1),
+		JobID:    uint(1),
+		Filename: "test.txt",
+	}
+	assert.NoError(t, err)
+	assert.Equal(t, expected, jobArtifacts[0])
 }
 
 func TestJobLogTxtGetHandlerNotFound(t *testing.T) {

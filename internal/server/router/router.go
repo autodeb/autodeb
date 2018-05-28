@@ -53,6 +53,7 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/status/{jobStatus:[0-9]+}").Handler(api.JobStatusPostHandler(appCtx)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/log").Handler(api.JobLogPostHandler(appCtx)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/log.txt").Handler(api.JobLogTxtGetHandler(appCtx)).Methods(http.MethodGet)
+	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/artifacts").Handler(api.JobArtifactsGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/artifacts/{filename}").Handler(api.JobArtifactPostHandler(appCtx)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/artifacts/{filename}").Handler(api.JobArtifactGetHandler(appCtx)).Methods(http.MethodGet)
 

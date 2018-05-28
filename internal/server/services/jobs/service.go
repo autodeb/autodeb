@@ -141,6 +141,10 @@ func (service *Service) SaveJobLog(jobID uint, content io.Reader) error {
 
 // SaveJobArtifact will save a job artifact
 func (service *Service) SaveJobArtifact(jobID uint, filename string, content io.Reader) error {
+	if _, err := service.db.CreateJobArtifact(jobID, filename); err != nil {
+		return err
+	}
+
 	if err := service.fs.MkdirAll(service.jobArtifactsDirectory(jobID), 0744); err != nil {
 		return err
 	}
@@ -169,4 +173,13 @@ func (service *Service) GetJobArtifact(jobID uint, filename string) (io.ReadClos
 	}
 
 	return file, nil
+}
+
+// GetAllJobArtifactsByJobID returns a list of all artifacts for a job
+func (service *Service) GetAllJobArtifactsByJobID(jobID uint) ([]*models.JobArtifact, error) {
+	jobArtifacts, err := service.db.GetAllJobArtifactsByJobID(jobID)
+	if err != nil {
+		return nil, err
+	}
+	return jobArtifacts, nil
 }

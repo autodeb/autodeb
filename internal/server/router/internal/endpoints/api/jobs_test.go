@@ -173,9 +173,8 @@ func TestJobLogTxtGetHandler(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	jobLog, err := apiClient.GetJobLog(uint(1))
+	_, err = apiClient.GetJobLog(uint(1))
 	assert.NoError(t, err)
-	defer jobLog.Close()
 
 	response := apiClient.LastRecorder()
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
@@ -194,9 +193,8 @@ func TestJobArtifactGetHandler(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	artifact, err := apiClient.GetJobArtifact(uint(1), "test.txt")
+	_, err = apiClient.GetJobArtifact(uint(1), "test.txt")
 	assert.NoError(t, err)
-	defer artifact.Close()
 
 	response := apiClient.LastRecorder()
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)

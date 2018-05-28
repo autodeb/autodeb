@@ -2,8 +2,10 @@
 package apiclient
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -41,45 +43,58 @@ func (c *APIClient) url(path string) *url.URL {
 	return absoluteURL
 }
 
-func (c *APIClient) post(path string, body io.Reader) (*http.Response, error) {
+func (c *APIClient) post(path string, body io.Reader) (*http.Response, []byte, error) {
 	return c.do(http.MethodPost, path, body)
 }
 
-func (c *APIClient) get(path string) (*http.Response, error) {
+func (c *APIClient) get(path string) (*http.Response, []byte, error) {
 	return c.do(http.MethodGet, path, nil)
 }
 
 func (c *APIClient) postJSON(path string, body io.Reader, v interface{}) (*http.Response, error) {
-	response, err := c.post(path, body)
+	response, responseBody, err := c.post(path, body)
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
 
-	err = json.NewDecoder(response.Body).Decode(v)
+	err = json.NewDecoder(
+		bytes.NewReader(responseBody),
+	).Decode(v)
 
 	return response, err
 }
 
 func (c *APIClient) getJSON(path string, v interface{}) (*http.Response, error) {
-	response, err := c.get(path)
+	response, body, err := c.get(path)
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
 
-	err = json.NewDecoder(response.Body).Decode(v)
+	err = json.NewDecoder(
+		bytes.NewReader(body),
+	).Decode(v)
 
 	return response, err
 }
 
-func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, error) {
+func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, []byte, error) {
 	absoluteURL := c.url(path)
 
 	request, err := http.NewRequest(method, absoluteURL.String(), body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return c.httpClient.Do(request)
+	response, err := c.httpClient.Do(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer response.Body.Close()
+
+	b, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return response, b, nil
 }

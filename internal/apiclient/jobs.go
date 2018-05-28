@@ -1,6 +1,7 @@
 package apiclient
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -50,8 +51,8 @@ func (c *APIClient) GetJobArtifacts(jobID uint) ([]*models.JobArtifact, error) {
 }
 
 // GetJobLog will retrieve the logs of a job
-func (c *APIClient) GetJobLog(jobID uint) (io.ReadCloser, error) {
-	response, err := c.get(
+func (c *APIClient) GetJobLog(jobID uint) (io.Reader, error) {
+	response, body, err := c.get(
 		fmt.Sprintf("/api/jobs/%d/log.txt", jobID),
 	)
 
@@ -63,19 +64,19 @@ func (c *APIClient) GetJobLog(jobID uint) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	return response.Body, nil
+	return bytes.NewReader(body), nil
 }
 
 // GetJobArtifact will retrieve a job's artifact
-func (c *APIClient) GetJobArtifact(jobID uint, filename string) (io.ReadCloser, error) {
-	response, err := c.get(
+func (c *APIClient) GetJobArtifact(jobID uint, filename string) (io.Reader, error) {
+	_, body, err := c.get(
 		fmt.Sprintf("/api/jobs/%d/artifacts/%s", jobID, filename),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return response.Body, nil
+	return bytes.NewReader(body), nil
 }
 
 // UnqueueNextJob will return the next job on the queue
@@ -98,7 +99,7 @@ func (c *APIClient) UnqueueNextJob() (*models.Job, error) {
 
 // SetJobStatus will set the Job Status
 func (c *APIClient) SetJobStatus(jobID uint, status models.JobStatus) error {
-	response, err := c.post(
+	response, _, err := c.post(
 		fmt.Sprintf("/api/jobs/%d/status/%d", jobID, status),
 		nil,
 	)
@@ -115,7 +116,7 @@ func (c *APIClient) SetJobStatus(jobID uint, status models.JobStatus) error {
 
 // SubmitJobLog will submit logs for a job
 func (c *APIClient) SubmitJobLog(jobID uint, jobLog io.Reader) error {
-	response, err := c.post(
+	response, _, err := c.post(
 		fmt.Sprintf("/api/jobs/%d/log", jobID),
 		jobLog,
 	)
@@ -132,7 +133,7 @@ func (c *APIClient) SubmitJobLog(jobID uint, jobLog io.Reader) error {
 
 // SubmitJobArtifact will submit a job artifact
 func (c *APIClient) SubmitJobArtifact(jobID uint, filename string, artifact io.Reader) error {
-	response, err := c.post(
+	response, _, err := c.post(
 		fmt.Sprintf("/api/jobs/%d/artifacts/%s", jobID, filename),
 		artifact,
 	)

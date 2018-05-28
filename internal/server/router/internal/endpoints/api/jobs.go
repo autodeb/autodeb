@@ -118,6 +118,44 @@ func JobLogTxtGetHandler(appCtx *appctx.Context) http.Handler {
 	return handler
 }
 
+//JobArtifactGetHandler returns a handler that retrieves the artifact of a job
+func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+
+		// Get input values
+		vars := mux.Vars(r)
+		jobID, err := strconv.Atoi(vars["jobID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		filename, ok := vars["filename"]
+		if !ok {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		file, err := appCtx.JobsService().GetJobArtifact(uint(jobID), filename)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if file == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		defer file.Close()
+		io.Copy(w, file)
+	}
+
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
+	handler = middleware.TextPlainHeaders(handler)
+
+	return handler
+}
+
 //JobLogPostHandler returns a handler that saves a log for a job
 func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {

@@ -72,6 +72,9 @@ func TestSaveJobArtifact(t *testing.T) {
 	_, err = jobsService.fs.Stat(jobArtifactsDirectory)
 	require.NoError(t, err, "the job artifacts directory should exist")
 
+	_, err = jobsService.fs.Stat(filepath.Join(jobArtifactsDirectory, "artifact.txt"))
+	require.NoError(t, err, "the job artifact should exist")
+
 	artifact, _ := jobsService.GetJobArtifact(uint(1), "artifact.txt")
 	defer artifact.Close()
 	b, _ := ioutil.ReadAll(artifact)

@@ -43,9 +43,14 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 
 	// ==== Profile ====
 	router.Path("/profile").Handler(webpages.ProfileGetHandler(appCtx)).Methods(http.MethodGet)
+
 	router.Path("/profile/pgp-keys").Handler(webpages.ProfilePGPKeysGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/profile/add-pgp-key").Handler(webpages.AddPGPKeyPostHandler(appCtx)).Methods(http.MethodPost)
 	router.Path("/profile/remove-pgp-key").Handler(webpages.RemovePGPKeyPostHandler(appCtx)).Methods(http.MethodPost)
+
+	router.Path("/profile/access-tokens").Handler(webpages.ProfileAccessTokensGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/profile/create-access-token").Handler(webpages.CreateAccessTokenPostHandler(appCtx)).Methods(http.MethodPost)
+	router.Path("/profile/remove-access-token").Handler(webpages.RemoveAccessTokenPostHandler(appCtx)).Methods(http.MethodPost)
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()

@@ -1,0 +1,54 @@
+{{ define "title" }}PGP Keys{{ end }}
+
+{{ define "content" }}
+
+<div class="row">
+    <div class="col">
+        <h2>Access Tokens</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <table class="table table-sm table-bordered table-hover table-condensed">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Remove</th>
+            </tr>
+
+            {{ range .Data.AccessTokens }}
+            <tr>
+                <td>{{ .ID }}</td>
+                <td>{{ .Name }}</td>
+                <td class="text-center">
+                    <form action="/profile/remove-access-token" method="post">
+                        <input type="hidden" name="tokenid" value="{{ .ID }}"></input>
+                        <input type="submit" value="x" class="btn btn-outline-danger font-weight-bold"/>
+                    </form>
+                </td>
+            </tr>
+            {{ end }}
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <h3>Generate a new token</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <form action="/profile/create-access-token" method="post">
+            <div class="form-group">
+                <label>Name:</label>
+                <input class="form-control" type="text" name="name"/>
+            </div>
+            <input type="submit" value="Create access token" class="btn btn-primary"></input>
+        </form>
+    </div>
+</div>
+
+{{ end }}

@@ -9,6 +9,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/jobs"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/pgp"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/tokens"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/uploads"
 )
 
@@ -17,10 +18,13 @@ type Services struct {
 	jobs    *jobs.Service
 	pgp     *pgp.Service
 	uploads *uploads.Service
+	tokens  *tokens.Service
 }
 
 // New returns a new set of services
 func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Services, error) {
+	// Tokens
+	tokensService := tokens.New(db)
 
 	// PGP
 	pgpService := pgp.New(db, serverURL)
@@ -45,12 +49,18 @@ func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Serv
 	)
 
 	services := &Services{
+		tokens:  tokensService,
 		jobs:    jobsService,
 		pgp:     pgpService,
 		uploads: uploadsService,
 	}
 
 	return services, nil
+}
+
+// Tokens returns the tokens service
+func (services *Services) Tokens() *tokens.Service {
+	return services.tokens
 }
 
 // PGP returns the pgp service

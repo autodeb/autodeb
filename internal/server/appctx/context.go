@@ -12,6 +12,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/jobs"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/pgp"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/tokens"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/uploads"
 )
 
@@ -88,6 +89,11 @@ func (ctx *Context) PGPService() *pgp.Service {
 // JobsService returns the jobs service
 func (ctx *Context) JobsService() *jobs.Service {
 	return ctx.services.Jobs()
+}
+
+// TokensService returns the Tokens service
+func (ctx *Context) TokensService() *tokens.Service {
+	return ctx.services.Tokens()
 }
 
 // TemplatesRenderer returns the template renderer

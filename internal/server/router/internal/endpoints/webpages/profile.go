@@ -13,6 +13,19 @@ import (
 //ProfileGetHandler returns a handler that renders the profile page
 func ProfileGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
+		renderWithBase(r, w, appCtx, user, "profile.html", nil)
+	}
+
+	handler := auth.WithUser(handlerFunc, appCtx)
+
+	handler = middleware.HTMLHeaders(handler)
+
+	return handler
+}
+
+//ProfilePGPKeysGetHandler returns a handler that renders the pgp keys page
+func ProfilePGPKeysGetHandler(appCtx *appctx.Context) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		pgpKeys, err := appCtx.PGPService().GetUserPGPKeys(user.ID)
 		if err != nil {
@@ -28,7 +41,7 @@ func ProfileGetHandler(appCtx *appctx.Context) http.Handler {
 			ExpectedPGPKeyProofText: appCtx.PGPService().ExpectedPGPKeyProofText(user.ID),
 		}
 
-		renderWithBase(r, w, appCtx, user, "profile.html", data)
+		renderWithBase(r, w, appCtx, user, "profile_pgp_keys.html", data)
 	}
 
 	handler := auth.WithUser(handlerFunc, appCtx)
@@ -56,7 +69,7 @@ func AddPGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 			appCtx.Sessions().Flash(r, w, "success", "PGP key added successfully")
 		}
 
-		http.Redirect(w, r, "/profile", http.StatusSeeOther)
+		http.Redirect(w, r, "/profile/pgp-keys", http.StatusSeeOther)
 	}
 
 	handler := auth.WithUser(handlerFunc, appCtx)
@@ -89,7 +102,7 @@ func RemovePGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 			appCtx.Sessions().Flash(r, w, "success", "PGP key removed successfully")
 		}
 
-		http.Redirect(w, r, "/profile", http.StatusSeeOther)
+		http.Redirect(w, r, "/profile/pgp-keys", http.StatusSeeOther)
 	}
 
 	handler := auth.WithUser(handlerFunc, appCtx)

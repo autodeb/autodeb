@@ -40,7 +40,10 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.Path("/").Handler(webpages.IndexGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/uploads").Handler(webpages.UploadsGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs").Handler(webpages.JobsGetHandler(appCtx)).Methods(http.MethodGet)
+
+	// ==== Profile ====
 	router.Path("/profile").Handler(webpages.ProfileGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/profile/pgp-keys").Handler(webpages.ProfilePGPKeysGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/profile/add-pgp-key").Handler(webpages.AddPGPKeyPostHandler(appCtx)).Methods(http.MethodPost)
 	router.Path("/profile/remove-pgp-key").Handler(webpages.RemovePGPKeyPostHandler(appCtx)).Methods(http.MethodPost)
 

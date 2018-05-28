@@ -1,13 +1,11 @@
 package api_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 
 	"github.com/stretchr/testify/assert"
@@ -15,6 +13,7 @@ import (
 
 func TestUploadDSCGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
+	apiClient := testRouter.APIClient
 	uploadsService := testRouter.AppCtx.UploadsService()
 
 	uploadDir := filepath.Join(uploadsService.UploadsDirectory(), "1")
@@ -37,9 +36,10 @@ func TestUploadDSCGetHandler(t *testing.T) {
 	err = testRouter.DB.UpdateFileUpload(fileUpload)
 	assert.NoError(t, err)
 
-	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/1/dsc", nil)
+	_, err = apiClient.GetUploadDSC(uint(1))
+	assert.NoError(t, err)
 
-	response := testRouter.ServeHTTP(request)
+	response := apiClient.LastRecorder()
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
 	assert.Equal(t, "Hello", response.Body.String())
@@ -47,15 +47,19 @@ func TestUploadDSCGetHandler(t *testing.T) {
 
 func TestUploadDSCGetHandlerNotFound(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
+	apiClient := testRouter.APIClient
 
-	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/1/dsc", nil)
+	dsc, err := apiClient.GetUploadDSC(uint(1))
+	assert.NoError(t, err)
+	assert.Nil(t, dsc)
 
-	response := testRouter.ServeHTTP(request)
+	response := apiClient.LastRecorder()
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 }
 
 func TestUploadFileGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
+	apiClient := testRouter.APIClient
 	uploadsService := testRouter.AppCtx.UploadsService()
 
 	uploadDir := filepath.Join(uploadsService.UploadsDirectory(), "1")
@@ -68,34 +72,33 @@ func TestUploadFileGetHandler(t *testing.T) {
 	dsc.Write([]byte("Hello"))
 	dsc.Close()
 
-	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/1/test.dsc", nil)
+	uploadFile, err := apiClient.GetUploadFile(uint(1), "test.dsc")
+	assert.NoError(t, err)
+	assert.NotNil(t, uploadFile)
 
-	response := testRouter.ServeHTTP(request)
+	response := apiClient.LastRecorder()
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Equal(t, "Hello", response.Body.String())
 }
 
 func TestUploadFilesGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
+	apiClient := testRouter.APIClient
 
 	testRouter.DB.CreateFileUpload("test", "sum", time.Now())
 	fileUpload, _ := testRouter.DB.GetFileUpload(uint(1))
 	fileUpload.UploadID = uint(3)
 	fileUpload.Completed = true
-	err := testRouter.DB.UpdateFileUpload(fileUpload)
 
+	err := testRouter.DB.UpdateFileUpload(fileUpload)
 	assert.NoError(t, err)
 
-	request, _ := http.NewRequest(http.MethodGet, "/api/uploads/3/files", nil)
-
-	response := testRouter.ServeHTTP(request)
-	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
-	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
-
-	var fileUploads []models.FileUpload
-	err = json.Unmarshal(response.Body.Bytes(), &fileUploads)
-
+	fileUploads, err := apiClient.GetUploadFiles(uint(3))
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(fileUploads))
 	assert.Equal(t, "test", fileUploads[0].Filename)
+
+	response := apiClient.LastRecorder()
+	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 }

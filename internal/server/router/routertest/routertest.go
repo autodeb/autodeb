@@ -17,6 +17,7 @@ type RouterTest struct {
 	*appctxtest.AppCtxTest
 	TemplatesFS filesystem.FS
 	Router      http.Handler
+	APIClient   *TestAPIClient
 }
 
 // SetupTest returns a new RouterTest
@@ -25,9 +26,12 @@ func SetupTest(t *testing.T) *RouterTest {
 
 	router := router.NewRouter(appCtxTest.AppCtx)
 
+	apiClient := newTestAPIClient(router)
+
 	routerTest := &RouterTest{
 		AppCtxTest: appCtxTest,
 		Router:     router,
+		APIClient:  apiClient,
 	}
 
 	return routerTest

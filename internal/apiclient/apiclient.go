@@ -45,8 +45,24 @@ func (c *APIClient) post(path string, body io.Reader) (*http.Response, error) {
 	return c.do(http.MethodPost, path, body)
 }
 
+func (c *APIClient) get(path string) (*http.Response, error) {
+	return c.do(http.MethodGet, path, nil)
+}
+
 func (c *APIClient) postJSON(path string, body io.Reader, v interface{}) (*http.Response, error) {
 	response, err := c.post(path, body)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	err = json.NewDecoder(response.Body).Decode(v)
+
+	return response, err
+}
+
+func (c *APIClient) getJSON(path string, v interface{}) (*http.Response, error) {
+	response, err := c.get(path)
 	if err != nil {
 		return nil, err
 	}

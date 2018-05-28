@@ -3,6 +3,7 @@ package api_test
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -104,6 +105,35 @@ func TestJobStatusPostHandler(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, models.JobStatusFailed, job.Status)
+}
+
+func TestJobLogPostHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	assert.NoError(t, err)
+
+	job.Status = models.JobStatusSuccess
+	err = testRouter.DB.UpdateJob(job)
+	assert.NoError(t, err)
+
+	request, _ := http.NewRequest(
+		http.MethodPost,
+		"/api/jobs/1/log",
+		strings.NewReader("log content test"),
+	)
+
+	response := testRouter.ServeHTTP(request)
+
+	assert.Equal(t, http.StatusCreated, response.Result().StatusCode)
+	assert.Equal(t, "", response.Body.String())
+
+	log, err := testRouter.AppCtx.JobsService().GetJobLog(uint(1))
+	assert.NoError(t, err)
+	defer log.Close()
+
+	b, err := ioutil.ReadAll(log)
+	assert.Equal(t, "log content test", string(b))
 }
 
 func TestJobLogTxtGetHandler(t *testing.T) {

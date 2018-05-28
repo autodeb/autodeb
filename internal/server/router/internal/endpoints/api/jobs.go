@@ -156,6 +156,8 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
+		w.WriteHeader(http.StatusCreated)
+
 	}
 
 	return http.HandlerFunc(handlerFunc)

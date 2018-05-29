@@ -86,6 +86,7 @@ func TestJobGetHandlerNotFound(t *testing.T) {
 func TestJobStatusPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
+	testRouter.Login()
 
 	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
@@ -109,6 +110,7 @@ func TestJobStatusPostHandler(t *testing.T) {
 func TestJobLogPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
+	testRouter.Login()
 
 	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
@@ -138,6 +140,7 @@ func TestJobLogPostHandler(t *testing.T) {
 func TestJobArtifactPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
+	testRouter.Login()
 
 	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)

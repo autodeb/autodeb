@@ -195,7 +195,7 @@ func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 
 //JobLogPostHandler returns a handler that saves a log for a job
 func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		// Get input values
 		vars := mux.Vars(r)
@@ -235,12 +235,14 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	return http.HandlerFunc(handlerFunc)
+	handler := auth.WithUser(handlerFunc, appCtx)
+
+	return handler
 }
 
 //JobStatusPostHandler returns a handler that sets the job status
 func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		// Get input values
 		vars := mux.Vars(r)
@@ -298,12 +300,14 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	return http.HandlerFunc(handlerFunc)
+	handler := auth.WithUser(handlerFunc, appCtx)
+
+	return handler
 }
 
 //JobArtifactPostHandler returns a handler that saves job artifacts
 func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		// Get input values
 		vars := mux.Vars(r)
@@ -348,5 +352,7 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	return http.HandlerFunc(handlerFunc)
+	handler := auth.WithUser(handlerFunc, appCtx)
+
+	return handler
 }

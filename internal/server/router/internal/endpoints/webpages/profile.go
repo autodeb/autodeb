@@ -15,7 +15,7 @@ func ProfileGetHandler(appCtx *appctx.Context) http.Handler {
 		renderWithBase(r, w, appCtx, user, "profile.html", nil)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 

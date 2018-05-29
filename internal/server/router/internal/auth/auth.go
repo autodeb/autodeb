@@ -79,23 +79,34 @@ func MaybeWithUser(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
 	return http.HandlerFunc(handlerFunc)
 }
 
-// WithUser promises to call the provided function with a non-nil user.
-// Other requests are redirected to the authentification page.
-func WithUser(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
-
+// WithUserOr403 promises to call the provided function with a non-nil user.
+// Other requests are responded with a 403
+func WithUserOr403(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
 	userHandlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
+		// Redirect if the user is not authenticated
+		if user == nil {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+		// Call the function
+		fn(w, r, user)
+	}
+	handler := MaybeWithUser(userHandlerFunc, appCtx)
+	return handler
+}
 
+// WithUserOrRedirect promises to call the provided function with a non-nil user.
+// Other requests are redirected to the login page
+func WithUserOrRedirect(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
+	userHandlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 		// Redirect if the user is not authenticated
 		if user == nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-
 		// Call the function
 		fn(w, r, user)
 	}
-
 	handler := MaybeWithUser(userHandlerFunc, appCtx)
-
 	return handler
 }

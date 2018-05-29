@@ -12,8 +12,8 @@ func (c *APIClient) GetCurrentUser() (*models.User, error) {
 
 	response, err := c.getJSON("/api/user", &user)
 
-	// We are redirected to an auth page
-	if response != nil && response.StatusCode == http.StatusSeeOther {
+	// We are not authenticated
+	if response != nil && response.StatusCode == http.StatusForbidden {
 		return nil, nil
 	}
 

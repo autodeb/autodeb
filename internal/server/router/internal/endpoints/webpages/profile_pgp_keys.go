@@ -31,7 +31,7 @@ func ProfilePGPKeysGetHandler(appCtx *appctx.Context) http.Handler {
 		renderWithBase(r, w, appCtx, user, "profile_pgp_keys.html", data)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 
@@ -59,7 +59,7 @@ func AddPGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 		http.Redirect(w, r, "/profile/pgp-keys", http.StatusSeeOther)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 
@@ -92,7 +92,7 @@ func RemovePGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 		http.Redirect(w, r, "/profile/pgp-keys", http.StatusSeeOther)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 

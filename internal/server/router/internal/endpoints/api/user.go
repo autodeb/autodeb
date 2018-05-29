@@ -27,7 +27,7 @@ func UserGetHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOr403(handlerFunc, appCtx)
 
 	handler = middleware.JSONHeaders(handler)
 

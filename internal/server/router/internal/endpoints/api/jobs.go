@@ -40,7 +40,7 @@ func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
 		fmt.Fprint(w, jsonJob)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOr403(handlerFunc, appCtx)
 
 	handler = middleware.JSONHeaders(handler)
 
@@ -235,7 +235,7 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOr403(handlerFunc, appCtx)
 
 	return handler
 }
@@ -300,7 +300,7 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOr403(handlerFunc, appCtx)
 
 	return handler
 }
@@ -352,7 +352,7 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOr403(handlerFunc, appCtx)
 
 	return handler
 }

@@ -28,7 +28,7 @@ func ProfileAccessTokensGetHandler(appCtx *appctx.Context) http.Handler {
 		renderWithBase(r, w, appCtx, user, "profile_access_tokens.html", data)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 
@@ -57,7 +57,7 @@ func CreateAccessTokenPostHandler(appCtx *appctx.Context) http.Handler {
 		http.Redirect(w, r, "/profile/access-tokens", http.StatusSeeOther)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 
@@ -90,7 +90,7 @@ func RemoveAccessTokenPostHandler(appCtx *appctx.Context) http.Handler {
 		http.Redirect(w, r, "/profile/access-tokens", http.StatusSeeOther)
 	}
 
-	handler := auth.WithUser(handlerFunc, appCtx)
+	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)
 
 	handler = middleware.HTMLHeaders(handler)
 

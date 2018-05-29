@@ -13,13 +13,22 @@ import (
 func TestWebPagesRender(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	// Pages that render when unauthenticated
-	pages := []string{
+	// Pages that render both authenticated and unauthenticated
+	pagesNoAuth := []string{
 		"/",
 		"/jobs",
 		"/uploads",
 	}
-	for _, page := range pages {
+
+	// Pages that only render when authenticated
+	pagesAuth := []string{
+		"/profile",
+		"/profile/pgp-keys",
+		"/profile/access-tokens",
+	}
+
+	// Test that the pages render when unauthenticated
+	for _, page := range pagesNoAuth {
 		request := httptest.NewRequest(http.MethodGet, page, nil)
 		response := testRouter.ServeHTTP(request)
 
@@ -29,18 +38,21 @@ func TestWebPagesRender(t *testing.T) {
 		)
 	}
 
+	// Test that the pages don't render when unauthenticated
+	for _, page := range pagesAuth {
+		request := httptest.NewRequest(http.MethodGet, page, nil)
+		response := testRouter.ServeHTTP(request)
+
+		assert.Equal(
+			t, http.StatusSeeOther, response.Result().StatusCode,
+			"this page should redirect when unauthenticated",
+		)
+	}
+
 	testRouter.Login()
 
-	// Pages that render when authenticated
-	pages = append(
-		pages,
-		[]string{
-			"/profile",
-			"/profile/pgp-keys",
-			"/profile/access-tokens",
-		}...,
-	)
-	for _, page := range pages {
+	// Test that all pages render when authenticated
+	for _, page := range append(pagesNoAuth, pagesAuth...) {
 		request := httptest.NewRequest(http.MethodGet, page, nil)
 		response := testRouter.ServeHTTP(request)
 

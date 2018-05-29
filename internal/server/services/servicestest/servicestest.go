@@ -67,6 +67,13 @@ func (servicesTest *ServicesTest) GetOrCreateTestUser() *models.User {
 	return user
 }
 
+// AddTokenToUser will generate an access token for the given user
+func (servicesTest *ServicesTest) AddTokenToUser(user *models.User) *models.AccessToken {
+	token, err := servicesTest.Services.Tokens().CreateToken(user.ID, "test token")
+	require.NoError(servicesTest.t, err)
+	return token
+}
+
 // AddPGPKeyToUser will add a pgp key to the user and return public and private key
 func (servicesTest *ServicesTest) AddPGPKeyToUser(user *models.User) (*models.PGPKey, string) {
 	key, err := servicesTest.DB.CreatePGPKey(

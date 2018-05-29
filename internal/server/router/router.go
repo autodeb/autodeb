@@ -55,6 +55,9 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()
 
+	// ==== User ====
+	restAPIRouter.Path("/user").Handler(api.UserGetHandler(appCtx)).Methods(http.MethodGet)
+
 	// ==== Jobs API ====
 	restAPIRouter.Path("/jobs/next").Handler(api.JobsNextPostHandler(appCtx)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}").Handler(api.JobGetHandler(appCtx)).Methods(http.MethodGet)

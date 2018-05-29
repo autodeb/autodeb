@@ -26,7 +26,7 @@ func SetupTest(t *testing.T) *RouterTest {
 
 	router := router.NewRouter(appCtxTest.AppCtx)
 
-	apiClient := newTestAPIClient(router)
+	apiClient := newTestAPIClient(router, "")
 
 	routerTest := &RouterTest{
 		AppCtxTest: appCtxTest,

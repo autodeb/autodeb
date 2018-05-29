@@ -16,6 +16,7 @@ import (
 func TestJobsNextPostHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
+	testRouter.Login()
 
 	testRouter.DB.CreateJob(models.JobTypeBuild, uint(3))
 
@@ -38,6 +39,7 @@ func TestJobsNextPostHandler(t *testing.T) {
 func TestJobsNextPostHandlerNoJob(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
+	testRouter.Login()
 
 	job, err := apiClient.UnqueueNextJob()
 	assert.NoError(t, err)

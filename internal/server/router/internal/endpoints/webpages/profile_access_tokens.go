@@ -46,7 +46,7 @@ func CreateAccessTokenPostHandler(appCtx *appctx.Context) http.Handler {
 
 		name := r.Form.Get("name")
 
-		if token, err := appCtx.TokensService().GenerateToken(user.ID, name); err != nil {
+		if token, err := appCtx.TokensService().CreateToken(user.ID, name); err != nil {
 			appCtx.Sessions().Flash(r, w, "danger", err.Error())
 		} else {
 			msg := fmt.Sprintf("Your access token is %s", token.Token)

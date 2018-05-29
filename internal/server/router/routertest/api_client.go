@@ -13,13 +13,14 @@ type TestAPIClient struct {
 	handlerHTTPClient *handlerHTTPClient
 }
 
-func newTestAPIClient(handler http.Handler) *TestAPIClient {
+func newTestAPIClient(handler http.Handler, token string) *TestAPIClient {
 	httpClient := &handlerHTTPClient{
 		handler: handler,
 	}
 
 	apiClient, err := apiclient.New(
 		"https://localhost:0871",
+		token,
 		httpClient,
 	)
 	if err != nil {

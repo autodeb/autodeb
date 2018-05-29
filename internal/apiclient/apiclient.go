@@ -14,6 +14,7 @@ import (
 type APIClient struct {
 	baseURL    *url.URL
 	httpClient HTTPClient
+	token      string
 }
 
 //HTTPClient is needed for the APIClient to perform requests. Typically, it
@@ -23,7 +24,7 @@ type HTTPClient interface {
 }
 
 //New creates a new APIClient
-func New(serverURL string, httpClient HTTPClient) (*APIClient, error) {
+func New(serverURL, token string, httpClient HTTPClient) (*APIClient, error) {
 	baseURL, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
@@ -31,10 +32,16 @@ func New(serverURL string, httpClient HTTPClient) (*APIClient, error) {
 
 	apiClient := &APIClient{
 		baseURL:    baseURL,
+		token:      token,
 		httpClient: httpClient,
 	}
 
 	return apiClient, nil
+}
+
+//SetToken will set  the access token used by the client
+func (c *APIClient) SetToken(token string) {
+	c.token = token
 }
 
 func (c *APIClient) url(path string) *url.URL {
@@ -80,11 +87,18 @@ func (c *APIClient) getJSON(path string, v interface{}) (*http.Response, error) 
 func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, []byte, error) {
 	absoluteURL := c.url(path)
 
+	// Create the request
 	request, err := http.NewRequest(method, absoluteURL.String(), body)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	// Set the auth headers
+	if c.token != "" {
+		request.Header.Set("Authorization", "token "+c.token)
+	}
+
+	// Send the request
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return nil, nil, err

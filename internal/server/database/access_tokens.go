@@ -55,3 +55,22 @@ func (db *Database) GetAllAccessTokensByUserID(userID uint) ([]*models.AccessTok
 
 	return accessTokens, nil
 }
+
+// GetAllAccessTokensByToken returns all AccessTokens that match the userID
+func (db *Database) GetAllAccessTokensByToken(token string) ([]*models.AccessToken, error) {
+	var accessTokens []*models.AccessToken
+
+	query := db.gormDB.Model(
+		&models.AccessToken{},
+	).Where(
+		&models.AccessToken{
+			Token: token,
+		},
+	)
+
+	if err := query.Find(&accessTokens).Error; err != nil {
+		return nil, err
+	}
+
+	return accessTokens, nil
+}

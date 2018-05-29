@@ -12,11 +12,12 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/internal/auth"
 )
 
 //JobsNextPostHandler returns a handler that find the next job to run
 func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
 		job, err := appCtx.JobsService().UnqueueNextJob()
 		if err != nil {
@@ -39,7 +40,7 @@ func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
 		fmt.Fprint(w, jsonJob)
 	}
 
-	handler := http.Handler(http.HandlerFunc(handlerFunc))
+	handler := auth.WithUser(handlerFunc, appCtx)
 
 	handler = middleware.JSONHeaders(handler)
 

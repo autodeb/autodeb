@@ -43,7 +43,7 @@ func TestRemoveAccessTokenPostHandler(t *testing.T) {
 
 	user := testRouter.Login()
 
-	token, err := testRouter.AppCtx.TokensService().GenerateToken(user.ID, "testname")
+	token, err := testRouter.AppCtx.TokensService().CreateToken(user.ID, "testname")
 	assert.NoError(t, err)
 
 	accessTokens, err := testRouter.AppCtx.TokensService().GetUserTokens(user.ID)

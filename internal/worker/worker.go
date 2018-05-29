@@ -47,6 +47,9 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 	if cfg.ServerURL == "" {
 		return nil, errors.New("ServerURL is empty")
 	}
+	if cfg.AccessToken == "" {
+		return nil, errors.New("AccessToken is empty")
+	}
 	if cfg.WorkingDirectory == "" {
 		return nil, errors.New("WorkingDirectory is empty")
 	}
@@ -55,7 +58,7 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 	}
 
 	// Create the apiClient
-	apiClient, err := apiclient.New(cfg.ServerURL, &http.Client{})
+	apiClient, err := apiclient.New(cfg.ServerURL, cfg.AccessToken, &http.Client{})
 	if err != nil {
 		return nil, err
 	}

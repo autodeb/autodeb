@@ -25,6 +25,9 @@ func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 	var serverURL string
 	fs.StringVar(&serverURL, "server-url", "", "URL of the autodeb server")
 
+	var accessToken string
+	fs.StringVar(&serverURL, "access-token", "", "API access token")
+
 	var workingDirectory string
 	fs.StringVar(&workingDirectory, "working-directory", "jobs", "working directory for jobs")
 
@@ -67,6 +70,7 @@ func Parse(args []string, writerOutput io.Writer) (*worker.Config, error) {
 	}
 
 	cfg := &worker.Config{
+		AccessToken:      accessToken,
 		ServerURL:        serverURL,
 		WorkingDirectory: workingDirectory,
 		LogLevel:         logLevel,

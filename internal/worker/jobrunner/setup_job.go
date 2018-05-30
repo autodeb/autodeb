@@ -8,6 +8,8 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
+// setupJob will create a working directory and a log file for a job. It is the
+// caller's responsibility to delete the directory
 func (jobRunner *JobRunner) setupJob(job *models.Job) (string, *os.File, error) {
 	workingDirectory := filepath.Join(
 		jobRunner.workingDirectory,

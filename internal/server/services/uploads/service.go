@@ -50,6 +50,11 @@ func (service *Service) GetAllUploads() ([]*models.Upload, error) {
 	return service.db.GetAllUploads()
 }
 
+// GetAllUploadsByUserID returns all uploads for a given user id
+func (service *Service) GetAllUploadsByUserID(userID uint) ([]*models.Upload, error) {
+	return service.db.GetAllUploadsByUserID(userID)
+}
+
 // GetUpload returns an upload by ID
 func (service *Service) GetUpload(uploadID uint) (*models.Upload, error) {
 	return service.db.GetUpload(uploadID)

@@ -42,6 +42,16 @@
                                 <a class="list-group-item" href="/jobs">Jobs</a>
                             </ul>
                         </div>
+                        {{ if .User }}
+                        <div class="card my-3">
+                            <div class="card-header">
+                                <strong>Personnal pages</strong>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <a class="list-group-item" href="/uploads?user_id={{ .User.ID }}">My Uploads</a>
+                            </ul>
+                        </div>
+                        {{ end }}
                         <div class="card my-3">
                             <div class="card-header">
                                 <strong>Account</strong>

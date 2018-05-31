@@ -16,10 +16,26 @@ import (
 func UploadsGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		uploads, err := appCtx.UploadsService().GetAllUploads()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+		var uploads []*models.Upload
+		var err error
+
+		if param := r.URL.Query().Get("user_id"); param != "" {
+			userID, err := strconv.Atoi(param)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			uploads, err = appCtx.UploadsService().GetAllUploadsByUserID(uint(userID))
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		} else {
+			uploads, err = appCtx.UploadsService().GetAllUploads()
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 		}
 
 		data := struct {

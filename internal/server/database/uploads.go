@@ -34,6 +34,25 @@ func (db *Database) GetAllUploads() ([]*models.Upload, error) {
 	return uploads, nil
 }
 
+// GetAllUploadsByUserID returns all uploads for a user
+func (db *Database) GetAllUploadsByUserID(userID uint) ([]*models.Upload, error) {
+	var uploads []*models.Upload
+
+	query := db.gormDB.Model(
+		&models.Upload{},
+	).Where(
+		&models.Upload{
+			UserID: userID,
+		},
+	)
+
+	if err := query.Find(&uploads).Error; err != nil {
+		return nil, err
+	}
+
+	return uploads, nil
+}
+
 // GetUpload returns the Upload with the given id
 func (db *Database) GetUpload(id uint) (*models.Upload, error) {
 	var upload models.Upload

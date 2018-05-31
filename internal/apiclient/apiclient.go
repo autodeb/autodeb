@@ -105,6 +105,7 @@ func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, []b
 	}
 	defer response.Body.Close()
 
+	// Put the body in a bytes array
 	b, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, nil, err

@@ -3,8 +3,6 @@ package jobrunner
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/apiclient"
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
@@ -68,26 +66,25 @@ JOB_LOOP:
 }
 
 func (jobRunner *JobRunner) setupAndExecJob(job *models.Job) {
-	// Setup the job
-	workingDirectory, logFile, err := jobRunner.setupJob(job)
+	// Setup the job directory
+	jobDirectory, err := jobRunner.setupJobDirectory(job)
 	if err != nil {
 		jobRunner.setJobStatus(job, models.JobStatusQueued)
-		jobRunner.logger.Errorf("failed job setup: %+v", err)
+		jobRunner.logger.Errorf("failed job directory setup: %+v", err)
 		return
 	}
-	defer os.RemoveAll(workingDirectory)
-	defer logFile.Close()
+	defer jobDirectory.Close()
 
 	// Create a cancelable context for the job
 	ctx, cancelCtx := jobRunner.getJobContext()
 	defer cancelCtx()
 
 	// Execute the job
-	jobError := jobRunner.execJob(ctx, job, workingDirectory, logFile)
+	jobError := jobRunner.execJob(ctx, job, jobDirectory)
 
 	// Include the job error at the end of the log
 	if jobError != nil {
-		fmt.Fprintf(logFile, "\nError: %+v", jobError)
+		fmt.Fprintf(jobDirectory.logFile, "\nError: %+v", jobError)
 	}
 
 	// If we canceled the job, requeue
@@ -100,8 +97,8 @@ func (jobRunner *JobRunner) setupAndExecJob(job *models.Job) {
 	}
 
 	// Submit the job result
-	logFile.Seek(0, 0)
-	jobRunner.submitResult(job, jobError, logFile)
+	jobDirectory.logFile.Seek(0, 0)
+	jobRunner.submitJobResult(job, jobError, jobDirectory.logFile, jobDirectory.artifactsDirectory)
 }
 
 // getJobContext returns a context that will be canceled if the JobRunner
@@ -123,10 +120,16 @@ func (jobRunner *JobRunner) getJobContext() (context.Context, context.CancelFunc
 	return ctx, cancelFunc
 }
 
-func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, workingDirectory string, logFile io.Writer) error {
+func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, jobDirectory *jobDirectory) error {
 	switch job.Type {
 	case models.JobTypeBuild:
-		return jobRunner.execBuild(ctx, job, workingDirectory, logFile)
+		return jobRunner.execBuild(
+			ctx,
+			job,
+			jobDirectory.workingDirectory,
+			jobDirectory.artifactsDirectory,
+			jobDirectory.logFile,
+		)
 	default:
 		jobRunner.logger.Errorf("Unknown job type: %s", job.Type)
 		return errors.Errorf("unknown job type: %s", job.Type)

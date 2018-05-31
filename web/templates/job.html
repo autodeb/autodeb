@@ -1,0 +1,48 @@
+{{ define "title" }}Uploads{{ end }}
+
+{{ define "content" }}
+
+<h2>Job details (#{{ $.Data.Job.ID }})</h2>
+<hr>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <td>{{ $.Data.Job.ID }}</td>
+    </tr>
+    <tr>
+        <th>Upload ID</th>
+        <td><a href="/uploads/{{ $.Data.Job.UploadID }}">{{ $.Data.Job.UploadID }}</a></td>
+    </tr>
+    <tr>
+        <th>Type</th>
+        <td>{{ $.Data.Job.Type }}</td>
+    </tr>
+    <tr>
+        <th>Log</th>
+        <td><a href="/api/jobs/{{ $.Data.Job.ID }}/log.txt">log (txt)</a></td>
+    </tr>
+</table>
+
+<h2>Artifacts</h2>
+<hr>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <th>File name</th>
+    </tr>
+
+    {{ range $.Data.Artifacts }}
+    <tr>
+        <td>{{ .ID }}</td>
+        <td>
+            <a href="/api/jobs/{{ .JobID }}/artifacts/{{ .Filename }}">{{ .Filename }}</a>
+        </td>
+    </tr>
+    {{ end }}
+
+</table>
+
+
+{{ end }}

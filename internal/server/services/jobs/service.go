@@ -74,6 +74,11 @@ func (service *Service) GetAllJobs() ([]*models.Job, error) {
 	return service.db.GetAllJobs()
 }
 
+// GetAllJobsByUploadID returns all jobs for a given upload
+func (service *Service) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, error) {
+	return service.db.GetAllJobsByUploadID(uploadID)
+}
+
 // UnqueueNextJob returns the next job and marks it as assigned
 func (service *Service) UnqueueNextJob() (*models.Job, error) {
 	job, err := service.db.GetNextJob()

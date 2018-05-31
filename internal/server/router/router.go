@@ -39,7 +39,9 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	// Web pages
 	router.Path("/").Handler(webpages.IndexGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/uploads").Handler(webpages.UploadsGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/uploads/{uploadID:[0-9]+}").Handler(webpages.UploadGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs").Handler(webpages.JobsGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/jobs/{jobID:[0-9]+}").Handler(webpages.JobGetHandler(appCtx)).Methods(http.MethodGet)
 
 	// ==== Profile ====
 	router.Path("/profile").Handler(webpages.ProfileGetHandler(appCtx)).Methods(http.MethodGet)

@@ -32,6 +32,25 @@ func (db *Database) GetAllJobs() ([]*models.Job, error) {
 	return jobs, nil
 }
 
+// GetAllJobsByUploadID returns all jobs for an upload
+func (db *Database) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, error) {
+	var jobs []*models.Job
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	).Where(
+		&models.Job{
+			UploadID: uploadID,
+		},
+	)
+
+	if err := query.Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
 // GetJob returns the Job with the given id
 func (db *Database) GetJob(id uint) (*models.Job, error) {
 	var job models.Job

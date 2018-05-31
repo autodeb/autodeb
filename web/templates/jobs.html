@@ -4,7 +4,7 @@
 
 <p>This page lists all jobs:</p>
 
-<table class="table table-sm table-bordered table-hover table-condensed">
+<table class="table table-bordered table-hover">
     <tr>
         <th>ID</th>
         <th>Type</th>
@@ -15,10 +15,10 @@
 
     {{ range $.Data.Jobs }}
     <tr>
-        <td>{{ .ID }}</td>
+        <td><a href="/jobs/{{ .ID}}">{{ .ID }}</a></td>
         <td>{{ .Type }}</td>
         <td>{{ .Status }}</td>
-        <td>{{ .UploadID }}</td>
+        <td><a href="/uploads/{{ .UploadID }}">{{ .UploadID }}</a></td>
         <td>
             <a href="/api/jobs/{{ .ID }}/log.txt">log (txt)</a>
         </td>

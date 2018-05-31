@@ -1,0 +1,59 @@
+{{ define "title" }}Uploads{{ end }}
+
+{{ define "content" }}
+
+<h2>Upload details (#{{ $.Data.Upload.ID }})</h2>
+<hr>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <td>{{ $.Data.Upload.ID }}</td>
+    </tr>
+    <tr>
+        <th>Uploader ID</th>
+        <td>{{ $.Data.Upload.UserID }}</td>
+    </tr>
+    <tr>
+        <th>Source Package</th>
+        <td>{{ $.Data.Upload.Source }}</td>
+    </tr>
+    <tr>
+        <th>Version</th>
+        <td>{{ $.Data.Upload.Version }}</td>
+    </tr>
+    <tr>
+        <th>Maintainer</th>
+        <td>{{ $.Data.Upload.Maintainer }}</td>
+    </tr>
+    <tr>
+        <th>ChangedBy</th>
+        <td>{{ $.Data.Upload.ChangedBy }}</td>
+    </tr>
+</table>
+
+<h2>Related jobs</h2>
+<hr>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Log</th>
+    </tr>
+
+    {{ range $.Data.Jobs }}
+    <tr>
+        <td><a href="/jobs/{{ .ID}}">{{ .ID }}</a></td>
+        <td>{{ .Type }}</td>
+        <td>{{ .Status }}</td>
+        <td>
+            <a href="/api/jobs/{{ .ID }}/log.txt">log (txt)</a>
+        </td>
+    </tr>
+    {{ end }}
+
+</table>
+
+{{ end }}

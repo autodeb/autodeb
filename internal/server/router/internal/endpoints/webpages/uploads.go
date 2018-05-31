@@ -54,6 +54,10 @@ func UploadGetHandler(appCtx *appctx.Context) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		if upload == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 
 		jobs, err := appCtx.JobsService().GetAllJobsByUploadID(uint(uploadID))
 		if err != nil {

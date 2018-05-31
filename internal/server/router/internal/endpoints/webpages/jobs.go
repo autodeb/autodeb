@@ -54,6 +54,10 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		if job == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 
 		artifacts, err := appCtx.JobsService().GetAllJobArtifactsByJobID(uint(jobID))
 		if err != nil {

@@ -117,11 +117,6 @@ func (service *Service) GetJob(id uint) (*models.Job, error) {
 	return job, nil
 }
 
-// UpdateJob will update a job
-func (service *Service) UpdateJob(job *models.Job) error {
-	return service.db.UpdateJob(job)
-}
-
 // GetJobLog returns the log of a job
 func (service *Service) GetJobLog(jobID uint) (io.ReadCloser, error) {
 	file, err := service.fs.Open(service.jobLogPath(jobID))
@@ -133,6 +128,33 @@ func (service *Service) GetJobLog(jobID uint) (io.ReadCloser, error) {
 	}
 
 	return file, nil
+}
+
+// SetJobStatus will change the status of a job
+func (service *Service) SetJobStatus(jobID uint, status models.JobStatus) error {
+	job, err := service.GetJob(jobID)
+	if err != nil {
+		return err
+	}
+	job.Status = status
+	if err := service.db.UpdateJob(job); err != nil {
+		return err
+	}
+
+	// Continue only if the job was a success
+	if status != models.JobStatusSuccess {
+		return nil
+	}
+
+	// Are there other jobs to create?
+	switch job.Type {
+	case models.JobTypeBuild:
+		// TODO: create autopkgtest jobs, if needed
+		return nil
+	default:
+		return nil
+	}
+
 }
 
 // SaveJobLog will save logs for a job

@@ -291,7 +291,7 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 
 		// Update the job
 		job.Status = newStatus
-		if err := appCtx.JobsService().UpdateJob(job); err != nil {
+		if err := appCtx.JobsService().SetJobStatus(job.ID, newStatus); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

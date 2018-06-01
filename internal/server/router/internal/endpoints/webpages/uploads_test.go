@@ -13,8 +13,8 @@ import (
 func TestUploadsGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	testRouter.DB.CreateUpload(1, "u1source", "u1version", "u1maint", "u1changedby")
-	testRouter.DB.CreateUpload(2, "u2source", "u2version", "u2maint", "u2changedby")
+	testRouter.DB.CreateUpload(1, "u1source", "u1version", "u1maint", "u1changedby", false)
+	testRouter.DB.CreateUpload(2, "u2source", "u2version", "u2maint", "u2changedby", false)
 
 	//Show all uploads
 	request := httptest.NewRequest(http.MethodGet, "/uploads/1", nil)
@@ -55,6 +55,7 @@ func TestUploadGetHandler(t *testing.T) {
 		"testversion",
 		"testmaintainer",
 		"testchangedbyname",
+		false,
 	)
 
 	response = testRouter.ServeHTTP(request)
@@ -66,5 +67,6 @@ func TestUploadGetHandler(t *testing.T) {
 		"testversion",
 		"testmaintainer",
 		"testchangedbyname",
+		false,
 	)
 }

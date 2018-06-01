@@ -10,18 +10,18 @@ import (
 )
 
 func (jobRunner *JobRunner) submitJobResult(job *models.Job, jobError error, jobLog io.Reader, artifactsDirectory string) {
-	// Set the job status
-	jobStatus := models.JobStatusSuccess
-	if jobError != nil {
-		jobStatus = models.JobStatusFailed
-	}
-	jobRunner.setJobStatus(job, jobStatus)
-
 	// Submit the log
 	jobRunner.submitJobLog(job, jobLog)
 
 	// Submit the artifacts
 	jobRunner.submitJobArtifacts(job, artifactsDirectory)
+
+	// Set the job status, only after all of this has been completed
+	jobStatus := models.JobStatusSuccess
+	if jobError != nil {
+		jobStatus = models.JobStatusFailed
+	}
+	jobRunner.setJobStatus(job, jobStatus)
 }
 
 func (jobRunner *JobRunner) submitJobArtifacts(job *models.Job, artifactsDirectory string) {

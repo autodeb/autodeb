@@ -216,12 +216,12 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		// Only accept logs on jobs that are completed
+		// Only accept logs for jobs that are currently running
+		// Completed jobs should be immutable.
 		switch job.Status {
-		case models.JobStatusSuccess:
-		case models.JobStatusFailed:
+		case models.JobStatusAssigned:
 		default:
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 
@@ -261,13 +261,11 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 		newStatus := models.JobStatus(jobStatus)
 		switch newStatus {
 		case models.JobStatusSuccess:
-			// The job was a success.
 		case models.JobStatusFailed:
-			// The job failed.
 		case models.JobStatusQueued:
 			// Allow workers to requeue jobs that they didn't complete.
 		default:
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 
@@ -287,7 +285,7 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 		switch job.Status {
 		case models.JobStatusAssigned:
 		default:
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 
@@ -333,12 +331,12 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		// Only accept logs on jobs that are completed
+		// Only accept artifacts for jobs that are currently running
+		// Completed jobs should be immutable.
 		switch job.Status {
-		case models.JobStatusSuccess:
-		case models.JobStatusFailed:
+		case models.JobStatusAssigned:
 		default:
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 

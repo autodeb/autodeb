@@ -98,6 +98,11 @@ func (service *Service) UnqueueNextJob() (*models.Job, error) {
 	return job, err
 }
 
+// CreateBuildJob creates a build job
+func (service *Service) CreateBuildJob(uploadID uint) (*models.Job, error) {
+	return service.db.CreateJob(models.JobTypeBuild, uploadID)
+}
+
 // GetJob returns the job with the given id
 func (service *Service) GetJob(id uint) (*models.Job, error) {
 	job, err := service.db.GetJob(id)

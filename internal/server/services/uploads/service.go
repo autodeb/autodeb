@@ -9,22 +9,25 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/jobs"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/pgp"
 )
 
 //Service manages uploads
 type Service struct {
-	db         *database.Database
-	pgpService *pgp.Service
-	fs         filesystem.FS
+	db          *database.Database
+	pgpService  *pgp.Service
+	jobsService *jobs.Service
+	fs          filesystem.FS
 }
 
 //New creates a new upload service
-func New(db *database.Database, pgpService *pgp.Service, fs filesystem.FS) *Service {
+func New(db *database.Database, pgpService *pgp.Service, jobsService *jobs.Service, fs filesystem.FS) *Service {
 	service := &Service{
-		db:         db,
-		pgpService: pgpService,
-		fs:         fs,
+		db:          db,
+		pgpService:  pgpService,
+		jobsService: jobsService,
+		fs:          fs,
 	}
 	return service
 }

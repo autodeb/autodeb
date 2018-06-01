@@ -115,7 +115,7 @@ func TestJobLogPostHandler(t *testing.T) {
 	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
 
-	job.Status = models.JobStatusSuccess
+	job.Status = models.JobStatusAssigned
 	err = testRouter.DB.UpdateJob(job)
 	assert.NoError(t, err)
 
@@ -145,7 +145,7 @@ func TestJobArtifactPostHandler(t *testing.T) {
 	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
 	assert.NoError(t, err)
 
-	job.Status = models.JobStatusSuccess
+	job.Status = models.JobStatusAssigned
 	err = testRouter.DB.UpdateJob(job)
 	assert.NoError(t, err)
 

@@ -29,16 +29,6 @@ func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Serv
 	// PGP
 	pgpService := pgp.New(db, serverURL)
 
-	// Uploads
-	if err := dataFS.MkdirAll("uploads", 0744); err != nil {
-		return nil, errors.WithMessage(err, "could not create uploads folder")
-	}
-	uploadsService := uploads.New(
-		db,
-		pgpService,
-		filesystem.NewBasePathFS(dataFS, "uploads"),
-	)
-
 	// Jobs
 	if err := dataFS.MkdirAll("jobs", 0744); err != nil {
 		return nil, errors.WithMessage(err, "could not create jobs folder")
@@ -46,6 +36,17 @@ func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Serv
 	jobsService := jobs.New(
 		db,
 		filesystem.NewBasePathFS(dataFS, "jobs"),
+	)
+
+	// Uploads
+	if err := dataFS.MkdirAll("uploads", 0744); err != nil {
+		return nil, errors.WithMessage(err, "could not create uploads folder")
+	}
+	uploadsService := uploads.New(
+		db,
+		pgpService,
+		jobsService,
+		filesystem.NewBasePathFS(dataFS, "uploads"),
 	)
 
 	services := &Services{

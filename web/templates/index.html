@@ -5,17 +5,50 @@
 <hr>
 
 <p>
-    Autodeb is a service that provides a way to test Debian source packages.
-    It empowers Debian Developers by giving them easy access to more rigorous
-    testing before they upload a package to the archive. It runs tests that
-    Debian Developers don’t necessarily run because of lack of time and
-    resources.
+    Autodeb is a work-in-progress service developed in the context of a Google
+    Summer of Code project. The main goals of the service are to automate
+    building, testing and distributing Debian packages.
+</p>
+
+</p>
+    The service focuses on two main use cases:
 </p>
 
 <p>
-    In the future, Autodeb will also  attempt to automatically update Debian
-    packages to newer upstream versions or to backport them. Resulting
-    packages will be distributed in apt repositories.
+    <strong>
+        1. Generate and distribute backports and packages for new upstream
+        versions automatically
+    </strong>
+</p>
+
+<p>
+    Autodeb will periodically attempt to update all packages in the Debian
+    archive to new upstream versions when they are available. It will also try
+    to backport all packages in the archive to previous Debian versions.
+    Resulting packages will be distributed and the build logs will be made
+    available. We hope that the resulting information will be useful to package
+    maintainers. The resulting builds could also be used by Debian users so
+    that they are left with a deb-based alternative when there are no packages
+    for their needs in Debian itself.
+</p>
+
+<p>
+    <strong>
+        2. Enable Debian package maintainers to test their packages (and their
+        reverse dependencies) before each upload
+    </strong>
+</p>
+
+<p>
+    Autodeb will empower Debian package maintainers by giving them easy access
+    to thorough testing before every upload. It will run tests that are not
+    often run due to lack of time or resources. Autodeb will provide a
+    dput-comptatible API. Instead of uploading your packages directly to the
+    ftp-master upload queue, you may upload your source packages to Autodeb
+    where they will be built on all release architectures. Autopkgtests will
+    also be ran on all resulting deb packages and their reverse dependencies.
+    Optionally, the upload will be forwarded to the ftp-master queue if all
+    tests succeed.
 </p>
 
 <p>

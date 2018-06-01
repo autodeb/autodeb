@@ -18,7 +18,7 @@ func TestJobsNextPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	testRouter.DB.CreateJob(models.JobTypeBuild, uint(3))
+	testRouter.Services.Jobs().CreateBuildJob(uint(3))
 
 	job, err := apiClient.UnqueueNextJob()
 	assert.NoError(t, err)
@@ -55,7 +55,7 @@ func TestJobGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	_, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	_, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 
 	job, err := apiClient.GetJob(uint(1))
@@ -88,7 +88,7 @@ func TestJobStatusPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 	assert.NotEqual(t, models.JobStatusFailed, job.Status)
 
@@ -112,7 +112,7 @@ func TestJobLogPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 
 	job.Status = models.JobStatusAssigned
@@ -142,7 +142,7 @@ func TestJobArtifactPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 
 	job.Status = models.JobStatusAssigned

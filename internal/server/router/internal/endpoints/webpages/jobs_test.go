@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/router/routertest"
 )
 
@@ -20,7 +19,7 @@ func TestJobGetHandler(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
 	assert.Equal(t, "", response.Body.String())
 
-	job, _ := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, _ := testRouter.Services.Jobs().CreateBuildJob(1)
 	testRouter.DB.CreateJobArtifact(job.ID, "testartifactfilename")
 
 	response = testRouter.ServeHTTP(request)

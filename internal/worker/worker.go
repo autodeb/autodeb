@@ -47,9 +47,6 @@ func New(cfg *Config, loggingOutput io.Writer) (*Worker, error) {
 	if cfg.ServerURL == "" {
 		return nil, errors.New("ServerURL is empty")
 	}
-	if cfg.AccessToken == "" {
-		return nil, errors.New("AccessToken is empty")
-	}
 	if cfg.WorkingDirectory == "" {
 		return nil, errors.New("WorkingDirectory is empty")
 	}

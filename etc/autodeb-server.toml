@@ -1,0 +1,45 @@
+### Welcome to the Autodeb server configuration file
+
+# This should be the public-facing URL of your server.
+# It is used for OAuth and for suggesting dput configuration
+# to the users.
+#server_url = "http://localhost:8071"
+
+# The directory in which autodeb is going to save uploads, job
+# artifacts, etc.
+#data_directory = "data"
+
+# The directory containing the web pages templates
+#templates_directory = "web/templates"
+
+# The directory containing the web pages static files
+#static_files_directory = "web/static"
+
+# Whether or not to cache templates in memory.
+#templates_cache_enabled = true
+
+# Log level: "error", "warning" or "info"
+#log_level = "info"
+
+[database]
+# Only sqlite is supported for now
+#driver = "sqlite"
+#connection_string = "test-connection-string"
+
+[http]
+# The address to listen to
+#address = ":8071"
+
+[authentication]
+# The authentication backend to use: "oauth" or "disabled"
+#backend = "disabled"
+
+    [authentication.oauth]
+    # OAuth provider. Only gitlab is supported for now.
+	#provider = "gitlab"
+	# The base URL of the OAuth provier
+	#base_url = "https://salsa.debian.org"
+	# The client ID of the OAuth application
+	#client_id = ""
+	# The client secret of the OAuth application
+	#client_secret = ""

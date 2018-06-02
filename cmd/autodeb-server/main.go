@@ -9,6 +9,7 @@ import (
 	"os/signal"
 
 	"salsa.debian.org/autodeb-team/autodeb/cmd/autodeb-server/internal/cli"
+	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/logo"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server"
 )
@@ -18,7 +19,7 @@ func main() {
 	args := os.Args[1:]
 
 	// Parse the command-line args
-	cfg, err := cli.Parse(args, os.Stdout)
+	cfg, err := cli.Parse(args, filesystem.NewOsFS(), os.Stdout)
 	if err != nil {
 		printErrorAndExit(err)
 	}

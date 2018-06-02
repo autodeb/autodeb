@@ -1,16 +1,16 @@
 ### Welcome to the Autodeb Worker confguration file.
 
 # The autodeb master server URL
-# server-url = "http://localhost:8071"
+#server-url = "http://localhost:8071"
 
 # This is where the worker will execute jobs
-# working-directory = "jobs"
+#working-directory = "jobs"
 
 # API Access token for the autodeb master
-# access-token = ""
+#access-token = ""
 
 # Log level: "error", "warning" or "info"
-# log-level = "info"
+#log-level = "info"
 
 # Number of jobs to execute at the same time
-# runner-count = 1
+#runner-count = 1

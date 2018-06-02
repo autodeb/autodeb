@@ -7,39 +7,51 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"salsa.debian.org/autodeb-team/autodeb/cmd/autodeb-server/internal/cli"
+	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 )
 
 type cliTest struct {
 	outputWriter bytes.Buffer
+	fs           filesystem.FS
 }
 
 func (cliTest *cliTest) Parse(args ...string) (*config.Config, error) {
-	return cli.Parse(args, &cliTest.outputWriter)
+	return cli.Parse(args, cliTest.fs, &cliTest.outputWriter)
 }
 
 func testSetup() *cliTest {
-	cliTest := cliTest{}
-	return &cliTest
+	fs := filesystem.NewMemMapFS()
+
+	cliTest := &cliTest{
+		fs: fs,
+	}
+
+	return cliTest
 }
 
-func TestEmptyArgsNoError(t *testing.T) {
+func TestNoConfigFound(t *testing.T) {
 	cliTest := testSetup()
 
 	cfg, err := cliTest.Parse("")
 
-	assert.NotNil(t, cfg)
-	assert.NoError(t, err)
-}
-
-func TestUnrecognizedLogLevel(t *testing.T) {
-	cliTest := testSetup()
-
-	cfg, err := cliTest.Parse(
-		"-log-level=potato",
-	)
-
 	assert.Nil(t, cfg)
 	assert.Error(t, err)
-	assert.EqualError(t, err, "unrecognized log level: potato")
+	assert.Contains(t, err.Error(), "could not open configuration file")
+}
+
+func TestEmptyConfig(t *testing.T) {
+	cliTest := testSetup()
+
+	f, err := cliTest.fs.Create("test.cfg")
+	assert.NoError(t, err)
+	f.Close()
+
+	cfg, err := cliTest.Parse(
+		"-config=test.cfg",
+	)
+
+	assert.NotNil(t, cfg)
+	assert.NoError(t, err)
+	assert.Equal(t, ":8071", cfg.HTTP.Address, "the config should use the defaults")
 }

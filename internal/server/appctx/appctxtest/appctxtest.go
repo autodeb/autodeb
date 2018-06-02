@@ -12,6 +12,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
+	"salsa.debian.org/autodeb-team/autodeb/internal/net/url"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -32,7 +33,9 @@ func SetupTest(t *testing.T) *AppCtxTest {
 	servicesTest := servicestest.SetupTest(t)
 
 	config := &config.Config{
-		ServerURL: servicesTest.ServerURL,
+		ServerURL: &url.URL{
+			URL: *servicesTest.ServerURL,
+		},
 	}
 
 	templatesFS := filesystem.NewBasePathFS(

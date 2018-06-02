@@ -58,7 +58,7 @@ func New(cfg *config.Config, loggingOutput io.Writer) (*Server, error) {
 	logger := log.New(loggingOutput)
 	logger.SetLevel(cfg.LogLevel)
 
-	services, err := services.New(db, dataFS, cfg.ServerURL)
+	services, err := services.New(db, dataFS, &cfg.ServerURL.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func getOAuthBackend(cfg *config.Config, db *database.Database, sessionsManager 
 		db,
 		sessionsManager,
 		oauthProvider,
-		cfg.ServerURL,
+		&cfg.ServerURL.URL,
 	)
 
 	return authBackend, nil

@@ -33,6 +33,22 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, ":8071", cfg.HTTP.Address, "the config should contain defaults")
 }
 
+func TestParseConfigUnknownKey(t *testing.T) {
+	fs := filesystem.NewMemMapFS()
+
+	f, err := fs.Create("server.cfg")
+	assert.NoError(t, err)
+
+	fmt.Fprintln(f, "unknownkey=11")
+
+	f.Close()
+
+	cfg, err := config.ParseConfig("server.cfg", fs)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unrecognized configuration key: unknownkey")
+	assert.Nil(t, cfg)
+}
+
 func TestParseConfig(t *testing.T) {
 	fs := filesystem.NewMemMapFS()
 

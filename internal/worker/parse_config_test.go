@@ -20,6 +20,22 @@ func TestNotFound(t *testing.T) {
 	assert.Contains(t, err.Error(), "file does not exist")
 }
 
+func TestParseConfigUnknownKey(t *testing.T) {
+	fs := filesystem.NewMemMapFS()
+
+	f, err := fs.Create("server.cfg")
+	assert.NoError(t, err)
+
+	fmt.Fprintln(f, "unknownkey=11")
+
+	f.Close()
+
+	cfg, err := worker.ParseConfig("server.cfg", fs)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unrecognized configuration key: unknownkey")
+	assert.Nil(t, cfg)
+}
+
 func TestDefaultConfig(t *testing.T) {
 	fs := filesystem.NewMemMapFS()
 

@@ -32,8 +32,10 @@ func ParseConfig(filepath string, fs filesystem.FS) (*Config, error) {
 		ServerURL:        "http://localhost:8071",
 	}
 
-	if _, err := toml.DecodeReader(bytes.NewReader(b), &config); err != nil {
+	if metadata, err := toml.DecodeReader(bytes.NewReader(b), &config); err != nil {
 		return nil, errors.WithMessage(err, "could not decode configuration file")
+	} else if keys := metadata.Undecoded(); len(keys) > 0 {
+		return nil, errors.Errorf("unrecognized configuration key: %s", keys[0].String())
 	}
 
 	return config, nil

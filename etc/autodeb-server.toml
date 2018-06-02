@@ -34,12 +34,12 @@
 # The authentication backend to use: "oauth" or "disabled"
 #backend = "disabled"
 
-    [authentication.oauth]
-    # OAuth provider. Only gitlab is supported for now.
-	#provider = "gitlab"
-	# The base URL of the OAuth provier
-	#base_url = "https://salsa.debian.org"
-	# The client ID of the OAuth application
-	#client_id = ""
-	# The client secret of the OAuth application
-	#client_secret = ""
+[authentication.oauth]
+# OAuth provider. Only gitlab is supported for now.
+#provider = "gitlab"
+# The base URL of the OAuth provier
+#base_url = "https://salsa.debian.org"
+# The client ID of the OAuth application
+#client_id = ""
+# The client secret of the OAuth application
+#client_secret = ""

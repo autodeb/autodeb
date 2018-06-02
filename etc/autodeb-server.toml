@@ -1,7 +1,7 @@
 ### Welcome to the Autodeb server configuration file
 
 # The commented out values in this file correspond to the default
-# values used by autodeb.
+# values used by the autodeb server.
 
 # This should be the public-facing URL of your server.
 # It is used for OAuth and for suggesting dput configuration

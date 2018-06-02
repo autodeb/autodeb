@@ -44,7 +44,10 @@ func (jobRunner *JobRunner) execBuild(
 	// Run sbuild
 	if err := exec.RunCtxDirStdoutStderr(
 		ctx, sourceDirectory, logFile, logFile,
-		"sbuild", "--no-clean-source", "--nolog",
+		"sbuild",
+		"--no-clean-source",
+		"--nolog",
+		"--arch-all",
 	); err != nil {
 		return errors.WithMessage(err, "sbuild failed")
 	}

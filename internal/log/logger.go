@@ -20,16 +20,6 @@ type Logger interface {
 	SetLevel(Level)
 }
 
-// Level represents a logging level
-type Level = logrus.Level
-
-// Logging levels
-const (
-	ErrorLevel   Level = logrus.ErrorLevel
-	WarningLevel Level = logrus.WarnLevel
-	InfoLevel    Level = logrus.InfoLevel
-)
-
 type logger struct {
 	logger *logrus.Logger
 }
@@ -53,7 +43,18 @@ func (l *logger) PrefixLogger(prefix string) Logger {
 
 // SetLevel sets the logging level
 func (l *logger) SetLevel(level Level) {
-	l.logger.SetLevel(level)
+	logrusLevel := logrus.InfoLevel
+
+	switch level {
+	case ErrorLevel:
+		logrusLevel = logrus.ErrorLevel
+	case WarningLevel:
+		logrusLevel = logrus.WarnLevel
+	case InfoLevel:
+		logrusLevel = logrus.InfoLevel
+	}
+
+	l.logger.SetLevel(logrusLevel)
 }
 
 // Error logs an error message

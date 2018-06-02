@@ -55,3 +55,20 @@ func TestEmptyConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, ":8071", cfg.HTTP.Address, "the config should use the defaults")
 }
+
+func TestUnrecognizedArgument(t *testing.T) {
+	cliTest := testSetup()
+
+	f, err := cliTest.fs.Create("test.cfg")
+	assert.NoError(t, err)
+	f.Close()
+
+	cfg, err := cliTest.Parse(
+		"-config=test.cfg",
+		"test",
+	)
+
+	assert.Error(t, err)
+	assert.Nil(t, cfg)
+	assert.Contains(t, err.Error(), "unrecognized argument")
+}

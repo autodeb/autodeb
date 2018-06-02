@@ -26,4 +26,5 @@ func TestJobGetHandler(t *testing.T) {
 	response = testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Contains(t, response.Body.String(), "testartifactfilename")
+	assert.Contains(t, response.Body.String(), "queued")
 }

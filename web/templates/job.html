@@ -11,13 +11,18 @@
         <td>{{ $.Data.Job.ID }}</td>
     </tr>
     <tr>
-        <th>Upload ID</th>
-        <td><a href="/uploads/{{ $.Data.Job.UploadID }}">{{ $.Data.Job.UploadID }}</a></td>
-    </tr>
-    <tr>
         <th>Type</th>
         <td>{{ $.Data.Job.Type }}</td>
     </tr>
+    <tr>
+        <th>Status</th>
+        <td>{{ $.Data.Job.Status }}</td>
+    </tr>
+    <tr>
+        <th>Upload ID</th>
+        <td><a href="/uploads/{{ $.Data.Job.UploadID }}">{{ $.Data.Job.UploadID }}</a></td>
+    </tr>
+
     <tr>
         <th>Log</th>
         <td><a href="/api/jobs/{{ $.Data.Job.ID }}/log.txt">log (txt)</a></td>

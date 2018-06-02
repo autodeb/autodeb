@@ -1,5 +1,8 @@
 ### Welcome to the Autodeb Worker confguration file.
 
+# The commented out values in this file correspond to the default
+# values used by autodeb.
+
 # The autodeb master server URL
 #server-url = "http://localhost:8071"
 

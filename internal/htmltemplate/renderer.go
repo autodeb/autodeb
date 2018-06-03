@@ -14,14 +14,16 @@ type Renderer struct {
 	fs           filesystem.FS
 	cache        *templateCache
 	cacheEnabled bool
+	funcMap      template.FuncMap
 }
 
 //NewRenderer created a new renderer
-func NewRenderer(fs filesystem.FS, cacheEnabled bool) *Renderer {
+func NewRenderer(fs filesystem.FS, funcMap template.FuncMap, cacheEnabled bool) *Renderer {
 	r := Renderer{
 		fs:           fs,
 		cache:        newTemplateCache(),
 		cacheEnabled: cacheEnabled,
+		funcMap:      funcMap,
 	}
 	return &r
 }
@@ -67,6 +69,8 @@ func (renderer *Renderer) getOrCreateTemplate(filenames ...string) (*template.Te
 
 func (renderer *Renderer) createTemplate(filenames ...string) (*template.Template, error) {
 	tmpl := template.New("")
+
+	tmpl.Funcs(renderer.funcMap)
 
 	for _, filename := range filenames {
 

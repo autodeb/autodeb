@@ -18,6 +18,12 @@ func newTemplateCache() *templateCache {
 	return &templateCache
 }
 
+func (cache *templateCache) Clear() {
+	cache.mutex.RLock()
+	defer cache.mutex.RUnlock()
+	cache.m = make(map[string]*template.Template)
+}
+
 func (cache *templateCache) Load(key string) (*template.Template, bool) {
 	cache.mutex.RLock()
 	defer cache.mutex.RUnlock()

@@ -10,7 +10,7 @@ import (
 
 func setupTest() (*Renderer, filesystem.FS) {
 	fs := filesystem.NewMemMapFS()
-	renderer := NewRenderer(fs, true)
+	renderer := NewRenderer(fs, nil, true)
 	return renderer, fs
 }
 

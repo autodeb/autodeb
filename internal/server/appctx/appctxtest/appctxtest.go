@@ -15,6 +15,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/net/url"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/webpages"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/servicestest"
 )
@@ -43,7 +44,7 @@ func SetupTest(t *testing.T) *AppCtxTest {
 		filepath.Join(projectDirectory(), "web", "templates"),
 	)
 
-	tmplRenderer := htmltemplate.NewRenderer(templatesFS, true)
+	tmplRenderer := htmltemplate.NewRenderer(templatesFS, webpages.FuncMap(), true)
 
 	staticFS := filesystem.NewMemMapFS()
 

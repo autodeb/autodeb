@@ -16,7 +16,7 @@
     </tr>
     <tr>
         <th>Status</th>
-        <td>{{ $.Data.Job.Status }}</td>
+        <td class="{{ $.Data.Job.Status | jobStatusTableClass }}">{{ $.Data.Job.Status }}</td>
     </tr>
     <tr>
         <th>Upload ID</th>

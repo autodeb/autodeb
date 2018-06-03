@@ -17,7 +17,7 @@
     <tr>
         <td><a href="/jobs/{{ .ID}}">{{ .ID }}</a></td>
         <td>{{ .Type }}</td>
-        <td>{{ .Status }}</td>
+        <td class="{{ .Status | jobStatusTableClass }}">{{ .Status }}</td>
         <td><a href="/uploads/{{ .UploadID }}">{{ .UploadID }}</a></td>
         <td>
             <a href="/api/jobs/{{ .ID }}/log.txt">log (txt)</a>

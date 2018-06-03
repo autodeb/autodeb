@@ -22,7 +22,8 @@ import (
 	authOAuth "salsa.debian.org/autodeb-team/autodeb/internal/server/auth/oauth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/router"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/webpages"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
 )
 
@@ -43,7 +44,7 @@ func New(cfg *config.Config, loggingOutput io.Writer) (*Server, error) {
 	staticFilesFS := filesystem.NewBasePathFS(filesystem.NewOsFS(), cfg.StaticFilesDirectory)
 	templatesFS := filesystem.NewBasePathFS(filesystem.NewOsFS(), cfg.TemplatesDirectory)
 
-	renderer := htmltemplate.NewRenderer(templatesFS, cfg.TemplatesCacheEnabled)
+	renderer := htmltemplate.NewRenderer(templatesFS, webpages.FuncMap(), cfg.TemplatesCacheEnabled)
 
 	sessionsManager, err := getSessionManager()
 	if err != nil {

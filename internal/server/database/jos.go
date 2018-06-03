@@ -7,11 +7,12 @@ import (
 )
 
 // CreateJob will create a job
-func (db *Database) CreateJob(jobType models.JobType, uploadID uint) (*models.Job, error) {
+func (db *Database) CreateJob(jobType models.JobType, uploadID, inputArtifactID uint) (*models.Job, error) {
 	job := &models.Job{
-		Type:     jobType,
-		UploadID: uploadID,
-		Status:   models.JobStatusQueued,
+		Type:            jobType,
+		UploadID:        uploadID,
+		InputArtifactID: inputArtifactID,
+		Status:          models.JobStatusQueued,
 	}
 
 	if err := db.gormDB.Create(job).Error; err != nil {

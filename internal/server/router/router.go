@@ -77,5 +77,9 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/files").Handler(api.UploadFilesGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/{filename}").Handler(api.UploadFileGetHandler(appCtx)).Methods(http.MethodGet)
 
+	// ==== Artifacts API ====
+	restAPIRouter.Path("/artifacts/{artifactID:[0-9]+}").Handler(api.ArtifactGetHandler(appCtx)).Methods(http.MethodGet)
+	restAPIRouter.Path("/artifacts/{artifactID:[0-9]+}/content").Handler(api.ArtifactContentGetHandler(appCtx)).Methods(http.MethodGet)
+
 	return router
 }

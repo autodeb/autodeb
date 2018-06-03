@@ -7,6 +7,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/artifacts"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/jobs"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/pgp"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/tokens"
@@ -15,10 +16,11 @@ import (
 
 //Services holds the services
 type Services struct {
-	jobs    *jobs.Service
-	pgp     *pgp.Service
-	uploads *uploads.Service
-	tokens  *tokens.Service
+	jobs      *jobs.Service
+	pgp       *pgp.Service
+	uploads   *uploads.Service
+	tokens    *tokens.Service
+	artifacts *artifacts.Service
 }
 
 // New returns a new set of services
@@ -29,12 +31,22 @@ func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Serv
 	// PGP
 	pgpService := pgp.New(db, serverURL)
 
+	// Artifacts
+	if err := dataFS.MkdirAll("artifacts", 0744); err != nil {
+		return nil, errors.WithMessage(err, "could not create artifacts folder")
+	}
+	artifactsService := artifacts.New(
+		db,
+		filesystem.NewBasePathFS(dataFS, "artifacts"),
+	)
+
 	// Jobs
 	if err := dataFS.MkdirAll("jobs", 0744); err != nil {
 		return nil, errors.WithMessage(err, "could not create jobs folder")
 	}
 	jobsService := jobs.New(
 		db,
+		artifactsService,
 		filesystem.NewBasePathFS(dataFS, "jobs"),
 	)
 
@@ -50,10 +62,11 @@ func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Serv
 	)
 
 	services := &Services{
-		tokens:  tokensService,
-		jobs:    jobsService,
-		pgp:     pgpService,
-		uploads: uploadsService,
+		tokens:    tokensService,
+		jobs:      jobsService,
+		pgp:       pgpService,
+		uploads:   uploadsService,
+		artifacts: artifactsService,
 	}
 
 	return services, nil
@@ -72,6 +85,11 @@ func (services *Services) PGP() *pgp.Service {
 // Jobs returns the jobs service
 func (services *Services) Jobs() *jobs.Service {
 	return services.jobs
+}
+
+// Artifacts returns the artifacts service
+func (services *Services) Artifacts() *artifacts.Service {
+	return services.artifacts
 }
 
 // Uploads returns the uploads service

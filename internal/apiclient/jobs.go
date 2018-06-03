@@ -30,28 +30,8 @@ func (c *APIClient) GetJob(jobID uint) (*models.Job, error) {
 	return &job, nil
 }
 
-// GetJobArtifacts retrieves all artifacts associated with a job
-func (c *APIClient) GetJobArtifacts(jobID uint) ([]*models.JobArtifact, error) {
-	var jobArtifacts []*models.JobArtifact
-
-	response, err := c.getJSON(
-		fmt.Sprintf("/api/jobs/%d/artifacts", jobID),
-		&jobArtifacts,
-	)
-
-	if response != nil && response.StatusCode == http.StatusNotFound {
-		return nil, nil
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return jobArtifacts, nil
-}
-
-// GetJobLog will retrieve the logs of a job
-func (c *APIClient) GetJobLog(jobID uint) (io.Reader, error) {
+// GetJobLogContent will retrieve the content of a job's log
+func (c *APIClient) GetJobLogContent(jobID uint) (io.Reader, error) {
 	response, body, err := c.get(
 		fmt.Sprintf("/api/jobs/%d/log.txt", jobID),
 	)
@@ -67,8 +47,8 @@ func (c *APIClient) GetJobLog(jobID uint) (io.Reader, error) {
 	return bytes.NewReader(body), nil
 }
 
-// GetJobArtifact will retrieve a job's artifact
-func (c *APIClient) GetJobArtifact(jobID uint, filename string) (io.Reader, error) {
+// GetJobArtifactContent will retrieve the content of a job's artifact
+func (c *APIClient) GetJobArtifactContent(jobID uint, filename string) (io.Reader, error) {
 	_, body, err := c.get(
 		fmt.Sprintf("/api/jobs/%d/artifacts/%s", jobID, filename),
 	)
@@ -119,23 +99,6 @@ func (c *APIClient) SubmitJobLog(jobID uint, jobLog io.Reader) error {
 	response, _, err := c.post(
 		fmt.Sprintf("/api/jobs/%d/log", jobID),
 		jobLog,
-	)
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode != http.StatusCreated {
-		return errors.Errorf("Unexpected status code %v", response.Status)
-	}
-
-	return nil
-}
-
-// SubmitJobArtifact will submit a job artifact
-func (c *APIClient) SubmitJobArtifact(jobID uint, filename string, artifact io.Reader) error {
-	response, _, err := c.post(
-		fmt.Sprintf("/api/jobs/%d/artifacts/%s", jobID, filename),
-		artifact,
 	)
 	if err != nil {
 		return err

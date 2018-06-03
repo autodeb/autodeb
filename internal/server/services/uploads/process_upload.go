@@ -22,6 +22,7 @@ import (
 type UploadParameters struct {
 	Filename      string
 	ForwardUpload bool
+	Autopkgtest   bool
 }
 
 type uploadError struct {
@@ -41,7 +42,7 @@ func (service *Service) ProcessUpload(uploadParameters *UploadParameters, conten
 
 	switch ext := filepath.Ext(uploadFileName); ext {
 	case ".changes":
-		upload, err := service.processChangesUpload(uploadFileName, content)
+		upload, err := service.processChangesUpload(uploadFileName, content, uploadParameters)
 		return upload, err
 	case ".deb":
 		return nil, &uploadError{errors.New("only source uploads are accepted"), true}
@@ -52,7 +53,7 @@ func (service *Service) ProcessUpload(uploadParameters *UploadParameters, conten
 
 }
 
-func (service *Service) processChangesUpload(filename string, content io.Reader) (*models.Upload, error) {
+func (service *Service) processChangesUpload(filename string, content io.Reader, uploadParameters *UploadParameters) (*models.Upload, error) {
 	contentBytes, err := ioutil.ReadAll(content)
 	if err != nil {
 		return nil, err
@@ -94,6 +95,7 @@ func (service *Service) processChangesUpload(filename string, content io.Reader)
 		changes.Version.String(),
 		changes.Maintainer,
 		changes.ChangedBy,
+		uploadParameters.Autopkgtest,
 	)
 	if err != nil {
 		return nil, err

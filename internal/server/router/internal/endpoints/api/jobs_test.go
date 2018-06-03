@@ -18,7 +18,7 @@ func TestJobsNextPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	testRouter.DB.CreateJob(models.JobTypeBuild, uint(3))
+	testRouter.Services.Jobs().CreateBuildJob(uint(3))
 
 	job, err := apiClient.UnqueueNextJob()
 	assert.NoError(t, err)
@@ -55,7 +55,7 @@ func TestJobGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	_, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	_, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 
 	job, err := apiClient.GetJob(uint(1))
@@ -88,7 +88,7 @@ func TestJobStatusPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 	assert.NotEqual(t, models.JobStatusFailed, job.Status)
 
@@ -112,7 +112,7 @@ func TestJobLogPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 
 	job.Status = models.JobStatusAssigned
@@ -142,29 +142,29 @@ func TestJobArtifactPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.DB.CreateJob(models.JobTypeBuild, 1)
+	job, err := testRouter.Services.Jobs().CreateBuildJob(1)
 	assert.NoError(t, err)
 
 	job.Status = models.JobStatusAssigned
 	err = testRouter.DB.UpdateJob(job)
 	assert.NoError(t, err)
 
-	err = apiClient.SubmitJobArtifact(
+	artifact, err := apiClient.SubmitJobArtifact(
 		uint(1),
 		"test.txt",
 		strings.NewReader("test txt content"),
 	)
 	assert.NoError(t, err)
+	assert.NotNil(t, artifact)
 
 	response := apiClient.LastRecorder()
 	assert.Equal(t, http.StatusCreated, response.Result().StatusCode)
-	assert.Equal(t, "", response.Body.String())
 
-	log, err := testRouter.AppCtx.JobsService().GetJobArtifact(uint(1), "test.txt")
+	artifactContent, err := testRouter.AppCtx.ArtifactsService().GetArtifactContent(artifact.ID)
 	assert.NoError(t, err)
-	defer log.Close()
+	defer artifactContent.Close()
 
-	b, err := ioutil.ReadAll(log)
+	b, err := ioutil.ReadAll(artifactContent)
 	assert.Equal(t, "test txt content", string(b))
 }
 
@@ -178,7 +178,7 @@ func TestJobLogTxtGetHandler(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, err = apiClient.GetJobLog(uint(1))
+	_, err = apiClient.GetJobLogContent(uint(1))
 	assert.NoError(t, err)
 
 	response := apiClient.LastRecorder()
@@ -191,14 +191,14 @@ func TestJobArtifactGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	err := testRouter.AppCtx.JobsService().SaveJobArtifact(
+	_, err := testRouter.AppCtx.ArtifactsService().CreateArtifact(
 		uint(1),
 		"test.txt",
 		strings.NewReader("test content"),
 	)
 	require.NoError(t, err)
 
-	_, err = apiClient.GetJobArtifact(uint(1), "test.txt")
+	_, err = apiClient.GetJobArtifactContent(uint(1), "test.txt")
 	assert.NoError(t, err)
 
 	response := apiClient.LastRecorder()
@@ -211,7 +211,7 @@ func TestJobsArtifactsGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	err := testRouter.AppCtx.JobsService().SaveJobArtifact(
+	_, err := testRouter.AppCtx.ArtifactsService().CreateArtifact(
 		uint(1),
 		"test.txt",
 		strings.NewReader("test content"),
@@ -222,7 +222,7 @@ func TestJobsArtifactsGetHandler(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobArtifacts))
 
-	expected := &models.JobArtifact{
+	expected := &models.Artifact{
 		ID:       uint(1),
 		JobID:    uint(1),
 		Filename: "test.txt",
@@ -238,7 +238,7 @@ func TestJobLogTxtGetHandlerNotFound(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	log, err := apiClient.GetJobLog(uint(1))
+	log, err := apiClient.GetJobLogContent(uint(1))
 	assert.NoError(t, err)
 	assert.Nil(t, log)
 

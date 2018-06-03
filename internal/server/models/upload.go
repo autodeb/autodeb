@@ -8,4 +8,7 @@ type Upload struct {
 	Version    string
 	Maintainer string
 	ChangedBy  string
+
+	// Parameters
+	Autopkgtest bool //whether or not to run autopkgtest
 }

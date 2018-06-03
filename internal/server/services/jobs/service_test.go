@@ -16,7 +16,7 @@ import (
 func setupTest(t *testing.T) *Service {
 	db := databasetest.SetupTest(t)
 	fs := filesystem.NewMemMapFS()
-	service := New(db, fs)
+	service := New(db, nil, fs)
 	return service
 }
 
@@ -50,43 +50,6 @@ func TestSaveJobLog(t *testing.T) {
 	defer logFile.Close()
 	b, _ := ioutil.ReadAll(logFile)
 	assert.Equal(t, "Hello", string(b))
-}
-
-func TestSaveJobArtifact(t *testing.T) {
-	jobsService := setupTest(t)
-
-	artifacts, err := jobsService.GetAllJobArtifactsByJobID(uint(1))
-	assert.NoError(t, err)
-	assert.Equal(t, 0, len(artifacts))
-
-	jobArtifactsDirectory := filepath.Join(
-		jobsService.jobsDirectory(),
-		"1",
-		"artifacts",
-	)
-	_, err = jobsService.fs.Stat(jobArtifactsDirectory)
-	require.Error(t, err, "the job artifacts directory should not exist")
-
-	err = jobsService.SaveJobArtifact(
-		uint(1),
-		"artifact.txt",
-		strings.NewReader("job artifact"),
-	)
-
-	_, err = jobsService.fs.Stat(jobArtifactsDirectory)
-	require.NoError(t, err, "the job artifacts directory should exist")
-
-	_, err = jobsService.fs.Stat(filepath.Join(jobArtifactsDirectory, "artifact.txt"))
-	require.NoError(t, err, "the job artifact should exist")
-
-	artifact, _ := jobsService.GetJobArtifact(uint(1), "artifact.txt")
-	defer artifact.Close()
-	b, _ := ioutil.ReadAll(artifact)
-	assert.Equal(t, "job artifact", string(b))
-
-	artifacts, err = jobsService.GetAllJobArtifactsByJobID(uint(1))
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(artifacts))
 }
 
 func TestGetJobLog(t *testing.T) {

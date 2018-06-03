@@ -17,4 +17,7 @@ func TestSetupDataDirectory(t *testing.T) {
 
 	_, err = fs.Stat("jobs")
 	assert.NoError(t, err, "the directory should have been created")
+
+	_, err = fs.Stat("artifacts")
+	assert.NoError(t, err, "the directory should have been created")
 }

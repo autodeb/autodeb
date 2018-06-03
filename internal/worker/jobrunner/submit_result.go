@@ -44,7 +44,7 @@ func (jobRunner *JobRunner) submitJobArtifacts(job *models.Job, artifactsDirecto
 		}
 		defer artifact.Close()
 
-		if err := jobRunner.apiClient.SubmitJobArtifact(job.ID, file.Name(), artifact); err != nil {
+		if _, err := jobRunner.apiClient.SubmitJobArtifact(job.ID, file.Name(), artifact); err != nil {
 			jobRunner.logger.Errorf("Could not submit job artifact: %+v", err)
 			return
 		}

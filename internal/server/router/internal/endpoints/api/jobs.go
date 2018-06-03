@@ -131,7 +131,7 @@ func JobArtifactsGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		jobArtifacts, err := appCtx.JobsService().GetAllJobArtifactsByJobID(uint(jobID))
+		jobArtifacts, err := appCtx.ArtifactsService().GetAllArtifactsByJobID(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -172,7 +172,20 @@ func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		file, err := appCtx.JobsService().GetJobArtifact(uint(jobID), filename)
+		artifacts, err := appCtx.ArtifactsService().GetAllArtifactsByJobIDFilename(
+			uint(jobID),
+			filename,
+		)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if len(artifacts) == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		file, err := appCtx.ArtifactsService().GetArtifactContent(artifacts[0].ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -291,7 +304,7 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 
 		// Update the job
 		job.Status = newStatus
-		if err := appCtx.JobsService().UpdateJob(job); err != nil {
+		if err := appCtx.JobsService().SetJobStatus(job.ID, newStatus); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -341,13 +354,22 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 		}
 
 		// Save the artifact
-		if err := appCtx.JobsService().SaveJobArtifact(uint(jobID), filename, r.Body); err != nil {
+		artifact, err := appCtx.ArtifactsService().CreateArtifact(uint(jobID), filename, r.Body)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
+		b, err := json.Marshal(artifact)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
+		jsonArtifact := string(b)
+
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprint(w, jsonArtifact)
 	}
 
 	handler := auth.WithUserOr403(handlerFunc, appCtx)

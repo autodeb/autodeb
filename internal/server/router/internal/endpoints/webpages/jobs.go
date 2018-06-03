@@ -59,7 +59,7 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		artifacts, err := appCtx.JobsService().GetAllJobArtifactsByJobID(uint(jobID))
+		artifacts, err := appCtx.ArtifactsService().GetAllArtifactsByJobID(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -67,7 +67,7 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 
 		data := struct {
 			Job       *models.Job
-			Artifacts []*models.JobArtifact
+			Artifacts []*models.Artifact
 		}{
 			Job:       job,
 			Artifacts: artifacts,

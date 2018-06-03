@@ -130,6 +130,14 @@ func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, jobDir
 			jobDirectory.artifactsDirectory,
 			jobDirectory.logFile,
 		)
+	case models.JobTypeAutopkgtest:
+		return jobRunner.execAutopkgtest(
+			ctx,
+			job,
+			jobDirectory.workingDirectory,
+			jobDirectory.artifactsDirectory,
+			jobDirectory.logFile,
+		)
 	default:
 		jobRunner.logger.Errorf("Unknown job type: %s", job.Type)
 		return errors.Errorf("unknown job type: %s", job.Type)

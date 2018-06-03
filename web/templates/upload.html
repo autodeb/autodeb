@@ -1,4 +1,4 @@
-{{ define "title" }}Uploads{{ end }}
+{{ define "title" }}Upload #{{ $.Data.Upload.ID }}{{ end }}
 
 {{ define "content" }}
 
@@ -29,6 +29,12 @@
     <tr>
         <th>ChangedBy</th>
         <td>{{ $.Data.Upload.ChangedBy }}</td>
+    </tr>
+    <tr>
+        <th>Debian Source Control (.dsc)</th>
+        <td>
+            <a href="/api/uploads/{{ $.Data.Upload.ID }}/source.dsc">dsc</a>
+        </td>
     </tr>
 </table>
 

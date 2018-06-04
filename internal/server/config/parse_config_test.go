@@ -90,7 +90,7 @@ backend = "test-backend"
 	assert.NotNil(t, cfg)
 
 	// Base config
-	assert.Equal(t, "test-server-url", cfg.ServerURL.Hostname())
+	assert.Equal(t, "https://test-server-url:1234", cfg.ServerURL.String())
 	assert.Equal(t, "test-data-directory", cfg.DataDirectory)
 	assert.Equal(t, "test-static-files-directory", cfg.StaticFilesDirectory)
 	assert.Equal(t, false, cfg.TemplatesCacheEnabled)

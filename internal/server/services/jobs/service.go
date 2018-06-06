@@ -72,11 +72,14 @@ func (service *Service) UnqueueNextJob() (*models.Job, error) {
 		return nil, nil
 	}
 
-	job.Status = models.JobStatusAssigned
-	err = service.db.UpdateJob(job)
-	if err != nil {
+	newStatus := models.JobStatusAssigned
+
+	if err := service.db.ChangeJobStatus(job.ID, newStatus); err != nil {
 		return nil, err
 	}
+
+	// Set the status for the caller
+	job.Status = newStatus
 
 	return job, err
 }

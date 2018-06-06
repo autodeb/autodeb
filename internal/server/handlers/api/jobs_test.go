@@ -22,6 +22,7 @@ func TestJobsNextPostHandler(t *testing.T) {
 
 	job, err := apiClient.UnqueueNextJob()
 	assert.NoError(t, err)
+	assert.NotNil(t, job)
 
 	expected := &models.Job{
 		ID:       uint(1),

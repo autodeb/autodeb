@@ -1,6 +1,7 @@
 package database
 
 import (
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 
 	"github.com/jinzhu/gorm"
@@ -31,6 +32,37 @@ func (db *Database) GetAllJobs() ([]*models.Job, error) {
 	}
 
 	return jobs, nil
+}
+
+// ChangeJobStatus will change a job's status. This is not
+// idempotent and will cause an error if the status was not modified.
+func (db *Database) ChangeJobStatus(jobID uint, newStatus models.JobStatus) error {
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	).Where(
+		&models.Job{
+			ID: jobID,
+		},
+	).Not(
+		&models.Job{
+			Status: newStatus,
+		},
+	).Update(
+		&models.Job{
+			Status: newStatus,
+		},
+	)
+
+	if err := query.Error; err != nil {
+		return err
+	}
+
+	if query.RowsAffected < 1 {
+		return errors.Errorf("could not update job id %d to status %s", jobID, newStatus)
+	}
+
+	return nil
 }
 
 // GetAllJobsByUploadID returns all jobs for an upload

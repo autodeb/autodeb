@@ -26,8 +26,9 @@ func Parse(r *http.Request) (*uploads.UploadParameters, error) {
 
 	// Create the UploadParameters with default values
 	uploadParameters := uploads.UploadParameters{
-		Filename:    filename,
-		Autopkgtest: true,
+		Filename:      filename,
+		Autopkgtest:   true,
+		ForwardUpload: false,
 	}
 
 	// Get parameters from method #2

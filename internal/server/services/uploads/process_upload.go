@@ -47,7 +47,7 @@ func (service *Service) ProcessUpload(uploadParameters *UploadParameters, conten
 	case ".deb":
 		return nil, &uploadError{errors.New("only source uploads are accepted"), true}
 	default:
-		err := service.processFileUpload(uploadFileName, content)
+		_, err := service.processFileUpload(uploadFileName, content)
 		return nil, err
 	}
 
@@ -88,6 +88,15 @@ func (service *Service) processChangesUpload(filename string, content io.Reader,
 		return nil, err
 	}
 
+	//Process the .changes file upload
+	fileUpload, err := service.processFileUpload(filename, bytes.NewReader(contentBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	// Append the .changes file to the file uploads
+	fileUploads = append(fileUploads, fileUpload)
+
 	//Create the upload
 	upload, err := service.db.CreateUpload(
 		signerID,
@@ -98,16 +107,6 @@ func (service *Service) processChangesUpload(filename string, content io.Reader,
 		uploadParameters.Autopkgtest,
 	)
 	if err != nil {
-		return nil, err
-	}
-
-	//Save the .changes file
-	if err := writeDataToDestInFS(
-		bytes.NewReader(contentBytes),
-		filepath.Join(service.UploadsDirectory(), fmt.Sprint(upload.ID)),
-		filename,
-		service.fs,
-	); err != nil {
 		return nil, err
 	}
 
@@ -195,23 +194,23 @@ func (service *Service) getChangesFileUploads(changes *control.Changes) ([]*mode
 	return fileUploads, nil
 }
 
-func (service *Service) processFileUpload(filename string, content io.Reader) error {
+func (service *Service) processFileUpload(filename string, content io.Reader) (*models.FileUpload, error) {
 	// Save the upload to a temp file on the os's filesystem so that we can
 	// calculate the shasum
 	tmpfileName, err := writeToTempfile(content)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer os.Remove(tmpfileName)
 
 	shasum, err := sha256.Sum256HexFile(tmpfileName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fileUpload, err := service.db.CreateFileUpload(filename, shasum, time.Now())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	destDir := filepath.Join(service.UploadedFilesDirectory(), fmt.Sprint(fileUpload.ID))
@@ -219,17 +218,19 @@ func (service *Service) processFileUpload(filename string, content io.Reader) er
 	// Open the temporary file
 	tmpFile, err := os.Open(tmpfileName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer tmpFile.Close()
 
 	// Write the upload in the fileStorage
-	err = writeDataToDestInFS(
+	if err := writeDataToDestInFS(
 		tmpFile,
 		destDir,
 		filename,
 		service.fs,
-	)
+	); err != nil {
+		return nil, err
+	}
 
-	return err
+	return fileUpload, err
 }

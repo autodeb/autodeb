@@ -65,6 +65,44 @@ func (db *Database) ChangeJobStatus(jobID uint, newStatus models.JobStatus) erro
 	return nil
 }
 
+// GetAllJobsByUploadIDStatuses returns all jobs that match the given id and statuses
+func (db *Database) GetAllJobsByUploadIDStatuses(uploadID uint, statuses ...models.JobStatus) ([]*models.Job, error) {
+	var jobs []*models.Job
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	)
+
+	// The first status is the first where clause
+	if len(statuses) > 0 {
+		status := statuses[0]
+		statuses = statuses[0:]
+
+		query = query.Where(
+			&models.Job{
+				UploadID: uploadID,
+				Status:   status,
+			},
+		)
+	}
+
+	// All the other statuses are in Or clauses
+	for _, status := range statuses[0:] {
+		query = query.Or(
+			&models.Job{
+				UploadID: uploadID,
+				Status:   status,
+			},
+		)
+	}
+
+	if err := query.Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
 // GetAllJobsByUploadID returns all jobs for an upload
 func (db *Database) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, error) {
 	var jobs []*models.Job

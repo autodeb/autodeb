@@ -62,6 +62,25 @@ func (service *Service) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, erro
 	return service.db.GetAllJobsByUploadID(uploadID)
 }
 
+// GetAllUncompletedJobsByUploadID returns all uncompleted jobs for a given upload
+func (service *Service) GetAllUncompletedJobsByUploadID(uploadID uint) ([]*models.Job, error) {
+	jobs, err := service.db.GetAllJobsByUploadIDStatuses(
+		uploadID,
+		models.JobStatusAssigned,
+		models.JobStatusQueued,
+	)
+	return jobs, err
+}
+
+// GetAllFailedJobsByUploadID returns all failed jobs for a given upload
+func (service *Service) GetAllFailedJobsByUploadID(uploadID uint) ([]*models.Job, error) {
+	jobs, err := service.db.GetAllJobsByUploadIDStatuses(
+		uploadID,
+		models.JobStatusFailed,
+	)
+	return jobs, err
+}
+
 // UnqueueNextJob returns the next job and marks it as assigned
 func (service *Service) UnqueueNextJob() (*models.Job, error) {
 	job, err := service.db.GetNextJob()
@@ -92,6 +111,11 @@ func (service *Service) CreateBuildJob(uploadID uint) (*models.Job, error) {
 // CreateAutopkgtestJob creates an autopkgtest job for the provided .deb artifact id
 func (service *Service) CreateAutopkgtestJob(uploadID uint, debJobArtifactID uint) (*models.Job, error) {
 	return service.db.CreateJob(models.JobTypeAutopkgtest, uploadID, debJobArtifactID)
+}
+
+// CreateForwardJob creates a forward job
+func (service *Service) CreateForwardJob(uploadID uint) (*models.Job, error) {
+	return service.db.CreateJob(models.JobTypeForward, uploadID, 0)
 }
 
 // GetJob returns the job with the given id

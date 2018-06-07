@@ -1,9 +1,5 @@
 package models
 
-import (
-	"fmt"
-)
-
 // JobType is the type of job
 type JobType int
 
@@ -12,18 +8,19 @@ const (
 	JobTypeUnknown JobType = iota
 	JobTypeBuild
 	JobTypeAutopkgtest
+	JobTypeForward
 )
 
 func (jt JobType) String() string {
 	switch jt {
-	case JobTypeUnknown:
-		return "unknown"
 	case JobTypeBuild:
 		return "build"
 	case JobTypeAutopkgtest:
 		return "autopkgtest"
+	case JobTypeForward:
+		return "forward"
 	default:
-		panic(fmt.Sprintf("Unknown job type %d", jt))
+		return "unknown"
 	}
 }
 
@@ -41,8 +38,6 @@ const (
 
 func (js JobStatus) String() string {
 	switch js {
-	case JobStatusUnknown:
-		return "unknown"
 	case JobStatusQueued:
 		return "queued"
 	case JobStatusAssigned:
@@ -52,7 +47,7 @@ func (js JobStatus) String() string {
 	case JobStatusFailed:
 		return "failed"
 	default:
-		panic(fmt.Sprintf("Unknown job status %d", js))
+		return "unknown"
 	}
 }
 

@@ -11,6 +11,7 @@ func (db *Database) CreateUpload(
 	userID uint,
 	source, version, maintainer, changedBy string,
 	autopkgtest bool,
+	forward bool,
 ) (*models.Upload, error) {
 	upload := &models.Upload{
 		UserID:      userID,
@@ -19,6 +20,7 @@ func (db *Database) CreateUpload(
 		Maintainer:  maintainer,
 		ChangedBy:   changedBy,
 		Autopkgtest: autopkgtest,
+		Forward:     forward,
 	}
 
 	if err := db.gormDB.Create(upload).Error; err != nil {

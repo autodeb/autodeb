@@ -96,6 +96,7 @@ func (service *Service) processChangesUpload(filename string, content io.Reader,
 		changes.Maintainer,
 		changes.ChangedBy,
 		uploadParameters.Autopkgtest,
+		uploadParameters.ForwardUpload,
 	)
 	if err != nil {
 		return nil, err

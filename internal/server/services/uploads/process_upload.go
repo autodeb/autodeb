@@ -143,14 +143,24 @@ func (service *Service) moveFileUpload(fileUpload *models.FileUpload, upload *mo
 		fileUpload.Filename,
 	)
 
-	dest := filepath.Join(
+	destFolder := filepath.Join(
 		service.UploadsDirectory(),
 		fmt.Sprint(upload.ID),
+	)
+
+	destFile := filepath.Join(
+		destFolder,
 		fileUpload.Filename,
 	)
 
-	if err := service.fs.Rename(source, dest); err != nil {
-		return errors.Errorf("could not move %s to %s", source, dest)
+	if _, err := service.fs.Stat(destFolder); os.IsNotExist(err) {
+		if err := service.fs.MkdirAll(destFolder, 0755); err != nil {
+			return errors.WithMessage(err, "could not create destination directory")
+		}
+	}
+
+	if err := service.fs.Rename(source, destFile); err != nil {
+		return errors.Errorf("could not move %s to %s", source, destFile)
 	}
 
 	fileUpload.Completed = true

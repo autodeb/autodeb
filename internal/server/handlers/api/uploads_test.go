@@ -49,7 +49,7 @@ func TestUploadGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	upload, err := testRouter.DB.CreateUpload(1, "testSource", "testVersion", "testMaintainer", "testChangedBy", true)
+	upload, err := testRouter.DB.CreateUpload(1, "testSource", "testVersion", "testMaintainer", "testChangedBy", true, true)
 	assert.NoError(t, err)
 
 	returnedUpload, err := apiClient.GetUpload(upload.ID)

@@ -72,6 +72,7 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/artifacts/{filename}").Handler(api.JobArtifactGetHandler(appCtx)).Methods(http.MethodGet)
 
 	// ==== Uploads API ====
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}").Handler(api.UploadGetHandler(appCtx)).Methods(http.MethodGet)
 
 	// these routes are kept for dget compatibility. Dget requires that the URL ends with /<something>.dsc (TODO: open a bug)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/source.dsc").Handler(api.UploadDSCGetHandler(appCtx)).Methods(http.MethodGet)

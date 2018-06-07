@@ -10,6 +10,26 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
+// GetUpload will retrieve an upload by its id
+func (c *APIClient) GetUpload(jobID uint) (*models.Upload, error) {
+	var upload models.Upload
+
+	response, err := c.getJSON(
+		fmt.Sprintf("/api/uploads/%d", jobID),
+		&upload,
+	)
+
+	if response != nil && response.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &upload, nil
+}
+
 // GetUploadDSCURL returns the .dsc URL for a given upload
 func (c *APIClient) GetUploadDSCURL(uploadID uint) *url.URL {
 	dscURL := c.url(

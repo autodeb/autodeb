@@ -45,6 +45,22 @@ func TestUploadDSCGetHandler(t *testing.T) {
 	assert.Equal(t, "Hello", response.Body.String())
 }
 
+func TestUploadGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+	apiClient := testRouter.APIClient
+
+	upload, err := testRouter.DB.CreateUpload(1, "testSource", "testVersion", "testMaintainer", "testChangedBy", true, true)
+	assert.NoError(t, err)
+
+	returnedUpload, err := apiClient.GetUpload(upload.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, upload, returnedUpload)
+
+	response := apiClient.LastRecorder()
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.Equal(t, "application/json", response.Result().Header.Get("Content-Type"))
+}
+
 func TestUploadChangesGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient

@@ -46,6 +46,45 @@ func UploadDSCGetHandler(appCtx *appctx.Context) http.Handler {
 	return handler
 }
 
+//UploadGetHandler returns a handler that returns an upload
+func UploadGetHandler(appCtx *appctx.Context) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		uploadID, err := strconv.Atoi(vars["uploadID"])
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		upload, err := appCtx.UploadsService().GetUpload(uint(uploadID))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if upload == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		b, err := json.Marshal(upload)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		jsonUpload := string(b)
+
+		fmt.Fprint(w, jsonUpload)
+	}
+
+	handler := http.Handler(http.HandlerFunc(handlerFunc))
+
+	handler = middleware.JSONHeaders(handler)
+
+	return handler
+}
+
 //UploadChangesGetHandler returns handler the DSC of the upload
 func UploadChangesGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request) {

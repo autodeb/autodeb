@@ -45,6 +45,40 @@ func TestUploadDSCGetHandler(t *testing.T) {
 	assert.Equal(t, "Hello", response.Body.String())
 }
 
+func TestUploadChangesGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+	apiClient := testRouter.APIClient
+	uploadsService := testRouter.AppCtx.UploadsService()
+
+	uploadDir := filepath.Join(uploadsService.UploadsDirectory(), "1")
+
+	err := uploadsService.FS().MkdirAll(uploadDir, 0644)
+	assert.NoError(t, err)
+
+	dsc, err := uploadsService.FS().Create(filepath.Join(uploadDir, "test.changes"))
+	assert.NoError(t, err)
+	dsc.Write([]byte("Hello"))
+	dsc.Close()
+
+	testRouter.DB.CreateFileUpload("test.changes", "shasum", time.Now())
+
+	fileUpload, err := testRouter.DB.GetFileUpload(uint(1))
+	assert.NotNil(t, fileUpload)
+	assert.NoError(t, err)
+
+	fileUpload.UploadID = 1
+	err = testRouter.DB.UpdateFileUpload(fileUpload)
+	assert.NoError(t, err)
+
+	_, err = apiClient.GetUploadChanges(uint(1))
+	assert.NoError(t, err)
+
+	response := apiClient.LastRecorder()
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.Equal(t, "text/plain", response.Result().Header.Get("Content-Type"))
+	assert.Equal(t, "Hello", response.Body.String())
+}
+
 func TestUploadDSCGetHandlerNotFound(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient

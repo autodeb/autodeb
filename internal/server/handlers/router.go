@@ -72,9 +72,13 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/artifacts/{filename}").Handler(api.JobArtifactGetHandler(appCtx)).Methods(http.MethodGet)
 
 	// ==== Uploads API ====
-	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/dsc").Handler(api.UploadDSCGetHandler(appCtx)).Methods(http.MethodGet)
-	// This route is kept for dget compatibility. Dget requires that the URL ends with /<something>.dsc (TODO: open a bug)
+
+	// these routes are kept for dget compatibility. Dget requires that the URL ends with /<something>.dsc (TODO: open a bug)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/source.dsc").Handler(api.UploadDSCGetHandler(appCtx)).Methods(http.MethodGet)
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/package.changes").Handler(api.UploadChangesGetHandler(appCtx)).Methods(http.MethodGet)
+
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/dsc").Handler(api.UploadDSCGetHandler(appCtx)).Methods(http.MethodGet)
+	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/changes").Handler(api.UploadChangesGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/files").Handler(api.UploadFilesGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/uploads/{uploadID:[0-9]+}/{filename}").Handler(api.UploadFileGetHandler(appCtx)).Methods(http.MethodGet)
 

@@ -88,6 +88,22 @@ func (service *Service) GetUploadDSC(uploadID uint) (io.ReadCloser, error) {
 	return nil, nil
 }
 
+// GetUploadChanges returns the .changes of the upload with a matching id
+func (service *Service) GetUploadChanges(uploadID uint) (io.ReadCloser, error) {
+	fileUploads, err := service.GetAllFileUploadsByUploadID(uploadID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fileUpload := range fileUploads {
+		if strings.HasSuffix(fileUpload.Filename, ".changes") {
+			return service.GetUploadFile(uploadID, fileUpload.Filename)
+		}
+	}
+
+	return nil, nil
+}
+
 // GetUploadFile returns the file associated with the upload id and filename
 func (service *Service) GetUploadFile(uploadID uint, filename string) (io.ReadCloser, error) {
 	file, err := service.fs.Open(

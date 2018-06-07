@@ -218,6 +218,13 @@ func TestProcessChanges(t *testing.T) {
 
 	fileUpload, err := db.GetFileUpload(uint(1))
 	assert.NoError(t, err)
+	assert.Equal(t, "test.dsc", fileUpload.Filename)
+	assert.Equal(t, true, fileUpload.Completed)
+	assert.Equal(t, uint(1), fileUpload.UploadID)
+
+	fileUpload, err = db.GetFileUpload(uint(2))
+	assert.NoError(t, err)
+	assert.Equal(t, "test.changes", fileUpload.Filename)
 	assert.Equal(t, true, fileUpload.Completed)
 	assert.Equal(t, uint(1), fileUpload.UploadID)
 

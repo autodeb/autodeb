@@ -1,0 +1,83 @@
+{{ define "title" }}autodeb{{ end }}
+
+{{ define "content" }}
+<h2>Instructions</h2>
+<hr>
+
+<h3>Table of contents</h3>
+<hr>
+
+<ol>
+    <li>
+        <a href="#getting-started">Getting Started</a>
+    </li>
+    <li>
+        <a href="#upload-parameters">Upload parameters</a>
+    </li>
+</ol>
+
+<h3 id="getting-started">Getting Started</h3>
+<hr>
+
+<p>
+    Take a look at our getting started guide on the <a href="/#getting-started">home page</a>.
+</p>
+
+<h3 id="upload-parameters">Upload parameters</h3>
+<hr>
+
+<p>
+    Upload parameters are options associated with the uploads that you make to Autodeb. They are used to
+    configure behaviours such as whether or not Autodeb should run Autopkgtests or if your upload should
+    be forwarded to the ftp-master queue if all jobs succeed.
+</p>
+
+<p>
+    Upload parameters can be set in <span class="font-italic">~/.dput.cf</span> by appending
+    slash-separated key-value couples to the queue URL.
+</p>
+
+<p>
+    For example:
+</p>
+
+<ul>
+    <li>
+        <code>/upload</code>: no upload parameters are set, use defaults.
+    </li>
+    <li>
+        <code>/upload/autopkgtest/true</code>: this sets <span class="font-italic">autopkgtest</span> to <span class="font-italic">true</span>.
+    </li>
+    <li>
+        <code>/upload/forward_upload/false</code>: this sets <span class="font-italic">forward_upload</span> to <span class="font-italic">false</span>.
+    </li>
+    <li>
+        <code>/upload/forward_upload/true/autopkgtest/false</code>: this sets
+        <span class="font-italic">forward_upload</span> to <span class="font-italic">true</span> and
+        <span class="font-italic">autopkgtest</span> to <span class="font-italic">false</span>.
+    </li>
+</ul>
+
+<p>
+    This means that you could configure multiple autodeb hosts in <span class="font-italic">~/.dput.cf</span>
+    and select which to use depending on the situation:
+</p>
+
+<pre>
+<code>
+[autodeb-forward]
+# [...]
+incoming = /upload/forward-upload/true
+
+[autodeb]
+# [...]
+incoming = /upload
+</code>
+</pre>
+
+<p>
+    NOTE: dput uploads packages with a series of HTTP PUT requests. The only upload parameters that
+    are considered are the ones that are set when uploading the .changes file.
+</p>
+
+{{ end }}

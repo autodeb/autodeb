@@ -23,8 +23,8 @@
                 <td>{{ .Name }}</td>
                 <td class="text-center">
                     <form action="/profile/remove-access-token" method="post">
-                        <input type="hidden" name="tokenid" value="{{ .ID }}"></input>
-                        <input type="submit" value="x" class="btn btn-outline-danger font-weight-bold"/>
+                        <input type="hidden" name="tokenid" value="{{ .ID }}">
+                        <input type="submit" value="x" class="btn btn-outline-danger font-weight-bold">
                     </form>
                 </td>
             </tr>
@@ -46,7 +46,7 @@
                 <label>Name:</label>
                 <input class="form-control" type="text" name="name"/>
             </div>
-            <input type="submit" value="Create access token" class="btn btn-primary"></input>
+            <input type="submit" value="Create access token" class="btn btn-primary">
         </form>
     </div>
 </div>

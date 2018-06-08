@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>{{ block "title" . }}{{ end }}</title>
         <!-- favicon -->
@@ -54,18 +54,27 @@
                         {{ end }}
                         <div class="card my-3">
                             <div class="card-header">
+                                <strong>Documentation</strong>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <a class="list-group-item" href="/instructions">Instructions</a>
+                            </ul>
+                        </div>
+                        <div class="card my-3">
+                            <div class="card-header">
                                 <strong>Account</strong>
                             </div>
                             <ul class="list-group list-group-flush">
                                 {{ if .User }}
                                     <a class="list-group-item" href="/profile">Profile ({{ .User.Username }})</a>
-                                    <a class="list-group-item" href="/profile/pgp-keys">PGP Keys<a>
-                                    <a class="list-group-item" href="/profile/access-tokens">Access Tokens<a>
+                                    <a class="list-group-item" href="/profile/pgp-keys">PGP Keys</a>
+                                    <a class="list-group-item" href="/profile/access-tokens">Access Tokens</a>
                                     <a class="list-group-item" href="/logout">Logout</a>
                                 {{ else }}
                                     <a class="list-group-item" href="/login">Login</a>
                                 {{ end }}
                             </ul>
+                        </div>
                     </aside>
                 </div>
 

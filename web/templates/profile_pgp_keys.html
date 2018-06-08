@@ -23,8 +23,8 @@
                 <td>{{ .Fingerprint }}</td>
                 <td class="text-center">
                     <form action="/profile/remove-pgp-key" method="post">
-                        <input type="hidden" name="keyid" value="{{ .ID }}"></input>
-                        <input type="submit" value="x" class="btn btn-outline-danger font-weight-bold"/>
+                        <input type="hidden" name="keyid" value="{{ .ID }}">
+                        <input type="submit" value="x" class="btn btn-outline-danger font-weight-bold">
                     </form>
                 </td>
             </tr>
@@ -55,18 +55,18 @@
 
         <div class="form-group">
             <label><strong>Public key (armored):</strong></label>
-            <pre><code>$ gpg --armor --export-options export-minimal --export &ltfingerprint&gt</code></pre>
+            <pre><code>$ gpg --armor --export-options export-minimal --export &lt;fingerprint&gt;</code></pre>
             <textarea name="key" form="form-add-pgp-key" class="form-control" placeholder="public key"></textarea>
         </div>
 
         <div class="form-group">
             <label><strong>Signed proof:</strong></label>
-            <pre><code>$ echo "{{ $.Data.ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&ltfingerprint&gt</code></pre>
+            <pre><code>$ echo "{{ $.Data.ExpectedPGPKeyProofText }}" | gpg --clearsign --sign-with=&lt;fingerprint&gt;</code></pre>
             <textarea name="proof" form="form-add-pgp-key" class="form-control" placeholder="signed proof"></textarea>
         </div>
 
         <form action="/profile/add-pgp-key" id="form-add-pgp-key" method="post">
-            <input type="submit" value="Add PGP key" class="btn btn-primary"></input>
+            <input type="submit" value="Add PGP key" class="btn btn-primary">
         </form>
     </div>
 </div>

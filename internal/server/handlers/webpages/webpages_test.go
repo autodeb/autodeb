@@ -18,6 +18,7 @@ func TestWebPagesRender(t *testing.T) {
 		"/",
 		"/jobs",
 		"/uploads",
+		"/instructions",
 	}
 
 	// Pages that only render when authenticated

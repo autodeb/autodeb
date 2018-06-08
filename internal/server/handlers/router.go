@@ -37,7 +37,6 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.PathPrefix("/auth/").Handler(http.StripPrefix("/auth/", appCtx.AuthBackend().AuthHandler()))
 
 	// ==== Web pages: General ====
-
 	router.Path("/").Handler(webpages.IndexGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/instructions").Handler(webpages.InstructionsGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/uploads").Handler(webpages.UploadsGetHandler(appCtx)).Methods(http.MethodGet)

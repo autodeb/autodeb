@@ -7,7 +7,7 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/auth"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/middleware/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 

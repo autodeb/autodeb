@@ -23,17 +23,20 @@ func UploadsGetHandler(appCtx *appctx.Context) http.Handler {
 			userID, err := strconv.Atoi(param)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
+				appCtx.RequestLogger().Error(r, err)
 				return
 			}
 			uploads, err = appCtx.UploadsService().GetAllUploadsByUserID(uint(userID))
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
+				appCtx.RequestLogger().Error(r, err)
 				return
 			}
 		} else {
 			uploads, err = appCtx.UploadsService().GetAllUploads()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
+				appCtx.RequestLogger().Error(r, err)
 				return
 			}
 		}
@@ -62,12 +65,14 @@ func UploadGetHandler(appCtx *appctx.Context) http.Handler {
 		uploadID, err := strconv.Atoi(vars["uploadID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		upload, err := appCtx.UploadsService().GetUpload(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if upload == nil {
@@ -78,6 +83,7 @@ func UploadGetHandler(appCtx *appctx.Context) http.Handler {
 		jobs, err := appCtx.JobsService().GetAllJobsByUploadID(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

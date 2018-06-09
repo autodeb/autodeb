@@ -19,6 +19,7 @@ func JobsGetHandler(appCtx *appctx.Context) http.Handler {
 		jobs, err := appCtx.JobsService().GetAllJobs()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -46,12 +47,14 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if job == nil {
@@ -62,6 +65,7 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 		artifacts, err := appCtx.ArtifactsService().GetAllArtifactsByJobID(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

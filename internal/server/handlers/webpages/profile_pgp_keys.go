@@ -17,6 +17,7 @@ func ProfilePGPKeysGetHandler(appCtx *appctx.Context) http.Handler {
 		pgpKeys, err := appCtx.PGPService().GetUserPGPKeys(user.ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -44,6 +45,7 @@ func AddPGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -72,6 +74,7 @@ func RemovePGPKeyPostHandler(appCtx *appctx.Context) http.Handler {
 
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

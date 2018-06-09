@@ -68,6 +68,7 @@ func MaybeWithUser(fn UserHandlerFunc, appCtx *appctx.Context) http.Handler {
 		user, err := identifyUser(appCtx, r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

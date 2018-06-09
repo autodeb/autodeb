@@ -22,12 +22,14 @@ func UploadDSCGetHandler(appCtx *appctx.Context) http.Handler {
 		uploadID, err := strconv.Atoi(vars["uploadID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		dsc, err := appCtx.UploadsService().GetUploadDSC(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if dsc == nil {
@@ -54,12 +56,14 @@ func UploadGetHandler(appCtx *appctx.Context) http.Handler {
 		uploadID, err := strconv.Atoi(vars["uploadID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		upload, err := appCtx.UploadsService().GetUpload(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if upload == nil {
@@ -70,6 +74,7 @@ func UploadGetHandler(appCtx *appctx.Context) http.Handler {
 		b, err := json.Marshal(upload)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -93,12 +98,14 @@ func UploadChangesGetHandler(appCtx *appctx.Context) http.Handler {
 		uploadID, err := strconv.Atoi(vars["uploadID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		changes, err := appCtx.UploadsService().GetUploadChanges(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if changes == nil {
@@ -125,18 +132,21 @@ func UploadFilesGetHandler(appCtx *appctx.Context) http.Handler {
 		uploadID, err := strconv.Atoi(vars["uploadID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		fileUploads, err := appCtx.UploadsService().GetAllFileUploadsByUploadID(uint(uploadID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		b, err := json.Marshal(fileUploads)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -176,6 +186,7 @@ func UploadFileGetHandler(appCtx *appctx.Context) http.Handler {
 		file, err := appCtx.UploadsService().GetUploadFile(uint(uploadID), filename)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if file == nil {

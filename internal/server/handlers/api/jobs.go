@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/middleware/auth"
@@ -22,6 +23,7 @@ func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
 		job, err := appCtx.JobsService().UnqueueNextJob()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if job == nil {
@@ -32,6 +34,7 @@ func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
 		b, err := json.Marshal(job)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -55,12 +58,14 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if job == nil {
@@ -71,6 +76,7 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 		b, err := json.Marshal(job)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -95,12 +101,14 @@ func JobLogTxtGetHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		file, err := appCtx.JobsService().GetJobLog(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if file == nil {
@@ -128,18 +136,21 @@ func JobArtifactsGetHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		jobArtifacts, err := appCtx.ArtifactsService().GetAllArtifactsByJobID(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		b, err := json.Marshal(jobArtifacts)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -164,11 +175,13 @@ func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		filename, ok := vars["filename"]
 		if !ok {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -178,6 +191,7 @@ func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 		)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if len(artifacts) == 0 {
@@ -188,6 +202,7 @@ func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 		file, err := appCtx.ArtifactsService().GetArtifactContent(artifacts[0].ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if file == nil {
@@ -215,6 +230,7 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -222,6 +238,7 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if job == nil {
@@ -241,6 +258,7 @@ func JobLogPostHandler(appCtx *appctx.Context) http.Handler {
 		// Save the logs
 		if err := appCtx.JobsService().SaveJobLog(uint(jobID), r.Body); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -262,11 +280,13 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		jobStatus, err := strconv.Atoi(vars["jobStatus"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -286,6 +306,7 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if job == nil {
@@ -306,6 +327,7 @@ func JobStatusPostHandler(appCtx *appctx.Context) http.Handler {
 		job.Status = newStatus
 		if err := appCtx.JobsService().ProcessJobStatus(job.ID, newStatus); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -325,11 +347,13 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 		jobID, err := strconv.Atoi(vars["jobID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		filename, ok := vars["filename"]
 		if !ok {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, errors.New("filename not found"))
 			return
 		}
 
@@ -337,6 +361,7 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 		job, err := appCtx.JobsService().GetJob(uint(jobID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if job == nil {
@@ -357,12 +382,14 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 		artifact, err := appCtx.ArtifactsService().CreateArtifact(uint(jobID), filename, r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		b, err := json.Marshal(artifact)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

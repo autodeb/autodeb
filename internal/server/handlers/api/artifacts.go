@@ -21,12 +21,14 @@ func ArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 		artifactID, err := strconv.Atoi(vars["artifactID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		artifact, err := appCtx.ArtifactsService().GetArtifact(uint(artifactID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if artifact == nil {
@@ -37,6 +39,7 @@ func ArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 		b, err := json.Marshal(artifact)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -61,12 +64,14 @@ func ArtifactContentGetHandler(appCtx *appctx.Context) http.Handler {
 		artifactID, err := strconv.Atoi(vars["artifactID"])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
 		file, err := appCtx.ArtifactsService().GetArtifactContent(uint(artifactID))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 		if file == nil {

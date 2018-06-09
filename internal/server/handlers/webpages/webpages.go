@@ -34,8 +34,8 @@ func renderWithBase(
 
 	rendered, err := appCtx.TemplatesRenderer().RenderTemplate(completeData, "base.html", template)
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		appCtx.RequestLogger().Error(r, err)
 		return
 	}
 

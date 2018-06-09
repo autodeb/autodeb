@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 )
 
@@ -32,7 +33,7 @@ func NewRenderer(fs filesystem.FS, funcMap template.FuncMap, cacheEnabled bool) 
 func (renderer *Renderer) RenderTemplate(data interface{}, filenames ...string) (string, error) {
 	tmpl, err := renderer.getOrCreateTemplate(filenames...)
 	if err != nil {
-		return "", err
+		return "", errors.WithMessage(err, "cannot get template")
 	}
 
 	var buf bytes.Buffer
@@ -57,7 +58,7 @@ func (renderer *Renderer) getOrCreateTemplate(filenames ...string) (*template.Te
 
 	tmpl, err := renderer.createTemplate(filenames...)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "could not create template")
 	}
 
 	if renderer.cacheEnabled {
@@ -76,19 +77,19 @@ func (renderer *Renderer) createTemplate(filenames ...string) (*template.Templat
 
 		f, err := renderer.fs.Open(filename)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithMessage(err, "could not open template")
 		}
 		defer f.Close()
 
 		b, err := ioutil.ReadAll(f)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithMessage(err, "could not read template")
 		}
 
 		str := string(b)
 
 		if _, err := tmpl.Parse(str); err != nil {
-			return nil, err
+			return nil, errors.WithMessage(err, "could not parse template")
 		}
 	}
 

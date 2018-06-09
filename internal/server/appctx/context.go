@@ -7,6 +7,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 	"salsa.debian.org/autodeb-team/autodeb/internal/log"
+	httplog "salsa.debian.org/autodeb-team/autodeb/internal/log/http"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/config"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services"
@@ -60,6 +61,11 @@ func (ctx *Context) Sessions() *sessions.Manager {
 // Logger returns the logger
 func (ctx *Context) Logger() log.Logger {
 	return ctx.logger
+}
+
+// RequestLogger returns a request logger
+func (ctx *Context) RequestLogger() *httplog.RequestLogger {
+	return httplog.NewRequestLogger(ctx.Logger())
 }
 
 // AuthBackend returns the authentification service

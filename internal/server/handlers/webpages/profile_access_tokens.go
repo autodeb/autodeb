@@ -17,6 +17,7 @@ func ProfileAccessTokensGetHandler(appCtx *appctx.Context) http.Handler {
 		accessTokens, err := appCtx.TokensService().GetUserTokens(user.ID)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -41,6 +42,7 @@ func CreateAccessTokenPostHandler(appCtx *appctx.Context) http.Handler {
 
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
@@ -70,6 +72,7 @@ func RemoveAccessTokenPostHandler(appCtx *appctx.Context) http.Handler {
 
 		if err := r.ParseForm(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

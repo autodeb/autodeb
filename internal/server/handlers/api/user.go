@@ -19,6 +19,7 @@ func UserGetHandler(appCtx *appctx.Context) http.Handler {
 		b, err := json.Marshal(user)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 

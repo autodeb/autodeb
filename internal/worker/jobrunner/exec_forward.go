@@ -49,7 +49,7 @@ func (jobRunner *JobRunner) execForward(
 	// Run dput
 	if err := exec.RunCtxDirStdoutStderr(
 		ctx, workingDirectory, logFile, logFile,
-		"dput", newChangesPath,
+		"dput", "--unchecked", newChangesPath,
 	); err != nil {
 		return errors.WithMessage(err, "dput failed")
 	}

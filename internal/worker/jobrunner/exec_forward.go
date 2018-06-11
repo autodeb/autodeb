@@ -37,7 +37,7 @@ func (jobRunner *JobRunner) execForward(
 
 	// Rename the changes file
 	changesFileName := path.Base(changesURL.EscapedPath())
-	newChangesFileName := fmt.Sprintf("%s_%s.source.changes", upload.Source, upload.Version)
+	newChangesFileName := fmt.Sprintf("%s_%s_.source.changes", upload.Source, upload.Version)
 	newChangesPath := filepath.Join(workingDirectory, newChangesFileName)
 	if err := os.Rename(
 		filepath.Join(workingDirectory, changesFileName),

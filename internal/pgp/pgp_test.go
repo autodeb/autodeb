@@ -4,8 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"golang.org/x/crypto/openpgp"
-
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp"
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp/pgptest"
 
@@ -55,7 +53,7 @@ func TestClearsignMessage(t *testing.T) {
 }
 
 func TestEntitySignatures(t *testing.T) {
-	keyring, err := openpgp.ReadArmoredKeyRing(
+	keyring, err := pgp.ReadArmoredKeyRing(
 		strings.NewReader(pgptest.TestKeyPublicSigned),
 	)
 	assert.NoError(t, err)
@@ -67,7 +65,7 @@ func TestEntitySignatures(t *testing.T) {
 }
 
 func TestEntitySignaturesNoSignatures(t *testing.T) {
-	keyring, err := openpgp.ReadArmoredKeyRing(
+	keyring, err := pgp.ReadArmoredKeyRing(
 		strings.NewReader(pgptest.TestKeyPublic),
 	)
 	assert.NoError(t, err)

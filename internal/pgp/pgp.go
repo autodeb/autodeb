@@ -15,6 +15,12 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
+// Entity represents a PGP entity
+type Entity = openpgp.Entity
+
+// EntityList is a list of PGP entities
+type EntityList = openpgp.EntityList
+
 //Clearsign will sign a message with a cleartext signature and return
 //it as a string
 func Clearsign(msg io.Reader, key io.Reader) (string, error) {
@@ -54,7 +60,7 @@ func clearsignWriter(msg io.Reader, key io.Reader, w io.Writer) error {
 
 //VerifySignatureClearsignedKeyRing verifies the signature of a clearsigned gpg
 //message, returning the message contents and the signer's entity.
-func VerifySignatureClearsignedKeyRing(msg io.Reader, keyring openpgp.KeyRing) (string, *openpgp.Entity, error) {
+func VerifySignatureClearsignedKeyRing(msg io.Reader, keyring openpgp.KeyRing) (string, *Entity, error) {
 	msgBytes, err := ioutil.ReadAll(msg)
 	if err != nil {
 		return "", nil, err
@@ -81,7 +87,7 @@ func VerifySignatureClearsignedKeyRing(msg io.Reader, keyring openpgp.KeyRing) (
 
 //VerifySignatureClearsigned verifies the signature of a clearsigned gpg
 //message, returning the message contents and the signer's entity.
-func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *openpgp.Entity, error) {
+func VerifySignatureClearsigned(msg io.Reader, keys io.Reader) (string, *Entity, error) {
 	keyring, err := openpgp.ReadArmoredKeyRing(keys)
 	if err != nil {
 		return "", nil, errors.WithMessage(err, "could not read keyring")

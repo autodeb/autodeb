@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/crypto/openpgp"
-
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/pgp"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
@@ -121,14 +119,14 @@ func (service *Service) IdentifySigner(message io.Reader) (uint, error) {
 }
 
 // keyRing returns keyring that contains all known public keys
-func (service *Service) keyRing() (openpgp.EntityList, error) {
+func (service *Service) keyRing() (pgp.EntityList, error) {
 	pgpKeys, err := service.db.GetAllPGPKeys()
 	if err != nil {
 		return nil, err
 	}
 
 	if len(pgpKeys) == 0 {
-		var keyring []*openpgp.Entity
+		var keyring []*pgp.Entity
 		return keyring, nil
 	}
 

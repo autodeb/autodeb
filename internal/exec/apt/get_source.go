@@ -3,6 +3,7 @@ package apt
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,7 +21,7 @@ const (
 //getSourceFtpMasterAPI tries to mimic apt-get source but by using the
 //ftpmasterapi and dget.
 func getSourceFtpMasterAPI(pkg, distribution, directory string) error {
-	dscs, err := ftpmasterapi.GetDSCInSuite(pkg, distribution)
+	dscs, err := ftpmasterapi.NewClient(http.DefaultClient).GetDSCSInSuite(pkg, distribution)
 	if err != nil {
 		return errors.Errorf("ftpmasterapi error: %s", err)
 	}

@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +10,28 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
+
+// CreateJob will create a new job
+func (c *APIClient) CreateJob(job *models.Job) (*models.Job, error) {
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(job); err != nil {
+		return nil, errors.WithMessage(err, "could not encode job")
+	}
+
+	var createdJob models.Job
+
+	response, err := c.postJSON(
+		fmt.Sprintf("/api/jobs"),
+		&body,
+		&createdJob,
+	)
+
+	if response != nil && response.StatusCode != http.StatusCreated {
+		return nil, errors.WithMessagef(err, "unexpected status code %d", response.StatusCode)
+	}
+
+	return &createdJob, err
+}
 
 // GetJob will retrieve a job by ID
 func (c *APIClient) GetJob(jobID uint) (*models.Job, error) {

@@ -12,7 +12,7 @@ import (
 func TestChangeJobStatus(t *testing.T) {
 	dbTest := databasetest.SetupTest(t)
 
-	job, err := dbTest.CreateJob(models.JobTypeBuild, 1, 0)
+	job, err := dbTest.CreateJob(models.JobTypeBuild, "", models.JobParentTypeUpload, 22)
 	assert.NoError(t, err)
 	assert.NotNil(t, job)
 	assert.Equal(t, models.JobStatusQueued, job.Status)

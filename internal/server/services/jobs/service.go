@@ -103,19 +103,9 @@ func (service *Service) UnqueueNextJob() (*models.Job, error) {
 	return job, err
 }
 
-// CreateBuildJob creates a build job
-func (service *Service) CreateBuildJob(uploadID uint) (*models.Job, error) {
-	return service.db.CreateJob(models.JobTypeBuild, uploadID, 0)
-}
-
-// CreateAutopkgtestJob creates an autopkgtest job for the provided .deb artifact id
-func (service *Service) CreateAutopkgtestJob(uploadID uint, debJobArtifactID uint) (*models.Job, error) {
-	return service.db.CreateJob(models.JobTypeAutopkgtest, uploadID, debJobArtifactID)
-}
-
-// CreateForwardJob creates a forward job
-func (service *Service) CreateForwardJob(uploadID uint) (*models.Job, error) {
-	return service.db.CreateJob(models.JobTypeForward, uploadID, 0)
+//CreateJob creates a new job
+func (service *Service) CreateJob(jobType models.JobType, input string, parentType models.JobParentType, parentID uint) (*models.Job, error) {
+	return service.db.CreateJob(jobType, input, parentType, parentID)
 }
 
 // GetJob returns the job with the given id

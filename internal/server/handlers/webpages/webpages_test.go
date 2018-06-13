@@ -19,6 +19,7 @@ func TestWebPagesRender(t *testing.T) {
 		"/jobs",
 		"/uploads",
 		"/instructions",
+		"/archive-upgrades",
 	}
 
 	// Pages that only render when authenticated
@@ -26,6 +27,7 @@ func TestWebPagesRender(t *testing.T) {
 		"/profile",
 		"/profile/pgp-keys",
 		"/profile/access-tokens",
+		"/new-archive-upgrade",
 	}
 
 	// Test that the pages render when unauthenticated

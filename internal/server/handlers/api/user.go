@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/middleware"
@@ -15,17 +14,11 @@ import (
 func UserGetHandler(appCtx *appctx.Context) http.Handler {
 
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
-
-		b, err := json.Marshal(user)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(user); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
-
-		jsonUser := string(b)
-		fmt.Fprint(w, jsonUser)
-
 	}
 
 	handler := auth.WithUserOr403(handlerFunc, appCtx)

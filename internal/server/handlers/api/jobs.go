@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -15,6 +14,45 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/middleware/auth"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
+
+//JobsPostHandler returns a handler that creates a new job
+func JobsPostHandler(appCtx *appctx.Context) http.Handler {
+	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
+		var job models.Job
+
+		if err := json.NewDecoder(r.Body).Decode(&job); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
+			return
+		}
+
+		createdJob, err := appCtx.JobsService().CreateJob(
+			job.Type,
+			job.Input,
+			job.ParentType,
+			job.ParentID,
+		)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+
+		if err := json.NewEncoder(w).Encode(createdJob); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			appCtx.RequestLogger().Error(r, err)
+			return
+		}
+
+	}
+
+	handler := auth.WithUserOr403(handlerFunc, appCtx)
+	handler = middleware.JSONHeaders(handler)
+
+	return handler
+}
 
 //JobsNextPostHandler returns a handler that find the next job to run
 func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
@@ -31,20 +69,15 @@ func JobsNextPostHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(job)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(job); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonJob := string(b)
-
-		fmt.Fprint(w, jsonJob)
 	}
 
 	handler := auth.WithUserOr403(handlerFunc, appCtx)
-
 	handler = middleware.JSONHeaders(handler)
 
 	return handler
@@ -73,20 +106,15 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(job)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(job); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonJob := string(b)
-
-		fmt.Fprint(w, jsonJob)
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
-
 	handler = middleware.JSONHeaders(handler)
 
 	return handler
@@ -121,7 +149,6 @@ func JobLogTxtGetHandler(appCtx *appctx.Context) http.Handler {
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
-
 	handler = middleware.TextPlainHeaders(handler)
 
 	return handler
@@ -147,20 +174,15 @@ func JobArtifactsGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(jobArtifacts)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(jobArtifacts); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonJobArtifacts := string(b)
-
-		fmt.Fprint(w, jsonJobArtifacts)
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
-
 	handler = middleware.JSONHeaders(handler)
 
 	return handler
@@ -215,7 +237,6 @@ func JobArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
-
 	handler = middleware.TextPlainHeaders(handler)
 
 	return handler
@@ -386,17 +407,14 @@ func JobArtifactPostHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(artifact)
-		if err != nil {
+		w.WriteHeader(http.StatusCreated)
+
+		if err := json.NewEncoder(w).Encode(artifact); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonArtifact := string(b)
-
-		w.WriteHeader(http.StatusCreated)
-		fmt.Fprint(w, jsonArtifact)
 	}
 
 	handler := auth.WithUserOr403(handlerFunc, appCtx)

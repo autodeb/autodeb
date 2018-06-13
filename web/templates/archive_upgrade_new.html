@@ -1,0 +1,34 @@
+{{ define "title" }}New Archive Upgrade{{ end }}
+
+{{ define "content" }}
+
+<div class="row">
+    <div class="col">
+        <h2>New Archive Upgrade</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <p>
+            Use this form to upgrade a selection of source packages from the archive to newer upstream versions.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <form action="/new-archive-upgrade" method="post">
+            <div class="form-group">
+                <label>Number of packages:</label>
+                <input class="form-control" type="number" name="package-count">
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create Archive Upgrade" class="btn btn-primary">
+            </div>
+        </form>
+    </div>
+</div>
+
+{{ end }}

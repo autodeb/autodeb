@@ -9,6 +9,7 @@ const (
 	JobTypeBuild
 	JobTypeAutopkgtest
 	JobTypeForward
+	JobTypeSetupArchiveUpgrade
 )
 
 func (jt JobType) String() string {
@@ -19,6 +20,8 @@ func (jt JobType) String() string {
 		return "autopkgtest"
 	case JobTypeForward:
 		return "forward"
+	case JobTypeSetupArchiveUpgrade:
+		return "setup-archive-upgrade"
 	default:
 		return "unknown"
 	}
@@ -51,17 +54,44 @@ func (js JobStatus) String() string {
 	}
 }
 
+// JobParentType represents the parent of the job
+type JobParentType int
+
+// JobParentType enum
+const (
+	JobParentTypeUnknown JobParentType = iota
+	JobParentTypeUpload
+	JobParentTypeArchiveUpgrade
+)
+
+func (parentType JobParentType) String() string {
+	switch parentType {
+	case JobParentTypeUpload:
+		return "upload"
+	case JobParentTypeArchiveUpgrade:
+		return "archive-upgrade"
+	default:
+		return "unknown"
+	}
+}
+
 // Job is a builds a test, etc.
 type Job struct {
 	ID     uint      `json:"id"`
 	Type   JobType   `json:"type"`
 	Status JobStatus `json:"status"`
 
-	// The upload that has triggered this job.
-	// The uploadID is also set to all child jobs.
-	UploadID uint `json:"upload_id"`
+	// == Job parent ==
 
-	// Some job's artifacts serve as input to other jobs.
-	// For example: a build job's artifacts is an input to an autopkgtest job
-	InputArtifactID uint `json:"input_artifact_id"`
+	// The ID of the Job's parent.
+	// It is propagated to all child jobs.
+	ParentID   uint          `json:"parent_id"`
+	ParentType JobParentType `json:"parent_type"`
+
+	// == JOB INPUTS ==
+
+	// Some jobs take an input.
+	// For example, the input of an Autopkgtest job is an artifact id
+	// that points to the .deb to test.
+	Input string `json:"input_string"`
 }

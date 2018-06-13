@@ -20,7 +20,9 @@ func TestProcessJobStatusBuildAndDontForward(t *testing.T) {
 	assert.NotNil(t, upload)
 
 	// Create a build job for this upload
-	job, err := jobsService.CreateBuildJob(upload.ID)
+	job, err := jobsService.CreateJob(
+		models.JobTypeBuild, "", models.JobParentTypeUpload, upload.ID,
+	)
 	assert.NoError(t, err)
 	assert.NotNil(t, job)
 
@@ -50,7 +52,9 @@ func TestProcessJobStatusBuildAndAutopkgTestAndForward(t *testing.T) {
 	assert.NotNil(t, upload)
 
 	// Create a build job for this upload
-	job, err := jobsService.CreateBuildJob(upload.ID)
+	job, err := jobsService.CreateJob(
+		models.JobTypeBuild, "", models.JobParentTypeUpload, upload.ID,
+	)
 	assert.NoError(t, err)
 	assert.NotNil(t, job)
 
@@ -76,43 +80,31 @@ func TestProcessJobStatusBuildAndAutopkgTestAndForward(t *testing.T) {
 	// There should now be two new autopkgtest jobs associated with the upload
 	jobs, err = jobsService.GetAllJobsByUploadID(upload.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, 3, len(jobs))
+	assert.Equal(t, 2, len(jobs))
 
-	autopkgTestJob1 := jobs[1]
-	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob1.Type)
-	assert.Equal(t, upload.ID, autopkgTestJob1.UploadID)
+	autopkgTestJob := jobs[1]
+	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob.Type)
+	assert.Equal(t, upload.ID, autopkgTestJob.ParentID)
+	assert.Equal(t, "1", autopkgTestJob.Input, "this job's input should be the build job")
 
-	autopkgTestJob2 := jobs[2]
-	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob2.Type)
-	assert.Equal(t, upload.ID, autopkgTestJob2.UploadID)
-
-	// Mark the first autopkgtest job as completed
-	err = jobsService.ProcessJobStatus(autopkgTestJob1.ID, models.JobStatusSuccess)
-	assert.NoError(t, err)
-
-	// There should be no additional jobs associated with the upload
-	jobs, err = jobsService.GetAllJobsByUploadID(upload.ID)
-	assert.NoError(t, err)
-	assert.Equal(t, 3, len(jobs))
-
-	// Mark the second autopkgtest job as completed
-	err = jobsService.ProcessJobStatus(autopkgTestJob2.ID, models.JobStatusSuccess)
+	// Mark the autopkgtest job as completed
+	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)
 	assert.NoError(t, err)
 
 	// There should now be a forward job associated with the upload
 	jobs, err = jobsService.GetAllJobsByUploadID(upload.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, 4, len(jobs))
+	assert.Equal(t, 3, len(jobs))
 
-	forwardJob := jobs[3]
+	forwardJob := jobs[2]
 	assert.Equal(t, models.JobTypeForward, forwardJob.Type)
 
 	// Mark the forward job as completed
-	err = jobsService.ProcessJobStatus(autopkgTestJob2.ID, models.JobStatusSuccess)
+	err = jobsService.ProcessJobStatus(forwardJob.ID, models.JobStatusSuccess)
 	assert.NoError(t, err)
 
 	// There should be no additional jobs associated with the upload
 	jobs, err = jobsService.GetAllJobsByUploadID(upload.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, 4, len(jobs))
+	assert.Equal(t, 3, len(jobs))
 }

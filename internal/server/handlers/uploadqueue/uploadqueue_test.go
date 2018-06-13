@@ -234,7 +234,8 @@ func TestProcessChanges(t *testing.T) {
 
 	job := jobs[0]
 	assert.Equal(t, uint(1), job.ID)
-	assert.Equal(t, uint(1), job.UploadID)
+	assert.Equal(t, uint(1), job.ParentID)
+	assert.Equal(t, models.JobParentTypeUpload, job.ParentType)
 	assert.Equal(t, models.JobTypeBuild, job.Type)
 	assert.Equal(t, models.JobStatusQueued, job.Status)
 }

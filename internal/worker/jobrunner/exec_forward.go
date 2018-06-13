@@ -20,14 +20,18 @@ func (jobRunner *JobRunner) execForward(
 	artifactsDirectory string,
 	logFile io.Writer) error {
 
+	if job.ParentType != models.JobParentTypeUpload {
+		return errors.Errorf("unsupported parent type %s", job.ParentType)
+	}
+
 	// Retrieve the corresponding Upload
-	upload, err := jobRunner.apiClient.GetUpload(job.UploadID)
+	upload, err := jobRunner.apiClient.GetUpload(job.ParentID)
 	if err != nil {
 		return errors.WithMessage(err, "could not retrieve corresponding upload")
 	}
 
 	// Download the upload
-	changesURL := jobRunner.apiClient.GetUploadChangesURL(job.UploadID)
+	changesURL := jobRunner.apiClient.GetUploadChangesURL(job.ParentID)
 	if err := exec.RunCtxDirStdoutStderr(
 		ctx, workingDirectory, logFile, logFile,
 		"dget", "--allow-unauthenticated", changesURL.String(),

@@ -20,8 +20,12 @@ func (jobRunner *JobRunner) execBuild(
 	artifactsDirectory string,
 	logFile io.Writer) error {
 
+	if job.ParentType != models.JobParentTypeUpload {
+		return errors.Errorf("unsupported parent type %s", job.ParentType)
+	}
+
 	// Get the .dsc URL
-	dscURL := jobRunner.apiClient.GetUploadDSCURL(job.UploadID)
+	dscURL := jobRunner.apiClient.GetUploadDSCURL(job.ParentID)
 
 	// Download the source
 	if err := exec.RunCtxDirStdoutStderr(

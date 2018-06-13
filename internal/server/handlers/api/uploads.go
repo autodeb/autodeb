@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -71,16 +70,12 @@ func UploadGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(upload)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(upload); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonUpload := string(b)
-
-		fmt.Fprint(w, jsonUpload)
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))
@@ -143,16 +138,12 @@ func UploadFilesGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(fileUploads)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(fileUploads); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonFileUploads := string(b)
-
-		fmt.Fprint(w, jsonFileUploads)
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))

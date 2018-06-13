@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"path/filepath"
+	"fmt"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -33,8 +33,13 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 		return nil
 	}
 
+	// If this job's parent isn't an upload, there is nothing to do, stop here.
+	if job.ParentType != models.JobParentTypeUpload {
+		return nil
+	}
+
 	// Retrieve the corresponding upload.
-	upload, err := service.db.GetUpload(job.UploadID)
+	upload, err := service.db.GetUpload(job.ParentID)
 	if err != nil {
 		return errors.WithMessage(err, "could not find corresponding upload")
 	}
@@ -66,7 +71,7 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 	}
 
 	// Forward the upload.
-	if _, err := service.CreateForwardJob(upload.ID); err != nil {
+	if _, err := service.CreateJob(models.JobTypeForward, "", models.JobParentTypeUpload, upload.ID); err != nil {
 		return err
 	}
 
@@ -76,20 +81,14 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 // createAutopkgtestJobFromBuildJob will create an autopkgtest job for
 // every binary package produced by a build job
 func (service *Service) createAutopkgtestJobFromBuildJob(job *models.Job, upload *models.Upload) error {
-	// Get the job artifacts
-	artifacts, err := service.artifactsService.GetAllArtifactsByJobID(job.ID)
-	if err != nil {
-		return errors.WithMessage(err, "could not find corresponding job artifacts")
-	}
 
-	// Create autopkgtest jobs for all debs
-	for _, artifact := range artifacts {
-		if filepath.Ext(artifact.Filename) == ".deb" {
-			_, err := service.CreateAutopkgtestJob(upload.ID, artifact.ID)
-			if err != nil {
-				return errors.WithMessagef(err, "could not create autopkgtest job for upload %d and artifact %d", upload.ID, artifact.ID)
-			}
-		}
+	if _, err := service.CreateJob(
+		models.JobTypeAutopkgtest,
+		fmt.Sprint(job.ID),
+		models.JobParentTypeUpload,
+		upload.ID,
+	); err != nil {
+		return errors.WithMessagef(err, "could not create autopkgtest job for upload %d", upload.ID)
 	}
 
 	return nil

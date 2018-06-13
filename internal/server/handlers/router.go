@@ -43,6 +43,9 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.Path("/uploads/{uploadID:[0-9]+}").Handler(webpages.UploadGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs").Handler(webpages.JobsGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs/{jobID:[0-9]+}").Handler(webpages.JobGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/archive-upgrades").Handler(webpages.ArchiveUpgradesGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/new-archive-upgrade").Handler(webpages.NewArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/new-archive-upgrade").Handler(webpages.NewArchiveUpgradePostHandler(appCtx)).Methods(http.MethodPost)
 
 	// ==== Web pages: Profile ====
 	router.Path("/profile").Handler(webpages.ProfileGetHandler(appCtx)).Methods(http.MethodGet)
@@ -62,6 +65,7 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	restAPIRouter.Path("/user").Handler(api.UserGetHandler(appCtx)).Methods(http.MethodGet)
 
 	// ==== Jobs API ====
+	restAPIRouter.Path("/jobs").Handler(api.JobsPostHandler(appCtx)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/next").Handler(api.JobsNextPostHandler(appCtx)).Methods(http.MethodPost)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}").Handler(api.JobGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/jobs/{jobID:[0-9]+}/status/{jobStatus:[0-9]+}").Handler(api.JobStatusPostHandler(appCtx)).Methods(http.MethodPost)
@@ -86,6 +90,9 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	// ==== Artifacts API ====
 	restAPIRouter.Path("/artifacts/{artifactID:[0-9]+}").Handler(api.ArtifactGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/artifacts/{artifactID:[0-9]+}/content").Handler(api.ArtifactContentGetHandler(appCtx)).Methods(http.MethodGet)
+
+	// ==== ArchiveUpgrades API ===
+	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}").Handler(api.ArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
 
 	return router
 }

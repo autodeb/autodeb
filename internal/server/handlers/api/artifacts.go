@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -36,16 +35,12 @@ func ArtifactGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
-		b, err := json.Marshal(artifact)
-		if err != nil {
+		if err := json.NewEncoder(w).Encode(artifact); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 			return
 		}
 
-		jsonArtifact := string(b)
-
-		fmt.Fprint(w, jsonArtifact)
 	}
 
 	handler := http.Handler(http.HandlerFunc(handlerFunc))

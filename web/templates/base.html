@@ -40,6 +40,7 @@
                                 <a class="list-group-item" href="/">Home</a>
                                 <a class="list-group-item" href="/uploads">Uploads</a>
                                 <a class="list-group-item" href="/jobs">Jobs</a>
+                                <a class="list-group-item" href="/archive-upgrades">Archive Upgrades</a>
                             </ul>
                         </div>
                         {{ if .User }}
@@ -49,6 +50,16 @@
                             </div>
                             <ul class="list-group list-group-flush">
                                 <a class="list-group-item" href="/uploads?user_id={{ .User.ID }}">My Uploads</a>
+                            </ul>
+                        </div>
+                        {{ end }}
+                        {{ if .User }}
+                        <div class="card my-3">
+                            <div class="card-header">
+                                <strong>Archive Upgrades</strong>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <a class="list-group-item" href="/new-archive-upgrade">New archive upgrade</a>
                             </ul>
                         </div>
                         {{ end }}

@@ -9,7 +9,8 @@
         <th>ID</th>
         <th>Type</th>
         <th>Status</th>
-        <th>Upload ID</th>
+        <th>Parent Type</th>
+        <th>Parent ID</th>
         <th>Log</th>
     </tr>
 
@@ -18,7 +19,8 @@
         <td><a href="/jobs/{{ .ID}}">{{ .ID }}</a></td>
         <td>{{ .Type }}</td>
         <td class="{{ .Status | jobStatusTableClass }}">{{ .Status }}</td>
-        <td><a href="/uploads/{{ .UploadID }}">{{ .UploadID }}</a></td>
+        <td>{{ .ParentType }}</td>
+        <td>{{ .ParentID }}</td>
         <td>
             <a href="/api/jobs/{{ .ID }}/log.txt">log (txt)</a>
         </td>

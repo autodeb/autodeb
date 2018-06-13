@@ -123,7 +123,7 @@ func (service *Service) processChangesUpload(filename string, content io.Reader,
 
 	//Create a build job. We do this at only after moving files
 	//because the job could be picked-up immediately.
-	if _, err := service.jobsService.CreateBuildJob(upload.ID); err != nil {
+	if _, err := service.jobsService.CreateJob(models.JobTypeBuild, "", models.JobParentTypeUpload, upload.ID); err != nil {
 		return nil, err
 	}
 

@@ -1,0 +1,24 @@
+{{ define "title" }}Archive Upgrades{{ end }}
+
+{{ define "content" }}
+
+<p>This page lists all archive upgrades:</p>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <th>User ID</th>
+        <th>Package Count</th>
+    </tr>
+
+    {{ range $.Data.ArchiveUpgrades }}
+    <tr>
+        <td>{{ .ID }}</td>
+        <td>{{ .UserID }}</td>
+        <td>{{ .PackageCount }}</td>
+    </tr>
+    {{ end }}
+
+</table>
+
+{{ end }}

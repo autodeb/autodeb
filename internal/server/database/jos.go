@@ -8,12 +8,13 @@ import (
 )
 
 // CreateJob will create a job
-func (db *Database) CreateJob(jobType models.JobType, uploadID, inputArtifactID uint) (*models.Job, error) {
+func (db *Database) CreateJob(jobType models.JobType, input string, parentType models.JobParentType, parentID uint) (*models.Job, error) {
 	job := &models.Job{
-		Type:            jobType,
-		UploadID:        uploadID,
-		InputArtifactID: inputArtifactID,
-		Status:          models.JobStatusQueued,
+		Type:       jobType,
+		Input:      input,
+		Status:     models.JobStatusQueued,
+		ParentID:   parentID,
+		ParentType: parentType,
 	}
 
 	if err := db.gormDB.Create(job).Error; err != nil {
@@ -80,8 +81,9 @@ func (db *Database) GetAllJobsByUploadIDStatuses(uploadID uint, statuses ...mode
 
 		query = query.Where(
 			&models.Job{
-				UploadID: uploadID,
-				Status:   status,
+				ParentID:   uploadID,
+				ParentType: models.JobParentTypeUpload,
+				Status:     status,
 			},
 		)
 	}
@@ -90,8 +92,9 @@ func (db *Database) GetAllJobsByUploadIDStatuses(uploadID uint, statuses ...mode
 	for _, status := range statuses[0:] {
 		query = query.Or(
 			&models.Job{
-				UploadID: uploadID,
-				Status:   status,
+				ParentID:   uploadID,
+				ParentType: models.JobParentTypeUpload,
+				Status:     status,
 			},
 		)
 	}
@@ -111,7 +114,8 @@ func (db *Database) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, error) {
 		&models.Job{},
 	).Where(
 		&models.Job{
-			UploadID: uploadID,
+			ParentType: models.JobParentTypeUpload,
+			ParentID:   uploadID,
 		},
 	)
 

@@ -23,10 +23,6 @@ func (jobRunner *JobRunner) execAutopkgtest(
 	artifactsDirectory string,
 	logFile io.Writer) error {
 
-	if job.ParentType != models.JobParentTypeUpload {
-		return errors.Errorf("unsupported parent type %s", job.ParentType)
-	}
-
 	// The job input is a build job
 	buildJobID, err := strconv.Atoi(job.Input)
 	if err != nil {

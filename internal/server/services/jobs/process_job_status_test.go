@@ -1,7 +1,7 @@
 package jobs_test
 
 import (
-	"strings"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,7 +10,53 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/servicestest"
 )
 
-func TestProcessJobStatusBuildAndDontForward(t *testing.T) {
+func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
+	servicesTest := servicestest.SetupTest(t)
+	jobsService := servicesTest.Services.Jobs()
+
+	archiveUpgrade, err := jobsService.CreateArchiveUpgrade(1, 33)
+	assert.NoError(t, err)
+
+	// Create a package upgrade job in the context of an archive upgrade
+	upgradeJob, err := jobsService.CreateJob(
+		models.JobTypePackageUpgrade, "", models.JobParentTypeArchiveUpgrade, archiveUpgrade.ID,
+	)
+	assert.NoError(t, err)
+	assert.NotNil(t, upgradeJob)
+
+	// There should be two jobs associated with the archive upgrade:
+	//  - the upgrade init
+	//  - the package upgrade job
+	jobs, err := jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobs))
+
+	// Mark the job as successfull
+	err = jobsService.ProcessJobStatus(upgradeJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	// There should now be a new autopkgtest job associated with the archive upgrade
+	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(jobs))
+
+	autopkgTestJob := jobs[2]
+	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob.Type)
+	assert.Equal(t, models.JobParentTypeArchiveUpgrade, autopkgTestJob.ParentType)
+	assert.Equal(t, archiveUpgrade.ID, autopkgTestJob.ParentID)
+	assert.Equal(t, fmt.Sprint(upgradeJob.ID), autopkgTestJob.Input, "this job's input should be the package upgrade job")
+
+	// Mark the autopkgtest job as completed
+	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	// There should be no new jobs created
+	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(jobs))
+}
+
+func TestProcessJobStatusUploadBuildAndDontForward(t *testing.T) {
 	servicesTest := servicestest.SetupTest(t)
 	jobsService := servicesTest.Services.Jobs()
 
@@ -41,10 +87,9 @@ func TestProcessJobStatusBuildAndDontForward(t *testing.T) {
 	assert.Equal(t, 1, len(jobs))
 }
 
-func TestProcessJobStatusBuildAndAutopkgTestAndForward(t *testing.T) {
+func TestProcessJobStatusUploadBuildAndAutopkgTestAndForward(t *testing.T) {
 	servicesTest := servicestest.SetupTest(t)
 	jobsService := servicesTest.Services.Jobs()
-	artifactsService := servicesTest.Services.Artifacts()
 
 	// Create an upload
 	upload, err := servicesTest.DB.CreateUpload(22, "testsource", "testversion", "testmaintainer", "testchangedby", true, true)
@@ -63,21 +108,11 @@ func TestProcessJobStatusBuildAndAutopkgTestAndForward(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobs))
 
-	// Upload debs
-	_, err = artifactsService.CreateArtifact(
-		job.ID, "test1.deb", strings.NewReader("deb content"),
-	)
-	assert.NoError(t, err)
-	_, err = artifactsService.CreateArtifact(
-		job.ID, "test2.deb", strings.NewReader("deb content"),
-	)
-	assert.NoError(t, err)
-
 	// Mark the job as successfull
 	err = jobsService.ProcessJobStatus(job.ID, models.JobStatusSuccess)
 	assert.NoError(t, err)
 
-	// There should now be two new autopkgtest jobs associated with the upload
+	// There should now be a new autopkgtest job associated with the upload
 	jobs, err = jobsService.GetAllJobsByUploadID(upload.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobs))
@@ -85,7 +120,7 @@ func TestProcessJobStatusBuildAndAutopkgTestAndForward(t *testing.T) {
 	autopkgTestJob := jobs[1]
 	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob.Type)
 	assert.Equal(t, upload.ID, autopkgTestJob.ParentID)
-	assert.Equal(t, "1", autopkgTestJob.Input, "this job's input should be the build job")
+	assert.Equal(t, fmt.Sprint(job.ID), autopkgTestJob.Input, "this job's input should be the build job")
 
 	// Mark the autopkgtest job as completed
 	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)

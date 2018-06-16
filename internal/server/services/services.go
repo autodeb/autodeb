@@ -46,7 +46,6 @@ func New(db *database.Database, dataFS filesystem.FS, serverURL *url.URL) (*Serv
 	}
 	jobsService := jobs.New(
 		db,
-		artifactsService,
 		filesystem.NewBasePathFS(dataFS, "jobs"),
 	)
 

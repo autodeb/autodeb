@@ -9,22 +9,19 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
-	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/artifacts"
 )
 
 //Service manages jobs
 type Service struct {
-	db               *database.Database
-	fs               filesystem.FS
-	artifactsService *artifacts.Service
+	db *database.Database
+	fs filesystem.FS
 }
 
 //New creates a jobs service
-func New(db *database.Database, artifactsService *artifacts.Service, fs filesystem.FS) *Service {
+func New(db *database.Database, fs filesystem.FS) *Service {
 	service := &Service{
-		db:               db,
-		artifactsService: artifactsService,
-		fs:               fs,
+		db: db,
+		fs: fs,
 	}
 	return service
 }

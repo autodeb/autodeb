@@ -16,7 +16,7 @@ import (
 func setupTest(t *testing.T) *Service {
 	db := databasetest.SetupTest(t)
 	fs := filesystem.NewMemMapFS()
-	service := New(db, nil, fs)
+	service := New(db, fs)
 	return service
 }
 

@@ -23,18 +23,35 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 		return err
 	}
 
-	// If the job has failed, there is nothing to do, stop here.
+	// If the job has failed, there is nothing to do, no matter the parent type.
 	if job.Status == models.JobStatusFailed {
 		return nil
 	}
 
-	// If this is a forward job, there is nothing to do, stop here.
-	if job.Type == models.JobTypeForward {
+	switch job.ParentType {
+	case models.JobParentTypeUpload:
+		return service.processUploadJobStatus(job)
+	case models.JobParentTypeArchiveUpgrade:
+		return service.processArchiveUpgradeJobStatus(job)
+	default:
 		return nil
 	}
 
-	// If this job's parent isn't an upload, there is nothing to do, stop here.
-	if job.ParentType != models.JobParentTypeUpload {
+}
+
+func (service *Service) processArchiveUpgradeJobStatus(job *models.Job) error {
+	// If this is a package upgrade job, create a corresponding autopkgtest job
+	// and stop here.
+	if job.Type == models.JobTypePackageUpgrade {
+		return service.createAutopkgtestJobFromBuildJob(job)
+	}
+
+	return nil
+}
+
+func (service *Service) processUploadJobStatus(job *models.Job) error {
+	// If this is a forward job, there is nothing to do, stop here.
+	if job.Type == models.JobTypeForward {
 		return nil
 	}
 
@@ -45,9 +62,9 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 	}
 
 	// If this is a build job and autopkgtest is enabled,
-	// create corresponding autopkgtest jobs and stop here.
+	// create a corresponding autopkgtest job and stop here.
 	if job.Type == models.JobTypeBuild && upload.Autopkgtest == true {
-		return service.createAutopkgtestJobFromBuildJob(job, upload)
+		return service.createAutopkgtestJobFromBuildJob(job)
 	}
 
 	// The next step can only be to forward the upload. Don't
@@ -80,15 +97,15 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 
 // createAutopkgtestJobFromBuildJob will create an autopkgtest job for
 // every binary package produced by a build job
-func (service *Service) createAutopkgtestJobFromBuildJob(job *models.Job, upload *models.Upload) error {
+func (service *Service) createAutopkgtestJobFromBuildJob(job *models.Job) error {
 
 	if _, err := service.CreateJob(
 		models.JobTypeAutopkgtest,
 		fmt.Sprint(job.ID),
-		models.JobParentTypeUpload,
-		upload.ID,
+		job.ParentType,
+		job.ParentID,
 	); err != nil {
-		return errors.WithMessagef(err, "could not create autopkgtest job for upload %d", upload.ID)
+		return errors.WithMessagef(err, "could not create autopkgtest job for build %d", job.ID)
 	}
 
 	return nil

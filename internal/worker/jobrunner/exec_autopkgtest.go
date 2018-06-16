@@ -2,11 +2,14 @@ package jobrunner
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
+	osexec "os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
+	"syscall"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/exec"
@@ -97,9 +100,25 @@ func (jobRunner *JobRunner) execAutopkgtest(
 		ctx, workingDirectory, logFile, logFile,
 		"autopkgtest", args...,
 	); err != nil {
-		// TODO: Autopkgtest's exit code 8 means that no tests were run.
-		// We shouldn't error when that happens.
-		return errors.WithMessage(err, "autopkgtest failed")
+
+		exitCode := -1
+
+		// Attempt to find the exit code
+		if exitError, ok := err.(*osexec.ExitError); ok {
+			if waitStatus, ok := exitError.Sys().(syscall.WaitStatus); ok {
+				exitCode = waitStatus.ExitStatus()
+			}
+		}
+
+		switch exitCode {
+		case 8:
+			fmt.Fprintf(logFile, "autopkgtest exited with exit code %d\n", exitCode)
+		case -1:
+			return errors.New("autopkgtest failed and we could not find the exit code")
+		default:
+			return errors.WithMessagef(err, "autopkgtest failed with exit code %d", exitCode)
+		}
+
 	}
 
 	return nil

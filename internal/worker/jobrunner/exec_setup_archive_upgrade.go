@@ -33,6 +33,8 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 	sourcePackages, err := udd.PackagesWithNewerUpstreamVersions()
 	if err != nil {
 		return errors.WithMessagef(err, "could not get source packages to update")
+	} else if len(sourcePackages) < 1 {
+		return errors.New("there are no packages to upgrade in the archive")
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -40,6 +42,12 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 	fmt.Fprintln(logFile, "Creating upgrade jobs...")
 
 	for i := uint(0); i < archiveUpgrade.PackageCount; i++ {
+
+		if len(sourcePackages) < 1 {
+			fmt.Fprintln(logFile, "there are no more source pacakges to ugprade...")
+			break
+		}
+
 		// select an index
 		index := rand.Intn(len(sourcePackages))
 

@@ -5,7 +5,9 @@ package database
 import (
 	"github.com/jinzhu/gorm"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite" // sqlite database driver
+	_ "github.com/jinzhu/gorm/dialects/mysql"    // mysql database driver
+	_ "github.com/jinzhu/gorm/dialects/postgres" // sqlite database driver
+	_ "github.com/jinzhu/gorm/dialects/sqlite"   // postgres database driver
 )
 
 // Database is an implementation of the app.Datastore interface

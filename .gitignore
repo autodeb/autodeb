@@ -1,6 +1,5 @@
 # Built binaries
 /list-packages-with-newer-upstream-versions
-/update-random-package
 /autodeb-server
 /autodeb-worker
 
@@ -13,5 +12,4 @@
 
 # stuff created at runtime
 /jobs
-/update-random-package-output-*
 /database.sqlite

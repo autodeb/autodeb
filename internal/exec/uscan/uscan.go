@@ -1,29 +1,31 @@
 package uscan
 
 import (
+	"context"
 	"encoding/xml"
 	"os/exec"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 )
 
-//Uscan runs uscan
-func Uscan(directory string) (*Result, error) {
-	command := exec.Command(
+//Uscan runs uscan from the given directory
+func Uscan(ctx context.Context, directory string) (*Result, error) {
+	command := exec.CommandContext(
+		ctx,
 		"uscan",
 		"--dehs",
 	)
 	command.Dir = directory
 
-	output, err := command.CombinedOutput()
+	output, err := command.Output()
 	if err != nil {
-		return nil, errors.Errorf("uscan error: %s", err)
+		return nil, errors.WithMessage(err, "uscan error")
 	}
 
 	result := &Result{}
 
 	if err := xml.Unmarshal(output, result); err != nil {
-		return nil, err
+		return nil, errors.WithMessagef(err, "cannot parse uscan dehs xml output: %s", output)
 	}
 
 	return result, nil

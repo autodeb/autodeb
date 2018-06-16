@@ -16,8 +16,8 @@ func NewVersion(changelogPath, version, distribution, message string) error {
 		message,
 	)
 
-	if err := command.Run(); err != nil {
-		return errors.Errorf("dch error: %s", err)
+	if output, err := command.CombinedOutput(); err != nil {
+		return errors.WithMessagef(err, "dch failed: %s", output)
 	}
 
 	return nil

@@ -41,7 +41,7 @@ func (jobRunner *JobRunner) execBuild(
 		return err
 	}
 	if numDirs := len(dirs); numDirs != 1 {
-		return err
+		return errors.Errorf("multiple directories, cannot guess which one contains the source: %s", dirs)
 	}
 	sourceDirectory := filepath.Join(workingDirectory, dirs[0])
 

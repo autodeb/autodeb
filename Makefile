@@ -1,7 +1,6 @@
 .PHONY: all
 all: fmt \
 	list-packages-with-newer-upstream-versions \
-	update-random-package \
 	autodeb-server \
 	autodeb-worker \
 	vet \
@@ -15,9 +14,6 @@ GO_IMPORT_PATH := salsa.debian.org/autodeb-team/autodeb
 
 list-packages-with-newer-upstream-versions: $(SOURCES) install
 	go build -v -o list-packages-with-newer-upstream-versions ${GO_IMPORT_PATH}/cmd/list-packages-with-newer-upstream-versions
-
-update-random-package: $(SOURCES) install
-	go build -v -o update-random-package ${GO_IMPORT_PATH}/cmd/update-random-package
 
 
 autodeb-server: $(SOURCES) install
@@ -62,10 +58,8 @@ get-deps:
 clean:
 	# Binaries
 	rm -f list-packages-with-newer-upstream-versions
-	rm -f update-random-package
 	rm -f autodeb-server
 	rm -f autodeb-worker
-	rm -rf update-random-package-output-*
 
 	# test coverage
 	rm -f coverage.txt

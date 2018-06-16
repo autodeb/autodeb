@@ -39,7 +39,7 @@ func main() {
 	}
 	fmt.Printf("Debian directory unpacked in %s\n", debianDir)
 
-	uscanResult, err := uscan.Uscan(workDir)
+	uscanResult, err := uscan.Uscan(context.TODO(), workDir)
 	if err != nil {
 		log.Fatal(err)
 	}

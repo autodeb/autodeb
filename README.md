@@ -31,8 +31,6 @@ You may chat with us at [#autodeb on irc.debian.org](irc://irc.debian.org:6667/a
 
 - ``list-packages-with-newer-upstream-versions``: lists source packages that have newer upstream versions available
 
-- ``update-random-package``: find a package that needs updating to a newer upstream version and try updating it automatically. On success, the output is moved to the current directory.
-
 - ``autodeb-server``: This is the server component of the system. It provides a web interface, a REST API and dput-compatible interface.
 
 - ``autodeb-worker``: This is the worker component of the system. It retrieves jobs from the main server and executes them.
@@ -72,7 +70,6 @@ Note that runtime dependencies of the scripts include:
 
 ```shell
 $ ./list-packages-with-newer-upstream-versions
-$ ./update-random-package
 $ ./autodeb-server
 $ ./autodeb-worker
 ```

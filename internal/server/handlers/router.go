@@ -44,6 +44,7 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.Path("/jobs").Handler(webpages.JobsGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs/{jobID:[0-9]+}").Handler(webpages.JobGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/archive-upgrades").Handler(webpages.ArchiveUpgradesGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}").Handler(webpages.ArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/new-archive-upgrade").Handler(webpages.NewArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/new-archive-upgrade").Handler(webpages.NewArchiveUpgradePostHandler(appCtx)).Methods(http.MethodPost)
 

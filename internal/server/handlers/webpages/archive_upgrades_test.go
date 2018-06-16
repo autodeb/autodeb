@@ -53,3 +53,24 @@ func TestNewArchiveUpgradePostHandler(t *testing.T) {
 	archiveUpgrade := archiveUpgrades[0]
 	assert.Equal(t, uint(42), archiveUpgrade.PackageCount)
 }
+
+func TestArchiveUpgradeGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	request := httptest.NewRequest(http.MethodGet, "/archive-upgrades/1", nil)
+	response := testRouter.ServeHTTP(request)
+
+	assert.Equal(t, http.StatusNotFound, response.Result().StatusCode)
+	assert.Equal(t, "", response.Body.String())
+
+	testRouter.Services.Jobs().CreateArchiveUpgrade(34, 710)
+
+	response = testRouter.ServeHTTP(request)
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.Contains(
+		t,
+		response.Body.String(),
+		"34",
+		"710",
+	)
+}

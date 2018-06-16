@@ -38,3 +38,8 @@ func (service *Service) GetAllArchiveUpgrades() ([]*models.ArchiveUpgrade, error
 func (service *Service) GetAllArchiveUpgradesByUserID(userID uint) ([]*models.ArchiveUpgrade, error) {
 	return service.db.GetAllArchiveUpgradesByUserID(userID)
 }
+
+// GetAllJobsByArchiveUpgradeID returns all jobs for an ArchiveUpgrade
+func (service *Service) GetAllJobsByArchiveUpgradeID(id uint) ([]*models.Job, error) {
+	return service.db.GetAllJobsByArchiveUpgradeID(id)
+}

@@ -1,0 +1,47 @@
+{{ define "title" }}Archive Upgrade #{{ $.Data.ArchiveUpgrade.ID }}{{ end }}
+
+{{ define "content" }}
+
+<h2>Archive Upgrade details (#{{ $.Data.ArchiveUpgrade.ID }})</h2>
+<hr>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <td>{{ $.Data.ArchiveUpgrade.ID }}</td>
+    </tr>
+    <tr>
+        <th>User ID</th>
+        <td>{{ $.Data.ArchiveUpgrade.UserID }}</td>
+    </tr>
+    <tr>
+        <th>Package Count</th>
+        <td>{{ $.Data.ArchiveUpgrade.PackageCount }}</td>
+    </tr>
+</table>
+
+<h2>Related jobs</h2>
+<hr>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Log</th>
+    </tr>
+
+    {{ range $.Data.Jobs }}
+    <tr>
+        <td><a href="/jobs/{{ .ID}}">{{ .ID }}</a></td>
+        <td>{{ .Type }}</td>
+        <td class="{{ .Status | jobStatusTableClass }}">{{ .Status }}</td>
+        <td>
+            <a href="/api/jobs/{{ .ID }}/log.txt">log (txt)</a>
+        </td>
+    </tr>
+    {{ end }}
+
+</table>
+
+{{ end }}

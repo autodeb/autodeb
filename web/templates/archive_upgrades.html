@@ -13,7 +13,7 @@
 
     {{ range $.Data.ArchiveUpgrades }}
     <tr>
-        <td>{{ .ID }}</td>
+        <td><a href="/archive-upgrades/{{ .ID }}">{{ .ID }}</a></td>
         <td>{{ .UserID }}</td>
         <td>{{ .PackageCount }}</td>
     </tr>

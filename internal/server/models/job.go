@@ -10,6 +10,7 @@ const (
 	JobTypeAutopkgtest
 	JobTypeForward
 	JobTypeSetupArchiveUpgrade
+	JobTypePackageUpgrade
 )
 
 func (jt JobType) String() string {
@@ -22,6 +23,8 @@ func (jt JobType) String() string {
 		return "forward"
 	case JobTypeSetupArchiveUpgrade:
 		return "setup-archive-upgrade"
+	case JobTypePackageUpgrade:
+		return "package-upgrade"
 	default:
 		return "unknown"
 	}

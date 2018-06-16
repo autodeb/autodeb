@@ -52,12 +52,25 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 		// Create an upgrade job
 		fmt.Fprintf(
 			logFile,
-			"Creating job: %s\t%s => %s\n",
+			"Creating job: %s %s => %s... ",
 			pkg.Package,
 			pkg.DebianUversion,
 			pkg.UpstreamVersion,
 		)
 
+		job, err := jobRunner.apiClient.CreateJob(
+			&models.Job{
+				Type:       models.JobTypePackageUpgrade,
+				Input:      pkg.Package,
+				ParentType: models.JobParentTypeArchiveUpgrade,
+				ParentID:   archiveUpgrade.ID,
+			},
+		)
+		if err != nil {
+			return errors.WithMessagef(err, "could not create upgrade job for package %s", pkg.Package)
+		}
+
+		fmt.Fprintf(logFile, "job id #%d\n", job.ID)
 	}
 
 	return nil

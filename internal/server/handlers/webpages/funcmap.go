@@ -18,6 +18,10 @@ func jobStatusTableClass(jobStatus models.JobStatus) string {
 	class := ""
 
 	switch jobStatus {
+	case models.JobStatusQueued:
+		return "table-secondary"
+	case models.JobStatusAssigned:
+		return "table-primary"
 	case models.JobStatusFailed:
 		return "table-danger"
 	case models.JobStatusSuccess:

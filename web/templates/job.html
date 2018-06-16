@@ -26,7 +26,10 @@
         <th>Parent ID</th>
         <td>{{ $.Data.Job.ParentID }}</td>
     </tr>
-
+    <tr>
+        <th>Input</th>
+        <td>{{ $.Data.Job.Input }}</td>
+    </tr>
     <tr>
         <th>Log</th>
         <td><a href="/api/jobs/{{ $.Data.Job.ID }}/log.txt">log (txt)</a></td>

@@ -21,12 +21,18 @@ func TestJobGetHandler(t *testing.T) {
 	assert.Equal(t, "", response.Body.String())
 
 	job, _ := testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, uint(1),
+		models.JobTypeBuild, "testinput", models.JobParentTypeArchiveUpgrade, 702,
 	)
 	testRouter.DB.CreateArtifact(job.ID, "testartifactfilename")
 
 	response = testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
-	assert.Contains(t, response.Body.String(), "testartifactfilename")
-	assert.Contains(t, response.Body.String(), "queued")
+	assert.Contains(
+		t, response.Body.String(),
+		"testartifactfilename",
+		"queued",
+		"testinput",
+		"archive-upgrade",
+		"702",
+	)
 }

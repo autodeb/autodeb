@@ -34,18 +34,20 @@ func (jobRunner *JobRunner) execAutopkgtest(
 		return errors.WithMessage(err, "could not get job artifacts")
 	}
 
+	// Autopkgtest input files
 	var inputFiles []string
 
-	// Get the artifacts (debs) that we should test
+	// Download all artifacts from the build
 	for _, artifact := range artifacts {
 
-		if ext := filepath.Ext(artifact.Filename); ext != ".dsc" && ext != ".deb" {
-			continue
+		switch filepath.Ext(artifact.Filename) {
+		case ".deb", ".dsc":
+			inputFiles = append(inputFiles, artifact.Filename)
+		default:
+			// Not an input file but we still need to download it.
 		}
 
-		inputFiles = append(inputFiles, artifact.Filename)
-
-		// Get the deb
+		// Get the artifact
 		artifactContent, err := jobRunner.apiClient.GetArtifactContent(artifact.ID)
 		if err != nil {
 			return errors.WithMessage(err, "could not get the artifact content")
@@ -55,11 +57,11 @@ func (jobRunner *JobRunner) execAutopkgtest(
 		debPath := filepath.Join(workingDirectory, artifact.Filename)
 		deb, err := os.Create(debPath)
 		if err != nil {
-			return errors.WithMessage(err, "could not create deb")
+			return errors.WithMessagef(err, "could not create artifact file %s", debPath)
 		}
 		defer deb.Close()
 		if _, err := io.Copy(deb, artifactContent); err != nil {
-			return errors.WithMessage(err, "could not copy artifact content to deb")
+			return errors.WithMessage(err, "could not copy artifact content to file")
 		}
 
 	}

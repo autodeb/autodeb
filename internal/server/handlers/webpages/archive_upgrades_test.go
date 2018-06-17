@@ -14,15 +14,22 @@ import (
 func TestArchiveUpgradesGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	request := httptest.NewRequest(http.MethodGet, "/archive-upgrades", nil)
-	response := testRouter.ServeHTTP(request)
-
 	_, err := testRouter.Services.Jobs().CreateArchiveUpgrade(421, 766)
 	assert.NoError(t, err)
 
-	response = testRouter.ServeHTTP(request)
+	request := httptest.NewRequest(http.MethodGet, "/archive-upgrades", nil)
+	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Contains(
+		t, response.Body.String(),
+		"421",
+		"766",
+	)
+
+	request = httptest.NewRequest(http.MethodGet, "/archive-upgrades?page=1", nil)
+	response = testRouter.ServeHTTP(request)
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.NotContains(
 		t, response.Body.String(),
 		"421",
 		"766",

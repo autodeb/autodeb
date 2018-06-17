@@ -53,9 +53,19 @@ func (service *Service) GetAllUploads() ([]*models.Upload, error) {
 	return service.db.GetAllUploads()
 }
 
+// GetAllUploadsPageLimit returns all uploads with pagination
+func (service *Service) GetAllUploadsPageLimit(page, limit int) ([]*models.Upload, error) {
+	return service.db.GetAllUploadsPageLimit(page, limit)
+}
+
 // GetAllUploadsByUserID returns all uploads for a given user id
 func (service *Service) GetAllUploadsByUserID(userID uint) ([]*models.Upload, error) {
 	return service.db.GetAllUploadsByUserID(userID)
+}
+
+// GetAllUploadsByUserIDPageLimit returns all uploads for a given user id with pagination
+func (service *Service) GetAllUploadsByUserIDPageLimit(userID uint, page, limit int) ([]*models.Upload, error) {
+	return service.db.GetAllUploadsByUserIDPageLimit(userID, page, limit)
 }
 
 // GetUpload returns an upload by ID

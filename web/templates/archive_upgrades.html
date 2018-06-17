@@ -21,4 +21,17 @@
 
 </table>
 
+<div class="row">
+    <div class="col">
+        {{ if ge $.Data.PreviousPage 0 }}
+        <a class="btn btn-outline-primary" href="?page={{ $.Data.PreviousPage }}">Previous</a>
+        {{ else }}
+        <button type="button" class="btn btn-outline-secondary" disabled>Previous</button>
+        {{ end }}
+    </div>
+    <div class="col text-right">
+        <a class="btn btn-outline-primary" href="?page={{ $.Data.NextPage }}">Next</a>
+    </div>
+</div>
+
 {{ end }}

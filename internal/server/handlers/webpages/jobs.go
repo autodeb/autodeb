@@ -16,7 +16,13 @@ import (
 func JobsGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		jobs, err := appCtx.JobsService().GetAllJobs()
+		page := 0
+		limit := 30
+		if pageParam := r.URL.Query().Get("page"); pageParam != "" {
+			page, _ = strconv.Atoi(pageParam)
+		}
+
+		jobs, err := appCtx.JobsService().GetAllJobsPageLimit(page, limit)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
@@ -24,16 +30,19 @@ func JobsGetHandler(appCtx *appctx.Context) http.Handler {
 		}
 
 		data := struct {
-			Jobs []*models.Job
+			Jobs         []*models.Job
+			NextPage     int
+			PreviousPage int
 		}{
-			Jobs: jobs,
+			Jobs:         jobs,
+			NextPage:     page + 1,
+			PreviousPage: page - 1,
 		}
 
 		renderWithBase(r, w, appCtx, user, "jobs.html", data)
 	}
 
 	handler := auth.MaybeWithUser(handlerFunc, appCtx)
-
 	handler = middleware.HTMLHeaders(handler)
 
 	return handler
@@ -81,7 +90,6 @@ func JobGetHandler(appCtx *appctx.Context) http.Handler {
 	}
 
 	handler := auth.MaybeWithUser(handlerFunc, appCtx)
-
 	handler = middleware.HTMLHeaders(handler)
 
 	return handler

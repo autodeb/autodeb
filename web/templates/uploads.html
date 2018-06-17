@@ -2,7 +2,9 @@
 
 {{ define "content" }}
 
-<p>This page lists all uploads:</p>
+<p>
+    This page lists all uploads{{ if $.Data.UserID }} for user {{ $.Data.UserID }}{{ end }}:
+</p>
 
 <table class="table table-bordered table-hover">
     <tr>
@@ -30,5 +32,18 @@
     {{ end }}
 
 </table>
+
+<div class="row">
+    <div class="col">
+        {{ if ge $.Data.PreviousPage 0 }}
+        <a class="btn btn-outline-primary" href="?page={{ $.Data.PreviousPage }}&user_id={{ $.Data.UserID }}">Previous</a>
+        {{ else }}
+        <button type="button" class="btn btn-outline-secondary" disabled>Previous</button>
+        {{ end }}
+    </div>
+    <div class="col text-right">
+        <a class="btn btn-outline-primary" href="?page={{ $.Data.NextPage }}&user_id={{ $.Data.UserID }}">Next</a>
+    </div>
+</div>
 
 {{ end }}

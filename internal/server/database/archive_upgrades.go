@@ -54,6 +54,29 @@ func (db *Database) GetAllArchiveUpgrades() ([]*models.ArchiveUpgrade, error) {
 	return archiveUpgrades, nil
 }
 
+// GetAllArchiveUpgradesPageLimit returns all ArchiveUpgrades with pagination
+func (db *Database) GetAllArchiveUpgradesPageLimit(page, limit int) ([]*models.ArchiveUpgrade, error) {
+	offset := page * limit
+
+	var archiveUpgrades []*models.ArchiveUpgrade
+
+	query := db.gormDB.Model(
+		&models.ArchiveUpgrade{},
+	).Order(
+		"id desc",
+	).Offset(
+		offset,
+	).Limit(
+		limit,
+	)
+
+	if err := query.Find(&archiveUpgrades).Error; err != nil {
+		return nil, err
+	}
+
+	return archiveUpgrades, nil
+}
+
 // GetAllArchiveUpgradesByUserID returns all ArchiveUpgrades for a UserID
 func (db *Database) GetAllArchiveUpgradesByUserID(userID uint) ([]*models.ArchiveUpgrade, error) {
 	var archiveUpgrades []*models.ArchiveUpgrade

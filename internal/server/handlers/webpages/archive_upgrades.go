@@ -16,7 +16,13 @@ import (
 func ArchiveUpgradesGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		archiveUpgrades, err := appCtx.JobsService().GetAllArchiveUpgrades()
+		page := 0
+		limit := 30
+		if pageParam := r.URL.Query().Get("page"); pageParam != "" {
+			page, _ = strconv.Atoi(pageParam)
+		}
+
+		archiveUpgrades, err := appCtx.JobsService().GetAllArchiveUpgradesPageLimit(page, limit)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
@@ -25,8 +31,12 @@ func ArchiveUpgradesGetHandler(appCtx *appctx.Context) http.Handler {
 
 		data := struct {
 			ArchiveUpgrades []*models.ArchiveUpgrade
+			PreviousPage    int
+			NextPage        int
 		}{
 			ArchiveUpgrades: archiveUpgrades,
+			PreviousPage:    page - 1,
+			NextPage:        page + 1,
 		}
 
 		renderWithBase(r, w, appCtx, user, "archive_upgrades.html", data)

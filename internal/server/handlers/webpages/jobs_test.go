@@ -11,6 +11,34 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
+func TestJobsGetHandler(t *testing.T) {
+	testRouter := routertest.SetupTest(t)
+
+	testRouter.DB.CreateJob(models.JobTypeAutopkgtest, "", models.JobParentTypeArchiveUpgrade, 711)
+	testRouter.DB.CreateJob(models.JobTypeForward, "", models.JobParentTypeUpload, 312)
+
+	//Show all jobs
+	request := httptest.NewRequest(http.MethodGet, "/jobs", nil)
+	response := testRouter.ServeHTTP(request)
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.Contains(
+		t, response.Body.String(),
+		"autopkgtest", "archive-upgrade", "711",
+		"forward", "upload", "312",
+	)
+
+	// There is nothing on the next page
+	request = httptest.NewRequest(http.MethodGet, "/jobs?page=1", nil)
+	response = testRouter.ServeHTTP(request)
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.NotContains(
+		t, response.Body.String(),
+		"u1source", "u1version", "u1maint", "u1changedby",
+		"autopkgtest", "archive-upgrade", "711",
+		"forward", "upload", "312",
+	)
+}
+
 func TestJobGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 

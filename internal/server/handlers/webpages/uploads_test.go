@@ -17,10 +17,20 @@ func TestUploadsGetHandler(t *testing.T) {
 	testRouter.DB.CreateUpload(2, "u2source", "u2version", "u2maint", "u2changedby", false, false)
 
 	//Show all uploads
-	request := httptest.NewRequest(http.MethodGet, "/uploads/1", nil)
+	request := httptest.NewRequest(http.MethodGet, "/uploads", nil)
 	response := testRouter.ServeHTTP(request)
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Contains(
+		t, response.Body.String(),
+		"u1source", "u1version", "u1maint", "u1changedby",
+		"u2source", "u2version", "u2maint", "u2changedby",
+	)
+
+	// There is nothing on the next page
+	request = httptest.NewRequest(http.MethodGet, "/uploads?page=1", nil)
+	response = testRouter.ServeHTTP(request)
+	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
+	assert.NotContains(
 		t, response.Body.String(),
 		"u1source", "u1version", "u1maint", "u1changedby",
 		"u2source", "u2version", "u2maint", "u2changedby",

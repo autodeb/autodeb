@@ -54,6 +54,11 @@ func (service *Service) GetAllJobs() ([]*models.Job, error) {
 	return service.db.GetAllJobs()
 }
 
+// GetAllJobsPageLimit returns all jobs with pagination
+func (service *Service) GetAllJobsPageLimit(page, limit int) ([]*models.Job, error) {
+	return service.db.GetAllJobsPageLimit(page, limit)
+}
+
 // GetAllJobsByUploadID returns all jobs for a given upload
 func (service *Service) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, error) {
 	return service.db.GetAllJobsByUploadID(uploadID)

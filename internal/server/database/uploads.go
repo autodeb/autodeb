@@ -41,6 +41,29 @@ func (db *Database) GetAllUploads() ([]*models.Upload, error) {
 	return uploads, nil
 }
 
+// GetAllUploadsPageLimit returns all uploads with pagination
+func (db *Database) GetAllUploadsPageLimit(page, limit int) ([]*models.Upload, error) {
+	offset := page * limit
+
+	var uploads []*models.Upload
+
+	query := db.gormDB.Model(
+		&models.Upload{},
+	).Order(
+		"id desc",
+	).Offset(
+		offset,
+	).Limit(
+		limit,
+	)
+
+	if err := query.Find(&uploads).Error; err != nil {
+		return nil, err
+	}
+
+	return uploads, nil
+}
+
 // GetAllUploadsByUserID returns all uploads for a user
 func (db *Database) GetAllUploadsByUserID(userID uint) ([]*models.Upload, error) {
 	var uploads []*models.Upload
@@ -51,6 +74,33 @@ func (db *Database) GetAllUploadsByUserID(userID uint) ([]*models.Upload, error)
 		&models.Upload{
 			UserID: userID,
 		},
+	)
+
+	if err := query.Find(&uploads).Error; err != nil {
+		return nil, err
+	}
+
+	return uploads, nil
+}
+
+// GetAllUploadsByUserIDPageLimit returns all uploads for a given user id with pagination
+func (db *Database) GetAllUploadsByUserIDPageLimit(userID uint, page, limit int) ([]*models.Upload, error) {
+	offset := page * limit
+
+	var uploads []*models.Upload
+
+	query := db.gormDB.Model(
+		&models.Upload{},
+	).Where(
+		&models.Upload{
+			UserID: userID,
+		},
+	).Order(
+		"id desc",
+	).Offset(
+		offset,
+	).Limit(
+		limit,
 	)
 
 	if err := query.Find(&uploads).Error; err != nil {

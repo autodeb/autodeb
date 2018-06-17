@@ -35,6 +35,29 @@ func (db *Database) GetAllJobs() ([]*models.Job, error) {
 	return jobs, nil
 }
 
+// GetAllJobsPageLimit returns all jobs with pagination
+func (db *Database) GetAllJobsPageLimit(page, limit int) ([]*models.Job, error) {
+	offset := page * limit
+
+	var jobs []*models.Job
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	).Order(
+		"id desc",
+	).Offset(
+		offset,
+	).Limit(
+		limit,
+	)
+
+	if err := query.Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
 // ChangeJobStatus will change a job's status. This is not
 // idempotent and will cause an error if the status was not modified.
 func (db *Database) ChangeJobStatus(jobID uint, newStatus models.JobStatus) error {
@@ -137,6 +160,34 @@ func (db *Database) GetAllJobsByArchiveUpgradeID(id uint) ([]*models.Job, error)
 			ParentType: models.JobParentTypeArchiveUpgrade,
 			ParentID:   id,
 		},
+	)
+
+	if err := query.Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
+// GetAllJobsByArchiveUpgradeIDPageLimit returns all jobs with pagination
+func (db *Database) GetAllJobsByArchiveUpgradeIDPageLimit(id uint, page, limit int) ([]*models.Job, error) {
+	offset := page * limit
+
+	var jobs []*models.Job
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	).Where(
+		&models.Job{
+			ParentType: models.JobParentTypeArchiveUpgrade,
+			ParentID:   id,
+		},
+	).Order(
+		"id desc",
+	).Offset(
+		offset,
+	).Limit(
+		limit,
 	)
 
 	if err := query.Find(&jobs).Error; err != nil {

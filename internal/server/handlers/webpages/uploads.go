@@ -16,24 +16,31 @@ import (
 func UploadsGetHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
+		page := 0
+		limit := 30
+		if pageParam := r.URL.Query().Get("page"); pageParam != "" {
+			page, _ = strconv.Atoi(pageParam)
+		}
+
 		var uploads []*models.Upload
 		var err error
 
-		if param := r.URL.Query().Get("user_id"); param != "" {
-			userID, err := strconv.Atoi(param)
+		userIDParam := r.URL.Query().Get("user_id")
+		if userIDParam != "" {
+			userID, err := strconv.Atoi(userIDParam)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				appCtx.RequestLogger().Error(r, err)
 				return
 			}
-			uploads, err = appCtx.UploadsService().GetAllUploadsByUserID(uint(userID))
+			uploads, err = appCtx.UploadsService().GetAllUploadsByUserIDPageLimit(uint(userID), page, limit)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				appCtx.RequestLogger().Error(r, err)
 				return
 			}
 		} else {
-			uploads, err = appCtx.UploadsService().GetAllUploads()
+			uploads, err = appCtx.UploadsService().GetAllUploadsPageLimit(page, limit)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				appCtx.RequestLogger().Error(r, err)
@@ -42,9 +49,15 @@ func UploadsGetHandler(appCtx *appctx.Context) http.Handler {
 		}
 
 		data := struct {
-			Uploads []*models.Upload
+			Uploads      []*models.Upload
+			PreviousPage int
+			NextPage     int
+			UserID       string
 		}{
-			Uploads: uploads,
+			Uploads:      uploads,
+			PreviousPage: page - 1,
+			NextPage:     page + 1,
+			UserID:       userIDParam,
 		}
 
 		renderWithBase(r, w, appCtx, user, "uploads.html", data)

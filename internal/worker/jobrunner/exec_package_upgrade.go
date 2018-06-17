@@ -67,22 +67,18 @@ func (jobRunner *JobRunner) execPackageUpgrade(
 		"--no-clean-source",
 		"--nolog",
 		"--arch-all",
+		"--source",
 	); err != nil {
 		return errors.WithMessage(err, "sbuild failed")
 	}
 
-	// Find .changes file
-	changes, err := getFirstChangesInDirectory(workingDirectory)
-	if err != nil {
+	// Find .changes file and copy all referenced files to the artifacts directory
+	if changes, err := getFirstChangesInDirectory(workingDirectory); err != nil {
 		return errors.WithMessage(err, "couldn't get changes file in output directory")
-	}
-	if changes == nil {
+	} else if changes == nil {
 		return errors.New("no changes file found in output directory")
-	}
-
-	// Move .changes and referenced files to artifacts directory
-	if err := changes.Move(artifactsDirectory); err != nil {
-		return errors.WithMessage(err, "couldn't move build output to artifacts directory")
+	} else if err := changes.Copy(artifactsDirectory); err != nil {
+		return errors.WithMessage(err, "couldn't copy changes and referenced files to the artifacts directory")
 	}
 
 	return nil

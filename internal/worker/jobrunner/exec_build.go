@@ -52,6 +52,7 @@ func (jobRunner *JobRunner) execBuild(
 		"--no-clean-source",
 		"--nolog",
 		"--arch-all",
+		"--source",
 	); err != nil {
 		return errors.WithMessage(err, "sbuild failed")
 	}

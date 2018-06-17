@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	osexec "os/exec"
-	"path"
 	"path/filepath"
 	"strconv"
 	"syscall"
@@ -29,32 +28,22 @@ func (jobRunner *JobRunner) execAutopkgtest(
 		return errors.WithMessage(err, "could not convert input to int")
 	}
 
-	// Get the .dsc URL
-	dscURL := jobRunner.apiClient.GetUploadDSCURL(job.ParentID)
-	dscFileName := path.Base(dscURL.EscapedPath())
-
-	// Download the source
-	if err := exec.RunCtxDirStdoutStderr(
-		ctx, workingDirectory, logFile, logFile,
-		"dget", "--allow-unauthenticated", dscURL.String(),
-	); err != nil {
-		return errors.WithMessage(err, "dget failed")
-	}
-
 	// Get the artifacts of the build job
 	artifacts, err := jobRunner.apiClient.GetJobArtifacts(uint(buildJobID))
 	if err != nil {
 		return errors.WithMessage(err, "could not get job artifacts")
 	}
 
-	var debFilenames []string
+	var inputFiles []string
 
 	// Get the artifacts (debs) that we should test
 	for _, artifact := range artifacts {
 
-		if filepath.Ext(artifact.Filename) != ".deb" {
+		if ext := filepath.Ext(artifact.Filename); ext != ".dsc" && ext != ".deb" {
 			continue
 		}
+
+		inputFiles = append(inputFiles, artifact.Filename)
 
 		// Get the deb
 		artifactContent, err := jobRunner.apiClient.GetArtifactContent(artifact.ID)
@@ -70,10 +59,9 @@ func (jobRunner *JobRunner) execAutopkgtest(
 		}
 		defer deb.Close()
 		if _, err := io.Copy(deb, artifactContent); err != nil {
-			return errors.WithMessage(err, "could not copt artifact content to deb")
+			return errors.WithMessage(err, "could not copy artifact content to deb")
 		}
 
-		debFilenames = append(debFilenames, artifact.Filename)
 	}
 
 	args := []string{
@@ -81,11 +69,10 @@ func (jobRunner *JobRunner) execAutopkgtest(
 	}
 	args = append(
 		args,
-		debFilenames...,
+		inputFiles...,
 	)
 	args = append(
 		args,
-		dscFileName,
 		"--",
 		"schroot",
 		"unstable-amd64-sbuild",

@@ -121,12 +121,12 @@ DISPATCH_JOBS_LOOP:
 					break
 				}
 
-				// Could not dispatch a job to the runner. Wait 10 seconds
+				// Could not dispatch a job to the runner. Wait 20 seconds
 				// before trying again or quit if we are asked to.
 				select {
 				case <-w.quit:
 					break DISPATCH_JOBS_LOOP
-				case <-time.After(10 * time.Second):
+				case <-time.After(20 * time.Second):
 					continue
 				}
 			}

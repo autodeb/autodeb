@@ -7,7 +7,6 @@ import (
 	"os"
 	osexec "os/exec"
 	"path/filepath"
-	"strconv"
 	"syscall"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
@@ -22,14 +21,8 @@ func (jobRunner *JobRunner) execAutopkgtest(
 	artifactsDirectory string,
 	logFile io.Writer) error {
 
-	// The job input is a build job
-	buildJobID, err := strconv.Atoi(job.Input)
-	if err != nil {
-		return errors.WithMessage(err, "could not convert input to int")
-	}
-
 	// Get the artifacts of the build job
-	artifacts, err := jobRunner.apiClient.GetJobArtifacts(uint(buildJobID))
+	artifacts, err := jobRunner.apiClient.GetJobArtifacts(job.BuildJobID)
 	if err != nil {
 		return errors.WithMessage(err, "could not get job artifacts")
 	}

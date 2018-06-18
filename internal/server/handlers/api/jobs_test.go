@@ -44,12 +44,7 @@ func TestJobsNextPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild,
-		"",
-		models.JobParentTypeUpload,
-		uint(3),
-	)
+	testRouter.Services.Jobs().CreateBuildUploadJob(uint(3))
 
 	job, err := apiClient.UnqueueNextJob()
 	assert.NoError(t, err)
@@ -57,7 +52,7 @@ func TestJobsNextPostHandler(t *testing.T) {
 
 	expected := &models.Job{
 		ID:         uint(1),
-		Type:       models.JobTypeBuild,
+		Type:       models.JobTypeBuildUpload,
 		Status:     models.JobStatusAssigned,
 		ParentType: models.JobParentTypeUpload,
 		ParentID:   uint(3),
@@ -88,16 +83,14 @@ func TestJobGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	_, err := testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, uint(1),
-	)
+	_, err := testRouter.Services.Jobs().CreateBuildUploadJob(uint(1))
 
 	assert.NoError(t, err)
 
 	job, err := apiClient.GetJob(uint(1))
 	assert.NoError(t, err)
 	assert.Equal(t, uint(1), job.ID)
-	assert.Equal(t, models.JobTypeBuild, job.Type)
+	assert.Equal(t, models.JobTypeBuildUpload, job.Type)
 	assert.Equal(t, uint(1), job.ParentID)
 	assert.Equal(t, models.JobParentTypeUpload, job.ParentType)
 
@@ -125,9 +118,7 @@ func TestJobStatusPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, uint(1),
-	)
+	job, err := testRouter.Services.Jobs().CreateBuildUploadJob(uint(1))
 	assert.NoError(t, err)
 	assert.NotEqual(t, models.JobStatusFailed, job.Status)
 
@@ -151,9 +142,7 @@ func TestJobLogPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, uint(1),
-	)
+	job, err := testRouter.Services.Jobs().CreateBuildUploadJob(uint(1))
 	assert.NoError(t, err)
 
 	job.Status = models.JobStatusAssigned
@@ -183,9 +172,7 @@ func TestJobArtifactPostHandler(t *testing.T) {
 	apiClient := testRouter.APIClient
 	testRouter.Login()
 
-	job, err := testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, uint(1),
-	)
+	job, err := testRouter.Services.Jobs().CreateBuildUploadJob(uint(1))
 	assert.NoError(t, err)
 
 	job.Status = models.JobStatusAssigned

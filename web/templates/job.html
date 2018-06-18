@@ -19,6 +19,16 @@
         <td class="{{ $.Data.Job.Status | jobStatusTableClass }}">{{ $.Data.Job.Status }}</td>
     </tr>
     <tr>
+        <th>Build Job ID</th>
+        <td>
+        {{ if $.Data.Job.BuildJobID }}
+            <a href="/jobs/{{ $.Data.Job.BuildJobID }}">{{ $.Data.Job.BuildJobID }}</a>
+        {{ else }}
+            N/A
+        {{ end }}
+        </td>
+    </tr>
+    <tr>
         <th>Parent Type</th>
         <td>{{ $.Data.Job.ParentType }}</td>
     </tr>

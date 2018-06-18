@@ -122,8 +122,8 @@ func (jobRunner *JobRunner) getJobContext() (context.Context, context.CancelFunc
 
 func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, jobDirectory *jobDirectory) error {
 	switch job.Type {
-	case models.JobTypeBuild:
-		return jobRunner.execBuild(
+	case models.JobTypeBuildUpload:
+		return jobRunner.execBuildUpload(
 			ctx,
 			job,
 			jobDirectory.workingDirectory,
@@ -138,8 +138,8 @@ func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, jobDir
 			jobDirectory.artifactsDirectory,
 			jobDirectory.logFile,
 		)
-	case models.JobTypeForward:
-		return jobRunner.execForward(
+	case models.JobTypeForwardUpload:
+		return jobRunner.execForwardUpload(
 			ctx,
 			job,
 			jobDirectory.workingDirectory,

@@ -13,7 +13,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
 )
 
-func (jobRunner *JobRunner) execBuild(
+func (jobRunner *JobRunner) execBuildUpload(
 	ctx context.Context,
 	job *models.Job,
 	workingDirectory string,

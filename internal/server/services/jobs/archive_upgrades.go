@@ -15,6 +15,7 @@ func (service *Service) CreateArchiveUpgrade(userID uint, packageCount uint) (*m
 	if _, err := service.db.CreateJob(
 		models.JobTypeSetupArchiveUpgrade,
 		"",
+		0,
 		models.JobParentTypeArchiveUpgrade,
 		archiveUpgrade.ID,
 	); err != nil {

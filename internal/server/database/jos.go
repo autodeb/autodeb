@@ -8,11 +8,12 @@ import (
 )
 
 // CreateJob will create a job
-func (db *Database) CreateJob(jobType models.JobType, input string, parentType models.JobParentType, parentID uint) (*models.Job, error) {
+func (db *Database) CreateJob(jobType models.JobType, input string, buildJobID uint, parentType models.JobParentType, parentID uint) (*models.Job, error) {
 	job := &models.Job{
 		Type:       jobType,
 		Input:      input,
 		Status:     models.JobStatusQueued,
+		BuildJobID: buildJobID,
 		ParentID:   parentID,
 		ParentType: parentType,
 	}

@@ -29,6 +29,7 @@ func JobsPostHandler(appCtx *appctx.Context) http.Handler {
 		createdJob, err := appCtx.JobsService().CreateJob(
 			job.Type,
 			job.Input,
+			job.BuildJobID,
 			job.ParentType,
 			job.ParentID,
 		)

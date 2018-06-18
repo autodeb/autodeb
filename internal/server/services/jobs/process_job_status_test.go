@@ -1,7 +1,6 @@
 package jobs_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,7 +18,7 @@ func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
 
 	// Create a package upgrade job in the context of an archive upgrade
 	upgradeJob, err := jobsService.CreateJob(
-		models.JobTypePackageUpgrade, "", models.JobParentTypeArchiveUpgrade, archiveUpgrade.ID,
+		models.JobTypePackageUpgrade, "", 0, models.JobParentTypeArchiveUpgrade, archiveUpgrade.ID,
 	)
 	assert.NoError(t, err)
 	assert.NotNil(t, upgradeJob)
@@ -44,7 +43,7 @@ func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
 	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob.Type)
 	assert.Equal(t, models.JobParentTypeArchiveUpgrade, autopkgTestJob.ParentType)
 	assert.Equal(t, archiveUpgrade.ID, autopkgTestJob.ParentID)
-	assert.Equal(t, fmt.Sprint(upgradeJob.ID), autopkgTestJob.Input, "this job's input should be the package upgrade job")
+	assert.Equal(t, upgradeJob.ID, autopkgTestJob.BuildJobID, "this job's build job id should be the package upgrade job")
 
 	// Mark the autopkgtest job as completed
 	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)
@@ -66,9 +65,7 @@ func TestProcessJobStatusUploadBuildAndDontForward(t *testing.T) {
 	assert.NotNil(t, upload)
 
 	// Create a build job for this upload
-	job, err := jobsService.CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, upload.ID,
-	)
+	job, err := jobsService.CreateBuildUploadJob(upload.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, job)
 
@@ -97,9 +94,7 @@ func TestProcessJobStatusUploadBuildAndAutopkgTestAndForward(t *testing.T) {
 	assert.NotNil(t, upload)
 
 	// Create a build job for this upload
-	job, err := jobsService.CreateJob(
-		models.JobTypeBuild, "", models.JobParentTypeUpload, upload.ID,
-	)
+	job, err := jobsService.CreateBuildUploadJob(upload.ID)
 	assert.NoError(t, err)
 	assert.NotNil(t, job)
 
@@ -120,7 +115,7 @@ func TestProcessJobStatusUploadBuildAndAutopkgTestAndForward(t *testing.T) {
 	autopkgTestJob := jobs[1]
 	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob.Type)
 	assert.Equal(t, upload.ID, autopkgTestJob.ParentID)
-	assert.Equal(t, fmt.Sprint(job.ID), autopkgTestJob.Input, "this job's input should be the build job")
+	assert.Equal(t, job.ID, autopkgTestJob.BuildJobID, "this job's BuildJobID should be the build job")
 
 	// Mark the autopkgtest job as completed
 	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)
@@ -132,7 +127,7 @@ func TestProcessJobStatusUploadBuildAndAutopkgTestAndForward(t *testing.T) {
 	assert.Equal(t, 3, len(jobs))
 
 	forwardJob := jobs[2]
-	assert.Equal(t, models.JobTypeForward, forwardJob.Type)
+	assert.Equal(t, models.JobTypeForwardUpload, forwardJob.Type)
 
 	// Mark the forward job as completed
 	err = jobsService.ProcessJobStatus(forwardJob.ID, models.JobStatusSuccess)

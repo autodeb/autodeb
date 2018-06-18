@@ -14,8 +14,8 @@ import (
 func TestJobsGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 
-	testRouter.DB.CreateJob(models.JobTypeAutopkgtest, "", models.JobParentTypeArchiveUpgrade, 711)
-	testRouter.DB.CreateJob(models.JobTypeForward, "", models.JobParentTypeUpload, 312)
+	testRouter.DB.CreateJob(models.JobTypeAutopkgtest, "", 0, models.JobParentTypeArchiveUpgrade, 711)
+	testRouter.Services.Jobs().CreateForwardJob(312)
 
 	//Show all jobs
 	request := httptest.NewRequest(http.MethodGet, "/jobs", nil)
@@ -49,7 +49,7 @@ func TestJobGetHandler(t *testing.T) {
 	assert.Equal(t, "", response.Body.String())
 
 	job, _ := testRouter.Services.Jobs().CreateJob(
-		models.JobTypeBuild, "testinput", models.JobParentTypeArchiveUpgrade, 702,
+		models.JobTypeBuildUpload, "testinput", 444, models.JobParentTypeArchiveUpgrade, 702,
 	)
 	testRouter.DB.CreateArtifact(job.ID, "testartifactfilename")
 
@@ -57,9 +57,11 @@ func TestJobGetHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Result().StatusCode)
 	assert.Contains(
 		t, response.Body.String(),
+		"build-upload",
 		"testartifactfilename",
 		"queued",
 		"testinput",
+		"444",
 		"archive-upgrade",
 		"702",
 	)

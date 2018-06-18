@@ -106,8 +106,47 @@ func (service *Service) UnqueueNextJob() (*models.Job, error) {
 }
 
 //CreateJob creates a new job
-func (service *Service) CreateJob(jobType models.JobType, input string, parentType models.JobParentType, parentID uint) (*models.Job, error) {
-	return service.db.CreateJob(jobType, input, parentType, parentID)
+func (service *Service) CreateJob(jobType models.JobType, input string, buildJobID uint, parentType models.JobParentType, parentID uint) (*models.Job, error) {
+	return service.db.CreateJob(
+		jobType,
+		input,
+		buildJobID,
+		parentType,
+		parentID,
+	)
+}
+
+//CreateBuildUploadJob creates a build job
+func (service *Service) CreateBuildUploadJob(uploadID uint) (*models.Job, error) {
+	return service.db.CreateJob(
+		models.JobTypeBuildUpload,
+		"",
+		0,
+		models.JobParentTypeUpload,
+		uploadID,
+	)
+}
+
+//CreateForwardJob creates an upload forward job
+func (service *Service) CreateForwardJob(uploadID uint) (*models.Job, error) {
+	return service.db.CreateJob(
+		models.JobTypeForwardUpload,
+		"",
+		0,
+		models.JobParentTypeUpload,
+		uploadID,
+	)
+}
+
+//CreateAutopkgtestJobFromBuildJob creates an autopkgtest job from the build job
+func (service *Service) CreateAutopkgtestJobFromBuildJob(buildJob *models.Job) (*models.Job, error) {
+	return service.CreateJob(
+		models.JobTypeAutopkgtest,
+		"",
+		buildJob.ID,
+		buildJob.ParentType,
+		buildJob.ParentID,
+	)
 }
 
 // GetJob returns the job with the given id

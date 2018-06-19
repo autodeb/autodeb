@@ -58,7 +58,7 @@ func TestNewArchiveUpgradePostHandler(t *testing.T) {
 	assert.Equal(t, 1, len(archiveUpgrades))
 
 	archiveUpgrade := archiveUpgrades[0]
-	assert.Equal(t, uint(42), archiveUpgrade.PackageCount)
+	assert.Equal(t, 42, archiveUpgrade.PackageCount)
 }
 
 func TestArchiveUpgradeGetHandler(t *testing.T) {

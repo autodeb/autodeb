@@ -41,7 +41,7 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 
 	fmt.Fprintln(logFile, "Creating upgrade jobs...")
 
-	for i := 0; i < archiveUpgrade.PackageCount; i++ {
+	for i := 0; i < archiveUpgrade.PackageCount || archiveUpgrade.PackageCount <= 0; i++ {
 
 		if len(sourcePackages) < 1 {
 			fmt.Fprintln(logFile, "there are no more source pacakges to ugprade...")

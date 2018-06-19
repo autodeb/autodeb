@@ -14,8 +14,8 @@ func Dget(url, directory string) error {
 	)
 	command.Dir = directory
 
-	if err := command.Run(); err != nil {
-		return errors.Errorf("dget error: %s", err)
+	if combinedOutput, err := command.CombinedOutput(); err != nil {
+		return errors.Errorf("dget error: %s: %s", err, combinedOutput)
 	}
 
 	return nil

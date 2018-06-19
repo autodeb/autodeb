@@ -19,7 +19,8 @@ func Uscan(ctx context.Context, directory string) (*Result, error) {
 
 	output, err := command.Output()
 	if err != nil {
-		return nil, errors.WithMessage(err, "uscan error")
+		combinedOutput, _ := command.CombinedOutput()
+		return nil, errors.WithMessagef(err, "uscan error: %s: %s", err, combinedOutput)
 	}
 
 	result := &Result{}

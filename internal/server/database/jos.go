@@ -141,6 +141,8 @@ func (db *Database) GetAllJobsByUploadID(uploadID uint) ([]*models.Job, error) {
 			ParentType: models.JobParentTypeUpload,
 			ParentID:   uploadID,
 		},
+	).Order(
+		"id",
 	)
 
 	if err := query.Find(&jobs).Error; err != nil {
@@ -161,6 +163,8 @@ func (db *Database) GetAllJobsByArchiveUpgradeID(id uint) ([]*models.Job, error)
 			ParentType: models.JobParentTypeArchiveUpgrade,
 			ParentID:   id,
 		},
+	).Order(
+		"id",
 	)
 
 	if err := query.Find(&jobs).Error; err != nil {

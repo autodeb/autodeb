@@ -90,8 +90,8 @@ func (db *Database) ChangeJobStatus(jobID uint, newStatus models.JobStatus) erro
 	return nil
 }
 
-// GetAllJobsByUploadIDStatuses returns all jobs that match the given id and statuses
-func (db *Database) GetAllJobsByUploadIDStatuses(uploadID uint, statuses ...models.JobStatus) ([]*models.Job, error) {
+// GetAllJobsByParentAndStatuses returns all jobs that match the given id and statuses
+func (db *Database) GetAllJobsByParentAndStatuses(parentType models.JobParentType, parentID uint, statuses ...models.JobStatus) ([]*models.Job, error) {
 	var jobs []*models.Job
 
 	query := db.gormDB.Model(
@@ -105,8 +105,8 @@ func (db *Database) GetAllJobsByUploadIDStatuses(uploadID uint, statuses ...mode
 
 		query = query.Where(
 			&models.Job{
-				ParentID:   uploadID,
-				ParentType: models.JobParentTypeUpload,
+				ParentID:   parentID,
+				ParentType: parentType,
 				Status:     status,
 			},
 		)
@@ -116,8 +116,8 @@ func (db *Database) GetAllJobsByUploadIDStatuses(uploadID uint, statuses ...mode
 	for _, status := range statuses[0:] {
 		query = query.Or(
 			&models.Job{
-				ParentID:   uploadID,
-				ParentType: models.JobParentTypeUpload,
+				ParentID:   parentID,
+				ParentType: parentType,
 				Status:     status,
 			},
 		)

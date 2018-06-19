@@ -46,6 +46,23 @@ func (service *Service) processArchiveUpgradeJobStatus(job *models.Job) error {
 		}
 	}
 
+	// If this is a CreateArchiveUpgradeRepositoryJob, stop here.
+	if job.Type == models.JobTypeCreateArchiveUpgradeRepository {
+		return nil
+	}
+
+	// Was that the last expected job for this archive upgrade?
+	if jobs, err := service.GetAllUncompletedJobsByArchiveUpgradeID(job.ParentID); err != nil {
+		return err
+	} else if len(jobs) > 0 {
+		return nil
+	}
+
+	// Create a repository from the archive upgrade
+	if _, err := service.CreateArchiveUpgradeRepositoryJob(job.ParentID); err != nil {
+		return err
+	}
+
 	return nil
 }
 

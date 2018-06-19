@@ -9,6 +9,42 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/servicestest"
 )
 
+func TestProcessJobStatusArchiveUpgrade(t *testing.T) {
+	servicesTest := servicestest.SetupTest(t)
+	jobsService := servicesTest.Services.Jobs()
+
+	archiveUpgrade, err := jobsService.CreateArchiveUpgrade(0, 0)
+	assert.NoError(t, err)
+
+	jobs, err := jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(jobs), "there should only be one job associated to the archive upgrade")
+
+	setupJob := jobs[0]
+	assert.Equal(t, models.JobTypeSetupArchiveUpgrade, setupJob.Type)
+	assert.Equal(t, models.JobParentTypeArchiveUpgrade, setupJob.ParentType)
+	assert.Equal(t, archiveUpgrade.ID, setupJob.ParentID)
+
+	err = jobsService.ProcessJobStatus(setupJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobs), "a new createrepository job should have been created")
+
+	createRepositoryJob := jobs[1]
+	assert.Equal(t, models.JobTypeCreateArchiveUpgradeRepository, createRepositoryJob.Type)
+	assert.Equal(t, models.JobParentTypeArchiveUpgrade, createRepositoryJob.ParentType)
+	assert.Equal(t, archiveUpgrade.ID, createRepositoryJob.ParentID)
+
+	err = jobsService.ProcessJobStatus(createRepositoryJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobs), "there should be no additional jobs created")
+}
+
 func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
 	servicesTest := servicestest.SetupTest(t)
 	jobsService := servicesTest.Services.Jobs()

@@ -117,7 +117,7 @@ func NewArchiveUpgradePostHandler(appCtx *appctx.Context) http.Handler {
 		packageCountInt, err := strconv.Atoi(packageCount)
 		if err != nil {
 			appCtx.Sessions().Flash(r, w, "danger", "invalid package count")
-		} else if _, err := appCtx.JobsService().CreateArchiveUpgrade(user.ID, uint(packageCountInt)); err != nil {
+		} else if _, err := appCtx.JobsService().CreateArchiveUpgrade(user.ID, packageCountInt); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 		} else {

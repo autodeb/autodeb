@@ -6,7 +6,7 @@ import (
 )
 
 // CreateArchiveUpgrade creates a new ArchiveUpgrade
-func (service *Service) CreateArchiveUpgrade(userID uint, packageCount uint) (*models.ArchiveUpgrade, error) {
+func (service *Service) CreateArchiveUpgrade(userID uint, packageCount int) (*models.ArchiveUpgrade, error) {
 	archiveUpgrade, err := service.db.CreateArchiveUpgrade(userID, packageCount)
 	if err != nil {
 		return nil, err

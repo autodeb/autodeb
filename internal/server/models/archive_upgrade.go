@@ -4,5 +4,5 @@ package models
 type ArchiveUpgrade struct {
 	ID           uint `json:"id"`
 	UserID       uint `json:"user_id"`
-	PackageCount uint `json:"package_count"`
+	PackageCount int  `json:"package_count"`
 }

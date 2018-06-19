@@ -7,7 +7,7 @@ import (
 )
 
 // CreateArchiveUpgrade will create an ArchiveUpgrade
-func (db *Database) CreateArchiveUpgrade(userID uint, packageCount uint) (*models.ArchiveUpgrade, error) {
+func (db *Database) CreateArchiveUpgrade(userID uint, packageCount int) (*models.ArchiveUpgrade, error) {
 	archiveUpgrade := &models.ArchiveUpgrade{
 		UserID:       userID,
 		PackageCount: packageCount,

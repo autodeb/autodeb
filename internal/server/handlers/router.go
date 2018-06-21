@@ -61,12 +61,7 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.Path("/profile/remove-access-token").Handler(webpages.RemoveAccessTokenPostHandler(appCtx)).Methods(http.MethodPost)
 
 	// APTLY
-	router.PathPrefix("/aptly/").Handler(
-		aptly.Handler(
-			&appCtx.Config().Aptly.APIURL.URL,
-			"/aptly/",
-		),
-	)
+	router.PathPrefix("/aptly/").Handler(aptly.Handler(appCtx, "/aptly/"))
 
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()

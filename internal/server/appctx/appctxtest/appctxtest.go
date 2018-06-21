@@ -37,6 +37,11 @@ func SetupTest(t *testing.T) *AppCtxTest {
 		ServerURL: &url.URL{
 			URL: *servicesTest.ServerURL,
 		},
+		Aptly: &config.Aptly{
+			APIURL: &url.URL{
+				URL: *servicesTest.AptlyAPIURL,
+			},
+		},
 	}
 
 	templatesFS := filesystem.NewBasePathFS(

@@ -27,7 +27,7 @@ func (c *APIClient) CreateJob(job *models.Job) (*models.Job, error) {
 	)
 
 	if response != nil && response.StatusCode != http.StatusCreated {
-		return nil, errors.WithMessagef(err, "unexpected status code %d", response.StatusCode)
+		return nil, errors.Errorf("unexpected status code %d", response.StatusCode)
 	}
 
 	return &createdJob, err

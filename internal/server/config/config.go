@@ -12,11 +12,17 @@ type Config struct {
 	HTTP                  *HTTPServerConfig `toml:"http"`
 	Auth                  *AuthConfig       `toml:"authentication"`
 	ServerURL             *url.URL          `toml:"server_url"`
+	Aptly                 *Aptly            `toml:"aptly"`
 	DataDirectory         string            `toml:"data_directory"`
 	TemplatesDirectory    string            `toml:"templates_directory"`
 	StaticFilesDirectory  string            `toml:"static_files_directory"`
 	TemplatesCacheEnabled bool              `toml:"templates_cache_enabled"`
 	LogLevel              log.Level         `toml:"log_level"`
+}
+
+// Aptly holds configuration related to aptly
+type Aptly struct {
+	APIURL *url.URL `toml:"api_url"`
 }
 
 // AuthConfig holds configuration related to the authentification backend

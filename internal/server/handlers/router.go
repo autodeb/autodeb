@@ -9,6 +9,7 @@ import (
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/appctx"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/api"
+	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/aptly"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/uploadqueue"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/handlers/webpages"
 )
@@ -59,6 +60,14 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.Path("/profile/create-access-token").Handler(webpages.CreateAccessTokenPostHandler(appCtx)).Methods(http.MethodPost)
 	router.Path("/profile/remove-access-token").Handler(webpages.RemoveAccessTokenPostHandler(appCtx)).Methods(http.MethodPost)
 
+	// APTLY
+	router.PathPrefix("/aptly/").Handler(
+		aptly.Handler(
+			&appCtx.Config().Aptly.APIURL.URL,
+			"/aptly/",
+		),
+	)
+
 	// REST API Router
 	restAPIRouter := router.PathPrefix("/api/").Subrouter()
 
@@ -94,6 +103,8 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 
 	// ==== ArchiveUpgrades API ===
 	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}").Handler(api.ArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
+	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}/jobs").Handler(api.ArchiveUpgradeJobsGetHandler(appCtx)).Methods(http.MethodGet)
+	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}/successful-builds").Handler(api.ArchiveUpgradeSuccessfulBuildsGetHandler(appCtx)).Methods(http.MethodGet)
 
 	return router
 }

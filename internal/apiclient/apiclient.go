@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path"
 )
 
 //APIClient is a client for the autodeb-server REST API
@@ -44,18 +45,20 @@ func (c *APIClient) SetToken(token string) {
 	c.token = token
 }
 
-func (c *APIClient) url(path string) *url.URL {
-	relativeURL := &url.URL{Path: path}
+func (c *APIClient) absoluteURL(relativePath string) *url.URL {
+	relativeURL := &url.URL{
+		Path: path.Join(c.baseURL.Path, relativePath),
+	}
 	absoluteURL := c.baseURL.ResolveReference(relativeURL)
 	return absoluteURL
 }
 
 func (c *APIClient) post(path string, body io.Reader) (*http.Response, []byte, error) {
-	return c.do(http.MethodPost, path, body)
+	return c.doAndCloseBody(http.MethodPost, path, body)
 }
 
 func (c *APIClient) get(path string) (*http.Response, []byte, error) {
-	return c.do(http.MethodGet, path, nil)
+	return c.doAndCloseBody(http.MethodGet, path, nil)
 }
 
 func (c *APIClient) postJSON(path string, body io.Reader, v interface{}) (*http.Response, error) {
@@ -84,22 +87,15 @@ func (c *APIClient) getJSON(path string, v interface{}) (*http.Response, error) 
 	return response, err
 }
 
-func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, []byte, error) {
-	absoluteURL := c.url(path)
-
+func (c *APIClient) doAndCloseBody(method, path string, body io.Reader) (*http.Response, []byte, error) {
 	// Create the request
-	request, err := http.NewRequest(method, absoluteURL.String(), body)
+	request, err := http.NewRequest(method, path, body)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Set the auth headers
-	if c.token != "" {
-		request.Header.Set("Authorization", "token "+c.token)
-	}
-
 	// Send the request
-	response, err := c.httpClient.Do(request)
+	response, err := c.do(request)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -112,4 +108,25 @@ func (c *APIClient) do(method, path string, body io.Reader) (*http.Response, []b
 	}
 
 	return response, b, nil
+}
+
+// do modify the request and send it to the autodeb api. Modifications include:
+//  - adding auth headers
+//  - adding the proper prefix to the URL
+func (c *APIClient) do(request *http.Request) (*http.Response, error) {
+	// Replace the URL by adding the prefix
+	request.URL = c.absoluteURL(request.URL.Path)
+
+	// Set the auth headers
+	if c.token != "" {
+		request.Header.Set("Authorization", "token "+c.token)
+	}
+
+	// Send the request
+	response, err := c.httpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }

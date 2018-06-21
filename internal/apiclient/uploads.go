@@ -32,7 +32,7 @@ func (c *APIClient) GetUpload(jobID uint) (*models.Upload, error) {
 
 // GetUploadDSCURL returns the .dsc URL for a given upload
 func (c *APIClient) GetUploadDSCURL(uploadID uint) *url.URL {
-	dscURL := c.url(
+	dscURL := c.absoluteURL(
 		fmt.Sprintf("/api/uploads/%d/source.dsc", uploadID),
 	)
 	return dscURL
@@ -40,7 +40,7 @@ func (c *APIClient) GetUploadDSCURL(uploadID uint) *url.URL {
 
 // GetUploadChangesURL returns the .changes URL for a given upload
 func (c *APIClient) GetUploadChangesURL(uploadID uint) *url.URL {
-	dscURL := c.url(
+	dscURL := c.absoluteURL(
 		fmt.Sprintf("/api/uploads/%d/package.changes", uploadID),
 	)
 	return dscURL

@@ -26,3 +26,43 @@ func (c *APIClient) GetArchiveUpgrade(id uint) (*models.ArchiveUpgrade, error) {
 
 	return &archiveUpgrade, nil
 }
+
+// GetArchiveUpgradeJobs returns all jobs for an ArchiveUpgrade
+func (c *APIClient) GetArchiveUpgradeJobs(id uint) ([]*models.Job, error) {
+	var jobs []*models.Job
+
+	response, err := c.getJSON(
+		fmt.Sprintf("/api/archive-upgrades/%d/jobs", id),
+		&jobs,
+	)
+
+	if response != nil && response.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
+// GetArchiveUpgradeSuccessfulBuilds returns all successful builds for an ArchiveUpgrade
+func (c *APIClient) GetArchiveUpgradeSuccessfulBuilds(id uint) ([]*models.Job, error) {
+	var jobs []*models.Job
+
+	response, err := c.getJSON(
+		fmt.Sprintf("/api/archive-upgrades/%d/successful-builds", id),
+		&jobs,
+	)
+
+	if response != nil && response.StatusCode == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}

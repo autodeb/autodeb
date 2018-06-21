@@ -54,3 +54,28 @@ func (service *Service) GetAllJobsByArchiveUpgradeID(id uint) ([]*models.Job, er
 func (service *Service) GetAllJobsByArchiveUpgradeIDPageLimit(id uint, page, limit int) ([]*models.Job, error) {
 	return service.db.GetAllJobsByArchiveUpgradeIDPageLimit(id, page, limit)
 }
+
+// GetArchiveUpgradeSuccessfulBuilds returns all successful builds for an ArchiveUpgrade.
+// Successful builds are build that have passed all tests.
+func (service *Service) GetArchiveUpgradeSuccessfulBuilds(archiveUpgradeID uint) ([]*models.Job, error) {
+	jobs, err := service.GetAllJobsByArchiveUpgradeID(archiveUpgradeID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a [jobID]*models.Job map
+	jobMap := make(map[uint]*models.Job)
+	for _, job := range jobs {
+		jobMap[job.ID] = job
+	}
+
+	// Find successful autopkgtest jobs and add their corresponding build jobs to the list
+	var successfulBuilds []*models.Job
+	for _, job := range jobs {
+		if job.Type == models.JobTypeAutopkgtest && job.Status == models.JobStatusSuccess {
+			successfulBuilds = append(successfulBuilds, jobMap[job.BuildJobID])
+		}
+	}
+
+	return successfulBuilds, nil
+}

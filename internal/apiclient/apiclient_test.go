@@ -18,8 +18,8 @@ func setupTest(t *testing.T) *apiClientTest {
 	fakeHTTPClient := &FakeHTTPClient{}
 
 	apiClient, err := apiclient.New(
-		"",
 		"https://auto.debian.net:8080",
+		"testtoken",
 		fakeHTTPClient,
 	)
 	require.NoError(t, err)

@@ -29,6 +29,18 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 		return errors.WithMessage(err, "could not get archive upgrade")
 	}
 
+	// Create aptly repository
+	repo, err := jobRunner.apiClient.Aptly().CreateRepository(
+		fmt.Sprintf("archive-upgrade-%d", archiveUpgrade.ID),
+		fmt.Sprintf("Packages of archive upgrade %d", archiveUpgrade.ID),
+		"unstable",
+		"main",
+	)
+	if err != nil {
+		return errors.WithMessage(err, "could not create aptly repository")
+	}
+	fmt.Fprintf(logFile, "created repository %+v\n", repo)
+
 	// Get all packages that need upgrading
 	sourcePackages, err := udd.PackagesWithNewerUpstreamVersions()
 	if err != nil {

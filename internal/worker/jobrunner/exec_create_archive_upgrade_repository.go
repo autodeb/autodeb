@@ -68,7 +68,7 @@ func (jobRunner *JobRunner) execCreateArchiveUpgradeRepository(
 				if err := jobRunner.apiClient.Aptly().AddPackageToRepository(
 					artifact.Filename,
 					archiveUpgrade.RepositoryName(),
-					fmt.Sprintf("archive-upgrade-%d", job.ParentID),
+					archiveUpgrade.RepositoryName(),
 				); err != nil {
 					return errors.WithMessagef(err, "could not add %s to the repository", artifact.Filename)
 				}

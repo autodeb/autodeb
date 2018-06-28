@@ -14,7 +14,7 @@
         <th>Version</th>
         <th>Maintainer</th>
         <th>ChangedBy</th>
-        <th>Debian Source Control (.dsc)</th>
+        <th>.changes</th>
     </tr>
 
     {{ range $.Data.Uploads }}
@@ -26,7 +26,7 @@
         <td>{{ .Maintainer }}</td>
         <td>{{ .ChangedBy }}</td>
         <td>
-            <a href="/api/uploads/{{ .ID }}/source.dsc">dsc</a>
+            <a href="/api/uploads/{{ .ID }}/package.changes">changes</a>
         </td>
     </tr>
     {{ end }}

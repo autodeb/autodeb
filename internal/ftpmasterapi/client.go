@@ -3,6 +3,7 @@ package ftpmasterapi
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
@@ -10,6 +11,7 @@ import (
 
 const (
 	ftpMasterAPIUrl = "https://api.ftp-master.debian.org"
+	mirrorURL       = "https://deb.debian.org/debian"
 )
 
 // Client for the ftpmasters api
@@ -51,11 +53,68 @@ func (client *Client) GetDSCSInSuite(pkg, distribution string) ([]*DSC, error) {
 
 	var dscs []*DSC
 	if err := json.NewDecoder(resp.Body).Decode(&dscs); err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "cannot parse json output")
 	}
 
 	return dscs, nil
+}
 
+// SHA256SumInArchive is an element of the sha256sum_in_archive query
+type SHA256SumInArchive struct {
+	SHA256Sum string `json:"sha256sum"`
+	Filename  string `json:"filename"`
+}
+
+// GetSHA256SumInArchive returns a list of files with matching shasums in the archive
+func (client *Client) GetSHA256SumInArchive(sha256sum string) ([]*SHA256SumInArchive, error) {
+	url := fmt.Sprintf(
+		"%s/sha256sum_in_archive/%s",
+		ftpMasterAPIUrl,
+		sha256sum,
+	)
+
+	resp, err := client.httpClient.Get(url)
+	if err != nil {
+		return nil, errors.WithMessage(err, "get failed")
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("unexpected HTTP status code: got %d for url %s", resp.StatusCode, url)
+	}
+
+	var files []*SHA256SumInArchive
+	if err := json.NewDecoder(resp.Body).Decode(&files); err != nil {
+		return nil, errors.WithMessage(err, "cannot parse json output")
+	}
+
+	return files, nil
+}
+
+// GetFileBySHA256Sum returns a file in the archive by sha256sum
+func (client *Client) GetFileBySHA256Sum(sha256sum string) (io.ReadCloser, error) {
+	files, err := client.GetSHA256SumInArchive(sha256sum)
+	if err != nil {
+		return nil, err
+	} else if len(files) < 1 {
+		return nil, errors.Errorf("could not find file for sha256sum %s", sha256sum)
+	}
+
+	url := fmt.Sprintf(
+		"%s/pool/main/%s",
+		mirrorURL,
+		files[0].Filename,
+	)
+
+	resp, err := client.httpClient.Get(url)
+	if err != nil {
+		return nil, errors.WithMessage(err, "get failed")
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("unexpected HTTP status code: got %d for url %s", resp.StatusCode, url)
+	}
+
+	return resp.Body, nil
 }
 
 // Source api object as returned by source_in_suite

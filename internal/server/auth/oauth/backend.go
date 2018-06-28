@@ -31,14 +31,14 @@ func NewBackend(db *database.Database, sessionsManager *sessions.Manager, oauthP
 }
 
 func (backend *backend) GetUser(r *http.Request) (*models.User, error) {
-	id, err := backend.getUserID(r)
+	id, err := backend.getAuthBackendUserID(r)
 	if err != nil {
 		// Ignore the error, there is no user in this session
 		return nil, nil
 	}
 
 	// Get the user model
-	user, err := backend.db.GetUser(id)
+	user, err := backend.db.GetUserByAuthBackendUserID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -47,17 +47,17 @@ func (backend *backend) GetUser(r *http.Request) (*models.User, error) {
 }
 
 func (backend *backend) SetUser(r *http.Request, w http.ResponseWriter, user *models.User) {
-	backend.setUserID(r, w, user.ID)
+	backend.setUserID(r, w, user.AuthBackendUserID)
 }
 
-func (backend *backend) login(r *http.Request, w http.ResponseWriter, id uint, username string) error {
-	user, err := backend.db.GetUser(id)
+func (backend *backend) login(r *http.Request, w http.ResponseWriter, authBackendUserID uint, username string) error {
+	user, err := backend.db.GetUser(authBackendUserID)
 	if err != nil {
 		return err
 	}
 
 	if user == nil {
-		user, err = backend.db.CreateUser(id, username)
+		user, err = backend.db.CreateUser(username, authBackendUserID)
 		if err != nil {
 			return err
 		}

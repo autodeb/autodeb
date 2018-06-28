@@ -8,7 +8,7 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/http/sessions"
 )
 
-const userIDSessionKey = "userid"
+const authBackendUserIDSessionKey = "auth-backend-user-id"
 
 func (backend *backend) session(r *http.Request) *sessions.Session {
 	session, _ := backend.sessionsManager.Get(r)
@@ -21,23 +21,23 @@ func (backend *backend) clearSession(r *http.Request, w http.ResponseWriter) {
 	session.Save(r, w)
 }
 
-func (backend *backend) getUserID(r *http.Request) (uint, error) {
+func (backend *backend) getAuthBackendUserID(r *http.Request) (uint, error) {
 	session := backend.session(r)
 
-	userIDString, err := session.Get(userIDSessionKey)
+	authBackendUserIDString, err := session.Get(authBackendUserIDSessionKey)
 	if err != nil {
 		return 0, err
 	}
 
-	userID, err := strconv.Atoi(userIDString)
+	authBackendUserID, err := strconv.Atoi(authBackendUserIDString)
 
-	return uint(userID), errors.WithMessage(err, "could not cast user id to int")
+	return uint(authBackendUserID), errors.WithMessage(err, "could not cast user id to int")
 }
 
 func (backend *backend) setUserID(r *http.Request, w http.ResponseWriter, id uint) {
 	session := backend.session(r)
 	session.Set(
-		userIDSessionKey,
+		authBackendUserIDSessionKey,
 		strconv.Itoa(int(id)),
 	)
 	session.Save(r, w)

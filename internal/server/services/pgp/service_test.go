@@ -26,7 +26,7 @@ func setupTest(t *testing.T) *Service {
 func TestAddPGPKey(t *testing.T) {
 	service := setupTest(t)
 
-	user, err := service.db.CreateUser(33, "testUser")
+	user, err := service.db.CreateUser("testUser", 33)
 	assert.NoError(t, err)
 
 	// Verify that the keyring is empty
@@ -73,7 +73,7 @@ func TestAddPGPKey(t *testing.T) {
 func TestAddPGPKeyAlreadyRegistered(t *testing.T) {
 	service := setupTest(t)
 
-	user, err := service.db.CreateUser(33, "testUser")
+	user, err := service.db.CreateUser("testUser", 33)
 	assert.NoError(t, err)
 
 	// Sign the proof

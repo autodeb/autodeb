@@ -65,7 +65,7 @@ func (servicesTest *ServicesTest) GetOrCreateTestUser() *models.User {
 		return user
 	}
 
-	user, err = servicesTest.DB.CreateUser(1, "testuser3579")
+	user, err = servicesTest.DB.CreateUser("testuser3579", 13)
 	require.NoError(servicesTest.t, err)
 	require.NotNil(servicesTest.t, user)
 

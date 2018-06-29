@@ -16,20 +16,16 @@ import (
 
 //ServicesTest makes it easy to test services
 type ServicesTest struct {
-	t           *testing.T
-	DataFS      filesystem.FS
-	DB          *database.Database
-	ServerURL   *url.URL
-	AptlyAPIURL *url.URL
-	Services    *services.Services
+	t         *testing.T
+	DataFS    filesystem.FS
+	DB        *database.Database
+	ServerURL *url.URL
+	Services  *services.Services
 }
 
 //SetupTest will create a test App
 func SetupTest(t *testing.T) *ServicesTest {
 	serverURL, err := url.Parse("https://test.auto.debian.net")
-	require.NoError(t, err)
-
-	aptlyAPIURL, err := url.Parse("https://aptly.test")
 	require.NoError(t, err)
 
 	db := databasetest.SetupTest(t)
@@ -44,12 +40,11 @@ func SetupTest(t *testing.T) *ServicesTest {
 	require.NoError(t, err)
 
 	appTest := &ServicesTest{
-		t:           t,
-		DataFS:      dataFS,
-		DB:          db,
-		ServerURL:   serverURL,
-		AptlyAPIURL: aptlyAPIURL,
-		Services:    services,
+		t:         t,
+		DataFS:    dataFS,
+		DB:        db,
+		ServerURL: serverURL,
+		Services:  services,
 	}
 
 	return appTest

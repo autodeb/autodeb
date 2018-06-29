@@ -2,11 +2,13 @@ package appctxtest
 
 import (
 	"io/ioutil"
+	neturl "net/url"
 	"path/filepath"
 	"runtime"
 	"testing"
 
 	gorillaSessions "github.com/gorilla/sessions"
+	"github.com/stretchr/testify/require"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/htmltemplate"
@@ -33,13 +35,22 @@ type AppCtxTest struct {
 func SetupTest(t *testing.T) *AppCtxTest {
 	servicesTest := servicestest.SetupTest(t)
 
+	aptlyRepositoryBaseURL, err := neturl.Parse("https://repos.autodeb.net/")
+	require.NoError(t, err)
+
+	aptlyAPIURL, err := neturl.Parse("https://aptly.test")
+	require.NoError(t, err)
+
 	config := &config.Config{
 		ServerURL: &url.URL{
 			URL: *servicesTest.ServerURL,
 		},
 		Aptly: &config.Aptly{
 			APIURL: &url.URL{
-				URL: *servicesTest.AptlyAPIURL,
+				URL: *aptlyAPIURL,
+			},
+			RepositoryBaseURL: &url.URL{
+				URL: *aptlyRepositoryBaseURL,
 			},
 		},
 	}

@@ -22,7 +22,8 @@ type Config struct {
 
 // Aptly holds configuration related to aptly
 type Aptly struct {
-	APIURL *url.URL `toml:"api_url"`
+	APIURL            *url.URL `toml:"api_url"`
+	RepositoryBaseURL *url.URL `toml:"repository_base_url"`
 }
 
 // AuthConfig holds configuration related to the authentification backend

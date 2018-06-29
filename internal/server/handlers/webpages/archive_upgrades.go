@@ -1,8 +1,10 @@
 package webpages
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -78,12 +80,23 @@ func ArchiveUpgradeGetHandler(appCtx *appctx.Context) http.Handler {
 			return
 		}
 
+		repositoryURL := fmt.Sprintf(
+			"deb [trusted=yes] %s/%s unstable main",
+			strings.Trim(
+				appCtx.Config().Aptly.RepositoryBaseURL.String(),
+				"/",
+			),
+			archiveUpgrade.RepositoryName(),
+		)
+
 		data := struct {
 			ArchiveUpgrade *models.ArchiveUpgrade
 			Jobs           []*models.Job
+			RepositoryURL  string
 		}{
 			ArchiveUpgrade: archiveUpgrade,
 			Jobs:           jobs,
+			RepositoryURL:  repositoryURL,
 		}
 
 		renderWithBase(r, w, appCtx, user, "archive_upgrade.html", data)

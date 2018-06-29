@@ -55,22 +55,13 @@ func (jobRunner *JobRunner) execCreateArchiveUpgradeRepository(
 					return errors.WithMessagef(err, "could not retrieve the content for artifact id %d", artifact.ID)
 				}
 
-				// Upload it to aptly
-				if err := jobRunner.apiClient.Aptly().UploadFileInDirectory(
+				// Add it to the archive rebuild's repository
+				if err := jobRunner.apiClient.Aptly().UploadPackageAndAddToRepository(
+					artifact.Filename,
 					artifactContent,
-					artifact.Filename,
 					archiveUpgrade.RepositoryName(),
 				); err != nil {
-					return errors.WithMessagef(err, "could not upload %s to aptly", artifact.Filename)
-				}
-
-				// Add the package
-				if err := jobRunner.apiClient.Aptly().AddPackageToRepository(
-					artifact.Filename,
-					archiveUpgrade.RepositoryName(),
-					archiveUpgrade.RepositoryName(),
-				); err != nil {
-					return errors.WithMessagef(err, "could not add %s to the repository", artifact.Filename)
+					return errors.WithMessagef(err, "could not upload package %s to repository %s", artifact.Filename, archiveUpgrade.RepositoryName())
 				}
 
 			}

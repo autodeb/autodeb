@@ -26,7 +26,7 @@ func Parse(args []string, fs filesystem.FS, writerOutput io.Writer) (*config.Con
 	flagSet.BoolVar(&h, "h", false, "print usage information")
 
 	var configFile string
-	flagSet.StringVar(&configFile, "config", "autodeb-worker.cfg", "path to configuration file")
+	flagSet.StringVar(&configFile, "config", "autodeb-server.cfg", "path to configuration file")
 
 	if err := flagSet.Parse(args); err != nil {
 		return nil, err

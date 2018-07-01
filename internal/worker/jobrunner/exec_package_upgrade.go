@@ -60,6 +60,23 @@ func (jobRunner *JobRunner) execPackageUpgrade(
 		return errors.WithMessage(err, "dch failed")
 	}
 
+	if err := exec.RunCtxDirStdoutStderr(
+		ctx, packageDir, logFile, logFile,
+		"bash",
+		"-c",
+		"while QUILT_PATCHES=\"debian/patches\" quilt push -f; do quilt refresh; done && quilt pop -a",
+	); err != nil {
+		// Exit code 2 is not an error:
+		// > An exit status of 2 denotes that quilt did not
+		// > do anything to complete the command.
+		exitCode, err := exec.ExitCodeFromError(err)
+		if err != nil {
+			return errors.WithMessage(err, "could not obtain exit code")
+		} else if exitCode != 2 {
+			return errors.Errorf("could not refresh patches")
+		}
+	}
+
 	// Run sbuild
 	if err := exec.RunCtxDirStdoutStderr(
 		ctx, packageDir, logFile, logFile,

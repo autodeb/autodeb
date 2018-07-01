@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	osexec "os/exec"
 	"path/filepath"
-	"syscall"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/exec"
@@ -79,20 +77,14 @@ func (jobRunner *JobRunner) execAutopkgtest(
 		"autopkgtest", args...,
 	); err != nil {
 
-		exitCode := -1
-
-		// Attempt to find the exit code
-		if exitError, ok := err.(*osexec.ExitError); ok {
-			if waitStatus, ok := exitError.Sys().(syscall.WaitStatus); ok {
-				exitCode = waitStatus.ExitStatus()
-			}
+		exitCode, err := exec.ExitCodeFromError(err)
+		if err != nil {
+			return errors.New("autopkgtest failed and we could not find the exit code")
 		}
 
 		switch exitCode {
 		case 8:
 			fmt.Fprintf(logFile, "autopkgtest exited with exit code %d\n", exitCode)
-		case -1:
-			return errors.New("autopkgtest failed and we could not find the exit code")
 		default:
 			return errors.WithMessagef(err, "autopkgtest failed with exit code %d", exitCode)
 		}

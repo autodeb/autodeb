@@ -21,7 +21,7 @@ func (jobRunner *JobRunner) execAddBuildToRepository(
 	repositoryName := job.Input
 
 	// Create the repository if it does not exist
-	if _, err := jobRunner.apiClient.Aptly().GetOrCreateRepository(repositoryName); err != nil {
+	if _, err := jobRunner.apiClient.Aptly().GetOrCreateAndPublishRepository(repositoryName); err != nil {
 		return errors.WithMessagef(err, "could get or create repository %s", repositoryName)
 	}
 

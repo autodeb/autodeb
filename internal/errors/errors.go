@@ -66,3 +66,8 @@ func nextCause(err error) error {
 
 	return nil
 }
+
+//Cause returns the underlying cause of the error
+func Cause(err error) error {
+	return pkgerrors.Cause(err)
+}

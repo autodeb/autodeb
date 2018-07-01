@@ -126,8 +126,8 @@ func (client *APIClient) CreateRepositoryDefaults(name string) (*Repository, err
 	return repo, err
 }
 
-// GetOrCreateRepository will get or create a repository with sensible defaults
-func (client *APIClient) GetOrCreateRepository(name string) (*Repository, error) {
+// GetOrCreateAndPublishRepository will get or create and publish a repository with sensible defaults
+func (client *APIClient) GetOrCreateAndPublishRepository(name string) (*Repository, error) {
 
 	// Get the repository, if it already exists
 	if repo, err := client.GetRepository(name); err != nil {

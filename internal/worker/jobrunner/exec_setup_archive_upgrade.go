@@ -30,19 +30,13 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 	}
 
 	// Create aptly repository
-	repo, err := jobRunner.apiClient.Aptly().CreateRepositoryDefaults(
+	repo, err := jobRunner.apiClient.Aptly().GetOrCreateAndPublishRepository(
 		archiveUpgrade.RepositoryName(),
 	)
 	if err != nil {
 		return errors.WithMessage(err, "could not create aptly repository")
 	}
 	fmt.Fprintf(logFile, "Created repository %+v\n", repo)
-
-	// Publish the repository for the first time
-	if err := jobRunner.apiClient.Aptly().PublishDefaults(archiveUpgrade.RepositoryName()); err != nil {
-		return errors.WithMessage(err, "could not publish aptly repository")
-	}
-	fmt.Fprintf(logFile, "Published repository %+v\n", repo)
 
 	// Get all packages that need upgrading
 	sourcePackages, err := udd.PackagesWithNewerUpstreamVersions()

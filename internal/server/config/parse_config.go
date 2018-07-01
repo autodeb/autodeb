@@ -37,6 +37,12 @@ func ParseConfig(filepath string, fs filesystem.FS) (*Config, error) {
 		return nil, errors.WithMessage(err, "cannot parse default repositories url")
 	}
 
+	// Default aptly api url
+	aptlyAPIURL := &url.URL{}
+	if err := aptlyAPIURL.UnmarshalBinary([]byte("http://localhost:8080/api")); err != nil {
+		return nil, errors.WithMessage(err, "cannot parse default repositories url")
+	}
+
 	// Create the config, with defaults
 	config := &Config{
 		DB: &DBConfig{
@@ -56,6 +62,7 @@ func ParseConfig(filepath string, fs filesystem.FS) (*Config, error) {
 			},
 		},
 		Aptly: &Aptly{
+			APIURL:            aptlyAPIURL,
 			RepositoryBaseURL: aptlyRepositoryBaseURL,
 		},
 		ServerURL:             serverURL,

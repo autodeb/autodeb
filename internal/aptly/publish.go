@@ -56,7 +56,7 @@ func (client *APIClient) Publish(prefix string, publishParameters *PublishParame
 		bytes.NewReader(paramsBytes),
 	)
 	if err != nil {
-		return err
+		return errors.WithMessage(err, "request failed")
 	}
 	defer resp.Body.Close()
 
@@ -67,7 +67,7 @@ func (client *APIClient) Publish(prefix string, publishParameters *PublishParame
 	createdRepository := &Repository{}
 
 	if err := json.NewDecoder(resp.Body).Decode(createdRepository); err != nil {
-		return err
+		return errors.WithMessage(err, "could not decode repository")
 	}
 
 	return nil
@@ -125,7 +125,7 @@ func (client *APIClient) UpdatePublishedRepository(prefix, distribution string, 
 		bytes.NewReader(paramsBytes),
 	)
 	if err != nil {
-		return err
+		return errors.WithMessage(err, "request failed")
 	}
 	defer resp.Body.Close()
 

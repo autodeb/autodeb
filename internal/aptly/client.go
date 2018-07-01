@@ -60,7 +60,7 @@ func (client *APIClient) do(method, path, contentType string, body io.Reader) (*
 	// Send the request
 	response, err := client.httpClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessagef(err, "%s request to %s failed", method, absoluteURL.String())
 	}
 
 	return response, nil

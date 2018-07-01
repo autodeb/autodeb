@@ -29,7 +29,7 @@ func (client *APIClient) GetRepositories() ([]*Repository, error) {
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "request failed")
 	}
 	defer resp.Body.Close()
 
@@ -38,7 +38,7 @@ func (client *APIClient) GetRepositories() ([]*Repository, error) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(repositories); err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "could not unmarshal repositories")
 	}
 
 	return repositories, err
@@ -46,7 +46,7 @@ func (client *APIClient) GetRepositories() ([]*Repository, error) {
 
 // GetRepository will return the repository with the corresponding name
 func (client *APIClient) GetRepository(name string) (*Repository, error) {
-	var repository *Repository
+	repository := &Repository{}
 
 	resp, err := client.do(
 		http.MethodGet,
@@ -58,7 +58,7 @@ func (client *APIClient) GetRepository(name string) (*Repository, error) {
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "request failed")
 	}
 	defer resp.Body.Close()
 
@@ -71,7 +71,7 @@ func (client *APIClient) GetRepository(name string) (*Repository, error) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(repository); err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "could not unmarshal repository")
 	}
 
 	return repository, err
@@ -88,7 +88,7 @@ func (client *APIClient) CreateRepository(name, comment, defaultDistribution, de
 
 	postedRepoBytes, err := json.Marshal(postedRepository)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessagef(err, "could not encode repository %+v", postedRepository)
 	}
 
 	resp, err := client.do(
@@ -109,10 +109,45 @@ func (client *APIClient) CreateRepository(name, comment, defaultDistribution, de
 	createdRepository := &Repository{}
 
 	if err := json.NewDecoder(resp.Body).Decode(createdRepository); err != nil {
-		return nil, err
+		return nil, errors.WithMessage(err, "could not decode repository")
 	}
 
 	return createdRepository, nil
+}
+
+// CreateRepositoryDefaults creates a new repository with sensible defaults
+func (client *APIClient) CreateRepositoryDefaults(name string) (*Repository, error) {
+	repo, err := client.CreateRepository(
+		name,
+		fmt.Sprintf("Packages for %s on autodeb", name),
+		"unstable",
+		"main",
+	)
+	return repo, err
+}
+
+// GetOrCreateRepository will get or create a repository with sensible defaults
+func (client *APIClient) GetOrCreateRepository(name string) (*Repository, error) {
+
+	// Get the repository, if it already exists
+	if repo, err := client.GetRepository(name); err != nil {
+		return nil, errors.WithMessagef(err, "could not retrieve repository %s", name)
+	} else if repo != nil {
+		return repo, nil
+	}
+
+	// Create the repository
+	repo, err := client.CreateRepositoryDefaults(name)
+	if err != nil {
+		return nil, errors.WithMessagef(err, "could not create repository %s", name)
+	}
+
+	// Publish it for the first time
+	if err := client.PublishDefaults(name); err != nil {
+		return nil, errors.WithMessagef(err, "could not publish newly created repository %s", name)
+	}
+
+	return repo, nil
 }
 
 // AddPackageToRepository adds a package to a repositoryA
@@ -124,7 +159,7 @@ func (client *APIClient) AddPackageToRepository(pkg, dir, repository string) err
 		nil,
 	)
 	if err != nil {
-		return err
+		return errors.WithMessage(err, "request failed")
 	}
 	defer resp.Body.Close()
 

@@ -162,8 +162,8 @@ func (jobRunner *JobRunner) execJob(ctx context.Context, job *models.Job, jobDir
 			jobDirectory.artifactsDirectory,
 			jobDirectory.logFile,
 		)
-	case models.JobTypeCreateArchiveUpgradeRepository:
-		return jobRunner.execCreateArchiveUpgradeRepository(
+	case models.JobTypeAddBuildToRepository:
+		return jobRunner.execAddBuildToRepository(
 			ctx,
 			job,
 			jobDirectory.workingDirectory,

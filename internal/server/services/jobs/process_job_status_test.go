@@ -1,11 +1,13 @@
 package jobs_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
+	jobsServicePkg "salsa.debian.org/autodeb-team/autodeb/internal/server/services/jobs"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/servicestest"
 )
 
@@ -13,9 +15,11 @@ func TestProcessJobStatusArchiveUpgrade(t *testing.T) {
 	servicesTest := servicestest.SetupTest(t)
 	jobsService := servicesTest.Services.Jobs()
 
+	// Create an ArchiveUpgrade
 	archiveUpgrade, err := jobsService.CreateArchiveUpgrade(0, 0)
 	assert.NoError(t, err)
 
+	// It should have created a SetupArchiveUpgrade Job
 	jobs, err := jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobs), "there should only be one job associated to the archive upgrade")
@@ -28,21 +32,17 @@ func TestProcessJobStatusArchiveUpgrade(t *testing.T) {
 	err = jobsService.ProcessJobStatus(setupJob.ID, models.JobStatusSuccess)
 	assert.NoError(t, err)
 
+	// Create a PackageUpgrade job and mark it as a success
+	packageUpgradeJob, err := jobsService.CreatePackageUpgradeJob(archiveUpgrade.ID, "test")
+	assert.NoError(t, err)
+	err = jobsService.ProcessJobStatus(packageUpgradeJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	// It should have created an autopkgtest job
 	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(jobs), "a new createrepository job should have been created")
+	assert.Equal(t, 3, len(jobs), fmt.Sprintf("jobs: %+v", jobs))
 
-	createRepositoryJob := jobs[1]
-	assert.Equal(t, models.JobTypeCreateArchiveUpgradeRepository, createRepositoryJob.Type)
-	assert.Equal(t, models.JobParentTypeArchiveUpgrade, createRepositoryJob.ParentType)
-	assert.Equal(t, archiveUpgrade.ID, createRepositoryJob.ParentID)
-
-	err = jobsService.ProcessJobStatus(createRepositoryJob.ID, models.JobStatusSuccess)
-	assert.NoError(t, err)
-
-	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(jobs), "there should be no additional jobs created")
 }
 
 func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
@@ -85,10 +85,21 @@ func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
 	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)
 	assert.NoError(t, err)
 
-	// There should be no new jobs created
+	// There should now be 5 jobs:
+	// - the upgrade init
+	// - the package upgrade job
+	// - the autopkgtest job
+	// - main respository job
+	// - archive upgrade repository job
 	jobs, err = jobsService.GetAllJobsByArchiveUpgradeID(archiveUpgrade.ID)
 	assert.NoError(t, err)
-	assert.Equal(t, 3, len(jobs))
+	assert.Equal(t, 5, len(jobs))
+
+	archiveUpgradeRepoJob := jobs[3]
+	assert.Equal(t, archiveUpgrade.RepositoryName(), archiveUpgradeRepoJob.Input)
+
+	mainRepoJob := jobs[4]
+	assert.Equal(t, jobsServicePkg.MainUpgradeRepositoryName, mainRepoJob.Input)
 }
 
 func TestProcessJobStatusUploadBuildAndDontForward(t *testing.T) {

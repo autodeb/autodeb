@@ -30,11 +30,8 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 	}
 
 	// Create aptly repository
-	repo, err := jobRunner.apiClient.Aptly().CreateRepository(
+	repo, err := jobRunner.apiClient.Aptly().CreateRepositoryDefaults(
 		archiveUpgrade.RepositoryName(),
-		fmt.Sprintf("Packages of archive upgrade %d", archiveUpgrade.ID),
-		"unstable",
-		"main",
 	)
 	if err != nil {
 		return errors.WithMessage(err, "could not create aptly repository")

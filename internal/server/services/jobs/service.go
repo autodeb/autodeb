@@ -162,14 +162,25 @@ func (service *Service) CreateAutopkgtestJobFromBuildJob(buildJob *models.Job) (
 	)
 }
 
-//CreateArchiveUpgradeRepositoryJob creates a CreateArchiveUpgradeRepository job
-func (service *Service) CreateArchiveUpgradeRepositoryJob(archiveUpgradeID uint) (*models.Job, error) {
+//CreatePackageUpgradeJob creates a PackageUpgrade job for the given package name
+func (service *Service) CreatePackageUpgradeJob(archiveUpgradeID uint, packageName string) (*models.Job, error) {
 	return service.CreateJob(
-		models.JobTypeCreateArchiveUpgradeRepository,
-		"",
+		models.JobTypePackageUpgrade,
+		packageName,
 		0,
 		models.JobParentTypeArchiveUpgrade,
 		archiveUpgradeID,
+	)
+}
+
+//CreateAddBuildToRepositoryJobFromJob will create an AddBuildToRepositoryJob
+func (service *Service) CreateAddBuildToRepositoryJobFromJob(job *models.Job, repositoryName string) (*models.Job, error) {
+	return service.CreateJob(
+		models.JobTypeAddBuildToRepository,
+		repositoryName,
+		job.BuildJobID,
+		job.ParentType,
+		job.ParentID,
 	)
 }
 

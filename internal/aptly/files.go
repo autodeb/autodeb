@@ -37,7 +37,7 @@ func (client *APIClient) UploadFileInDirectory(content io.Reader, filename, dire
 		body,
 	)
 	if err != nil {
-		return err
+		return errors.WithMessage(err, "request failed")
 	}
 	defer resp.Body.Close()
 

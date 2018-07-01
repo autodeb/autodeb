@@ -11,7 +11,7 @@ const (
 	JobTypeForwardUpload
 	JobTypeSetupArchiveUpgrade
 	JobTypePackageUpgrade
-	JobTypeCreateArchiveUpgradeRepository
+	JobTypeAddBuildToRepository
 )
 
 func (jt JobType) String() string {
@@ -26,8 +26,8 @@ func (jt JobType) String() string {
 		return "setup-archive-upgrade"
 	case JobTypePackageUpgrade:
 		return "package-upgrade"
-	case JobTypeCreateArchiveUpgradeRepository:
-		return "create-archive-upgrade-repository"
+	case JobTypeAddBuildToRepository:
+		return "add-build-to-repository"
 	default:
 		return "unknown"
 	}

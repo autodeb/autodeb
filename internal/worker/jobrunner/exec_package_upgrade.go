@@ -68,6 +68,7 @@ func (jobRunner *JobRunner) execPackageUpgrade(
 		"--nolog",
 		"--arch-all",
 		"--source",
+		"--dist=unstable",
 	); err != nil {
 		return errors.WithMessage(err, "sbuild failed")
 	}

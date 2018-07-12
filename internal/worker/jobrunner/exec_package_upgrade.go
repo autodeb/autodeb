@@ -54,7 +54,7 @@ func (jobRunner *JobRunner) execPackageUpgrade(
 	if err := dch.NewVersion(
 		changelogPath,
 		uscanResult.UpstreamVersion+"-1",
-		"unstable",
+		"autodeb",
 		"Update to new upstream version by autodeb.",
 	); err != nil {
 		return errors.WithMessage(err, "dch failed")

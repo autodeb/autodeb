@@ -14,6 +14,9 @@
     <li>
         <a href="#upload-parameters">Upload parameters</a>
     </li>
+    <li>
+        <a href="#repositories">Repositories</a>
+    </li>
 </ol>
 
 <h3 id="getting-started">Getting Started</h3>
@@ -79,5 +82,32 @@ incoming = /upload
     NOTE: dput uploads packages with a series of HTTP PUT requests. The only upload parameters that
     are considered are the ones that are set when uploading the .changes file.
 </p>
+
+<h3 id="repositories">Repositories</h3>
+<hr>
+
+Autodeb hosts repositories for a number of things that are built on the service. There are repositories
+that are created in the contex of a job. The link for these repositories is displayed on the job page.
+<br><br>
+There is also one repository that holds the most recent package upgrades created by autodeb. This is
+the repository that unstable users should add if they want to occasionally download packages from autodeb:
+
+<pre>
+<code>
+deb [trusted=yes] {{ $.Data.RepositoryBaseURL }}/{{ $.Data.MainUpgradeRepositoryName }} unstable main
+</code>
+</pre>
+
+This would work well with the with the following in <span class="font-italic">/etc/apt/preferences.d/autodeb-package-upgrades</span>:
+
+<pre>
+<code>
+Package: *
+Pin: release a=autodeb
+Pin-Priority: -10
+</code>
+</pre>
+
+One would then install packages from autodeb with <code>apt-get install -t autodeb &lt;package&gt;</code>
 
 {{ end }}

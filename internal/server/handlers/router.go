@@ -99,7 +99,6 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	// ==== ArchiveUpgrades API ===
 	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}").Handler(api.ArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
 	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}/jobs").Handler(api.ArchiveUpgradeJobsGetHandler(appCtx)).Methods(http.MethodGet)
-	restAPIRouter.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}/successful-builds").Handler(api.ArchiveUpgradeSuccessfulBuildsGetHandler(appCtx)).Methods(http.MethodGet)
 
 	return router
 }

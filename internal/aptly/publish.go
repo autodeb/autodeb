@@ -137,7 +137,7 @@ func (client *APIClient) UpdatePublishedRepository(prefix, distribution string, 
 }
 
 // UpdatePublishedRepositoryDefaults updates a published repository with sensible defaults
-func (client *APIClient) UpdatePublishedRepositoryDefaults(repositoryName string) error {
+func (client *APIClient) UpdatePublishedRepositoryDefaults(repositoryName, distribution string) error {
 	params := &PublishedRepositoryUpdateParameters{
 		ForceOverwrite: true,
 		Signing: &SigningOptions{
@@ -146,5 +146,5 @@ func (client *APIClient) UpdatePublishedRepositoryDefaults(repositoryName string
 		AcquireByHash: true,
 	}
 
-	return client.UpdatePublishedRepository(repositoryName, "unstable", params)
+	return client.UpdatePublishedRepository(repositoryName, distribution, params)
 }

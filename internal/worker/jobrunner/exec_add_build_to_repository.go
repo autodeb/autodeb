@@ -2,9 +2,11 @@ package jobrunner
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"path/filepath"
+	"strings"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -17,12 +19,14 @@ func (jobRunner *JobRunner) execAddBuildToRepository(
 	artifactsDirectory string,
 	logFile io.Writer) error {
 
-	// The job input is the name of the repository
-	repositoryName := job.Input
+	input := &models.AddBuildToRepositoryInput{}
+	if err := json.NewDecoder(strings.NewReader(job.Input)).Decode(&input); err != nil {
+		return errors.WithMessagef(err, "could not decode job input")
+	}
 
 	// Create the repository if it does not exist
-	if _, err := jobRunner.apiClient.Aptly().GetOrCreateAndPublishRepository(repositoryName); err != nil {
-		return errors.WithMessagef(err, "could get or create repository %s", repositoryName)
+	if _, err := jobRunner.apiClient.Aptly().GetOrCreateAndPublishRepository(input.RepositoryName, input.Distribution); err != nil {
+		return errors.WithMessagef(err, "could get or create repository %s", input.RepositoryName)
 	}
 
 	buildJob, err := jobRunner.apiClient.GetJob(job.BuildJobID)
@@ -53,7 +57,7 @@ func (jobRunner *JobRunner) execAddBuildToRepository(
 			if err := jobRunner.apiClient.Aptly().UploadPackageAndAddToRepository(
 				artifact.Filename,
 				artifactContent,
-				repositoryName,
+				input.RepositoryName,
 			); err != nil {
 				return errors.WithMessagef(err, "could not upload package %s to repository %s", artifact.Filename, job.Input)
 			}
@@ -63,7 +67,7 @@ func (jobRunner *JobRunner) execAddBuildToRepository(
 	}
 
 	// Publish the repository
-	if err := jobRunner.apiClient.Aptly().UpdatePublishedRepositoryDefaults(repositoryName); err != nil {
+	if err := jobRunner.apiClient.Aptly().UpdatePublishedRepositoryDefaults(input.RepositoryName, input.Distribution); err != nil {
 		return errors.WithMessage(err, "could update aptly repository")
 	}
 	fmt.Fprintf(logFile, "Updated aptly repository\n")

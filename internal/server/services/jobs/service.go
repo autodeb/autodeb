@@ -1,11 +1,13 @@
 package jobs
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
+	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/filesystem"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/database"
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/models"
@@ -174,10 +176,21 @@ func (service *Service) CreatePackageUpgradeJob(archiveUpgradeID uint, packageNa
 }
 
 //CreateAddBuildToRepositoryJobFromJob will create an AddBuildToRepositoryJob
-func (service *Service) CreateAddBuildToRepositoryJobFromJob(job *models.Job, repositoryName string) (*models.Job, error) {
+func (service *Service) CreateAddBuildToRepositoryJobFromJob(job *models.Job, repositoryName, distribution string) (*models.Job, error) {
+
+	input, err := json.Marshal(
+		&models.AddBuildToRepositoryInput{
+			RepositoryName: repositoryName,
+			Distribution:   distribution,
+		},
+	)
+	if err != nil {
+		return nil, errors.WithMessage(err, "could not encode job input")
+	}
+
 	return service.CreateJob(
 		models.JobTypeAddBuildToRepository,
-		repositoryName,
+		string(input),
 		job.BuildJobID,
 		job.ParentType,
 		job.ParentID,

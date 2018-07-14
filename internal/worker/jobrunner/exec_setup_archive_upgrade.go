@@ -32,6 +32,7 @@ func (jobRunner *JobRunner) execSetupArchiveUpgrade(
 	// Create aptly repository
 	repo, err := jobRunner.apiClient.Aptly().GetOrCreateAndPublishRepository(
 		archiveUpgrade.RepositoryName(),
+		"autodeb",
 	)
 	if err != nil {
 		return errors.WithMessage(err, "could not create aptly repository")

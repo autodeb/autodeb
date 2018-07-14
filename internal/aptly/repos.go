@@ -116,18 +116,18 @@ func (client *APIClient) CreateRepository(name, comment, defaultDistribution, de
 }
 
 // CreateRepositoryDefaults creates a new repository with sensible defaults
-func (client *APIClient) CreateRepositoryDefaults(name string) (*Repository, error) {
+func (client *APIClient) CreateRepositoryDefaults(name, distribution string) (*Repository, error) {
 	repo, err := client.CreateRepository(
 		name,
 		fmt.Sprintf("Packages for %s on autodeb", name),
-		"unstable",
+		distribution,
 		"main",
 	)
 	return repo, err
 }
 
 // GetOrCreateAndPublishRepository will get or create and publish a repository with sensible defaults
-func (client *APIClient) GetOrCreateAndPublishRepository(name string) (*Repository, error) {
+func (client *APIClient) GetOrCreateAndPublishRepository(name, distribution string) (*Repository, error) {
 
 	// Get the repository, if it already exists
 	if repo, err := client.GetRepository(name); err != nil {
@@ -137,7 +137,7 @@ func (client *APIClient) GetOrCreateAndPublishRepository(name string) (*Reposito
 	}
 
 	// Create the repository
-	repo, err := client.CreateRepositoryDefaults(name)
+	repo, err := client.CreateRepositoryDefaults(name, distribution)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "could not create repository %s", name)
 	}
@@ -150,7 +150,7 @@ func (client *APIClient) GetOrCreateAndPublishRepository(name string) (*Reposito
 	return repo, nil
 }
 
-// AddPackageToRepository adds a package to a repositoryA
+// AddPackageToRepository adds a package to a repository
 func (client *APIClient) AddPackageToRepository(pkg, dir, repository string) error {
 	resp, err := client.do(
 		http.MethodPost,

@@ -1,0 +1,35 @@
+{{ define "title" }}Archive Backports{{ end }}
+
+{{ define "content" }}
+
+<p>This page lists all archive backports:</p>
+
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>ID</th>
+        <th>User ID</th>
+    </tr>
+
+    {{ range $.Data.ArchiveBackports }}
+    <tr>
+        <td><a href="/archive-backports/{{ .ID }}">{{ .ID }}</a></td>
+        <td>{{ .UserID }}</td>
+    </tr>
+    {{ end }}
+
+</table>
+
+<div class="row">
+    <div class="col">
+        {{ if ge $.Data.PreviousPage 0 }}
+        <a class="btn btn-outline-primary" href="?page={{ $.Data.PreviousPage }}">Previous</a>
+        {{ else }}
+        <button type="button" class="btn btn-outline-secondary" disabled>Previous</button>
+        {{ end }}
+    </div>
+    <div class="col text-right">
+        <a class="btn btn-outline-primary" href="?page={{ $.Data.NextPage }}">Next</a>
+    </div>
+</div>
+
+{{ end }}

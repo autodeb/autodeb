@@ -1,0 +1,30 @@
+{{ define "title" }}New Archive Backport{{ end }}
+
+{{ define "content" }}
+
+<div class="row">
+    <div class="col">
+        <h2>New Archive Backport</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <p>
+            Use this form to backport all pkg-ruby packages to stable.
+            In the future, it will be possible to backport select other groups of packages or backport every single package in the archive.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <form action="/new-archive-backport" method="post">
+            <div class="form-group">
+                <input type="submit" value="Create Archive Backport" class="btn btn-primary">
+            </div>
+        </form>
+    </div>
+</div>
+
+{{ end }}

@@ -44,10 +44,18 @@ func NewRouter(appCtx *appctx.Context) http.Handler {
 	router.Path("/uploads/{uploadID:[0-9]+}").Handler(webpages.UploadGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs").Handler(webpages.JobsGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/jobs/{jobID:[0-9]+}").Handler(webpages.JobGetHandler(appCtx)).Methods(http.MethodGet)
+
+	// === Web pages: Archive Upgrades ====
 	router.Path("/archive-upgrades").Handler(webpages.ArchiveUpgradesGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/archive-upgrades/{archiveUpgradeID:[0-9]+}").Handler(webpages.ArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/new-archive-upgrade").Handler(webpages.NewArchiveUpgradeGetHandler(appCtx)).Methods(http.MethodGet)
 	router.Path("/new-archive-upgrade").Handler(webpages.NewArchiveUpgradePostHandler(appCtx)).Methods(http.MethodPost)
+
+	// Web pages: Archive Backports ====
+	router.Path("/archive-backports").Handler(webpages.ArchiveBackportsGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/archive-backports/{archiveBackportID:[0-9]+}").Handler(webpages.ArchiveBackportGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/new-archive-backport").Handler(webpages.NewArchiveBackportGetHandler(appCtx)).Methods(http.MethodGet)
+	router.Path("/new-archive-backport").Handler(webpages.NewArchiveBackportPostHandler(appCtx)).Methods(http.MethodPost)
 
 	// ==== Web pages: Profile ====
 	router.Path("/profile").Handler(webpages.ProfileGetHandler(appCtx)).Methods(http.MethodGet)

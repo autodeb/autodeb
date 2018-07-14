@@ -174,6 +174,28 @@ func (db *Database) GetAllJobsByArchiveUpgradeID(id uint) ([]*models.Job, error)
 	return jobs, nil
 }
 
+// GetAllJobsByArchiveBackportID returns all jobs for an upload
+func (db *Database) GetAllJobsByArchiveBackportID(id uint) ([]*models.Job, error) {
+	var jobs []*models.Job
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	).Where(
+		&models.Job{
+			ParentType: models.JobParentTypeArchiveBackport,
+			ParentID:   id,
+		},
+	).Order(
+		"id",
+	)
+
+	if err := query.Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
 // GetAllJobsByArchiveUpgradeIDPageLimit returns all jobs with pagination
 func (db *Database) GetAllJobsByArchiveUpgradeIDPageLimit(id uint, page, limit int) ([]*models.Job, error) {
 	offset := page * limit
@@ -185,6 +207,34 @@ func (db *Database) GetAllJobsByArchiveUpgradeIDPageLimit(id uint, page, limit i
 	).Where(
 		&models.Job{
 			ParentType: models.JobParentTypeArchiveUpgrade,
+			ParentID:   id,
+		},
+	).Order(
+		"id desc",
+	).Offset(
+		offset,
+	).Limit(
+		limit,
+	)
+
+	if err := query.Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
+// GetAllJobsByArchiveBackportIDPageLimit returns all jobs for an ArchiveBackport with pagination
+func (db *Database) GetAllJobsByArchiveBackportIDPageLimit(id uint, page, limit int) ([]*models.Job, error) {
+	offset := page * limit
+
+	var jobs []*models.Job
+
+	query := db.gormDB.Model(
+		&models.Job{},
+	).Where(
+		&models.Job{
+			ParentType: models.JobParentTypeArchiveBackport,
 			ParentID:   id,
 		},
 	).Order(

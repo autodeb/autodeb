@@ -12,6 +12,7 @@ const (
 	JobTypeSetupArchiveUpgrade
 	JobTypePackageUpgrade
 	JobTypeAddBuildToRepository
+	JobTypeSetupArchiveBackport
 )
 
 func (jt JobType) String() string {
@@ -28,6 +29,8 @@ func (jt JobType) String() string {
 		return "package-upgrade"
 	case JobTypeAddBuildToRepository:
 		return "add-build-to-repository"
+	case JobTypeSetupArchiveBackport:
+		return "setup-archive-backport"
 	default:
 		return "unknown"
 	}
@@ -68,6 +71,7 @@ const (
 	JobParentTypeUnknown JobParentType = iota
 	JobParentTypeUpload
 	JobParentTypeArchiveUpgrade
+	JobParentTypeArchiveBackport
 )
 
 func (parentType JobParentType) String() string {
@@ -76,6 +80,8 @@ func (parentType JobParentType) String() string {
 		return "upload"
 	case JobParentTypeArchiveUpgrade:
 		return "archive-upgrade"
+	case JobParentTypeArchiveBackport:
+		return "arhive-backport"
 	default:
 		return "unknown"
 	}

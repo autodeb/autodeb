@@ -89,8 +89,10 @@ incoming = /upload
 Autodeb hosts repositories for a number of things that are built on the service. There are repositories
 that are created in the contex of a job. The link for these repositories is displayed on the job page.
 <br><br>
-There is also one repository that holds the most recent package upgrades created by autodeb. This is
-the repository that unstable users should add if they want to occasionally download packages from autodeb:
+There is also one repository that holds the most recent package upgrades created by autodeb. Unstable users
+that want to occasionally install packages from autodeb should create a file at
+<span class="font-italic">/etc/apt/sources.list.d/autodeb-package-upgrades.list</span> with the following
+content:
 
 <pre>
 <code>

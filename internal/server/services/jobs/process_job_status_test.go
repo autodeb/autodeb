@@ -1,7 +1,9 @@
 package jobs_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -96,10 +98,20 @@ func TestProcessJobStatusUpgradeAutopkgtest(t *testing.T) {
 	assert.Equal(t, 5, len(jobs))
 
 	archiveUpgradeRepoJob := jobs[3]
-	assert.Equal(t, archiveUpgrade.RepositoryName(), archiveUpgradeRepoJob.Input)
+	addBuildToRepositoryJobInput := &models.AddBuildToRepositoryInput{}
+	err = json.NewDecoder(strings.NewReader(archiveUpgradeRepoJob.Input)).Decode(&addBuildToRepositoryJobInput)
+	assert.NoError(t, err)
+	assert.Equal(t, archiveUpgrade.RepositoryName(), addBuildToRepositoryJobInput.RepositoryName,
+		"the first job should add the package to the archive upgrade's repository")
+	assert.Equal(t, "autodeb", addBuildToRepositoryJobInput.Distribution)
 
 	mainRepoJob := jobs[4]
-	assert.Equal(t, jobsServicePkg.MainUpgradeRepositoryName, mainRepoJob.Input)
+	addBuildToRepositoryJobInput = &models.AddBuildToRepositoryInput{}
+	err = json.NewDecoder(strings.NewReader(mainRepoJob.Input)).Decode(&addBuildToRepositoryJobInput)
+	assert.NoError(t, err)
+	assert.Equal(t, jobsServicePkg.MainUpgradeRepositoryName, addBuildToRepositoryJobInput.RepositoryName,
+		"the second job should add the package to the maian upgrade repository")
+	assert.Equal(t, "autodeb", addBuildToRepositoryJobInput.Distribution)
 }
 
 func TestProcessJobStatusUploadBuildAndDontForward(t *testing.T) {

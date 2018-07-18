@@ -20,6 +20,7 @@ func TestWebPagesRender(t *testing.T) {
 		"/uploads",
 		"/instructions",
 		"/archive-upgrades",
+		"/archive-backports",
 	}
 
 	// Pages that only render when authenticated

@@ -87,5 +87,24 @@ func (jobRunner *JobRunner) execSetupArchiveBackport(
 
 	}
 
+	// Create Upgrade jobs
+	for _, backportCandidate := range backportCandidates {
+		if _, err := jobRunner.apiClient.CreateJob(
+			&models.Job{
+				Type:       models.JobTypeBackport,
+				ParentType: job.ParentType,
+				ParentID:   job.ParentID,
+				Input:      backportCandidate,
+			},
+		); err != nil {
+			return errors.WithMessagef(err, "could not create backport job for package %s", backportCandidate)
+		}
+		fmt.Fprintf(
+			logFile,
+			"Created backport job for source package %s\n",
+			backportCandidate,
+		)
+	}
+
 	return nil
 }

@@ -13,6 +13,7 @@ const (
 	JobTypePackageUpgrade
 	JobTypeAddBuildToRepository
 	JobTypeSetupArchiveBackport
+	JobTypeBackport
 )
 
 func (jt JobType) String() string {
@@ -31,6 +32,8 @@ func (jt JobType) String() string {
 		return "add-build-to-repository"
 	case JobTypeSetupArchiveBackport:
 		return "setup-archive-backport"
+	case JobTypeBackport:
+		return "backport"
 	default:
 		return "unknown"
 	}
@@ -81,7 +84,7 @@ func (parentType JobParentType) String() string {
 	case JobParentTypeArchiveUpgrade:
 		return "archive-upgrade"
 	case JobParentTypeArchiveBackport:
-		return "arhive-backport"
+		return "archive-backport"
 	default:
 		return "unknown"
 	}

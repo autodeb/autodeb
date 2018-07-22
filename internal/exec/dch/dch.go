@@ -12,6 +12,7 @@ func NewVersion(changelogPath, version, distribution, message string) error {
 		"dch",
 		"--changelog", changelogPath,
 		"--newversion", version,
+		"--force-distribution",
 		"--distribution", distribution,
 		message,
 	)

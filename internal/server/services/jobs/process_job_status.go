@@ -51,9 +51,8 @@ func (service *Service) processArchiveUpgradeJobStatus(job *models.Job) error {
 	// If this is a package upgrade job, create a corresponding autopkgtest job
 	// and stop here.
 	if job.Type == models.JobTypePackageUpgrade {
-		if _, err := service.CreateAutopkgtestJobFromBuildJob(job); err != nil {
-			return err
-		}
+		_, err := service.CreateAutopkgtestJobFromBuildJob(job)
+		return err
 	}
 
 	// If this is an autopkgtest job, create corresponding repository jobs
@@ -65,6 +64,7 @@ func (service *Service) processArchiveUpgradeJobStatus(job *models.Job) error {
 		if _, err := service.CreateAddBuildToRepositoryJobFromJob(job, MainUpgradeRepositoryName, "autodeb"); err != nil {
 			return err
 		}
+		return nil
 	}
 
 	return nil

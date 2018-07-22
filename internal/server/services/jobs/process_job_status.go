@@ -25,8 +25,8 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 		return err
 	}
 
-	// If the job has failed, there is nothing to do, no matter the parent type.
-	if job.Status == models.JobStatusFailed {
+	// If the new status isn't a success, there is nothing to do, no matter the parent type.
+	if job.Status != models.JobStatusSuccess {
 		return nil
 	}
 

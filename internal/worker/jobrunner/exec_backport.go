@@ -55,7 +55,10 @@ func (jobRunner *JobRunner) execBackport(
 	// Run dch
 	if err := exec.RunCtxDirStdoutStderr(
 		ctx, sourceDirectory, logFile, logFile,
-		"dch", "--bpo", "Automatic backport by Autodeb.",
+		"dch",
+		"--force-distribution",
+		"--distribution=autodeb",
+		"Automatic backport by Autodeb.",
 	); err != nil {
 		return errors.WithMessage(err, "dch failed")
 	}

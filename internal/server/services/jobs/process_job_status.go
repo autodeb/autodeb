@@ -48,12 +48,6 @@ func (service *Service) ProcessJobStatus(jobID uint, status models.JobStatus) er
 }
 
 func (service *Service) processArchiveBackportJobStatus(job *models.Job) error {
-	// Obtain the parent ArchiveBackport
-	archiveBackport, err := service.GetArchiveBackport(job.ParentID)
-	if err != nil {
-		return errors.WithMessagef(err, "could not obtain archive backport %s", job.ParentID)
-	}
-
 	// If this a package backport job, create a corresponding autopkgtest job
 	// and stop here.
 	if job.Type == models.JobTypeBackport {
@@ -68,6 +62,7 @@ func (service *Service) processArchiveBackportJobStatus(job *models.Job) error {
 		return err
 	}
 
+	return nil
 }
 
 func (service *Service) processArchiveUpgradeJobStatus(job *models.Job) error {

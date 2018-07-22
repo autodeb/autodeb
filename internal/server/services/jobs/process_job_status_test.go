@@ -13,6 +13,63 @@ import (
 	"salsa.debian.org/autodeb-team/autodeb/internal/server/services/servicestest"
 )
 
+func TestProcessJobStatusBackportAutopkgtest(t *testing.T) {
+	servicesTest := servicestest.SetupTest(t)
+	jobsService := servicesTest.Services.Jobs()
+
+	archiveBackport, err := jobsService.CreateArchiveBackport(566)
+	assert.NoError(t, err)
+
+	// Create a package backport job in the context of the ArchiveBackport
+	backportJob, err := jobsService.CreateJob(
+		models.JobTypeBackport, "", 0, models.JobParentTypeArchiveBackport, archiveBackport.ID,
+	)
+	assert.NoError(t, err)
+	assert.NotNil(t, backportJob)
+
+	// There should be two jobs associated with the archive upgrade:
+	//  - the backport init
+	//  - the package backport job
+	jobs, err := jobsService.GetAllJobsByArchiveBackportID(archiveBackport.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(jobs))
+
+	// Mark the job as successfull
+	err = jobsService.ProcessJobStatus(backportJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	// There should now be a new autopkgtest job associated with the archive upgrade
+	jobs, err = jobsService.GetAllJobsByArchiveBackportID(archiveBackport.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(jobs))
+
+	autopkgTestJob := jobs[2]
+	assert.Equal(t, models.JobTypeAutopkgtest, autopkgTestJob.Type)
+	assert.Equal(t, models.JobParentTypeArchiveBackport, autopkgTestJob.ParentType)
+	assert.Equal(t, archiveBackport.ID, autopkgTestJob.ParentID)
+	assert.Equal(t, backportJob.ID, autopkgTestJob.BuildJobID, "this job's build job id should be the package backport job")
+
+	// Mark the autopkgtest job as completed
+	err = jobsService.ProcessJobStatus(autopkgTestJob.ID, models.JobStatusSuccess)
+	assert.NoError(t, err)
+
+	// There should now be 4 jobs:
+	// - the upgrade init
+	// - the package upgrade job
+	// - the autopkgtest job
+	// - archive backport repository job
+	jobs, err = jobsService.GetAllJobsByArchiveBackportID(archiveBackport.ID)
+	assert.NoError(t, err)
+	assert.Equal(t, 4, len(jobs))
+
+	archiveBackportRepoJob := jobs[3]
+	addBuildToRepositoryJobInput := &models.AddBuildToRepositoryInput{}
+	err = json.NewDecoder(strings.NewReader(archiveBackportRepoJob.Input)).Decode(&addBuildToRepositoryJobInput)
+	assert.NoError(t, err)
+	assert.Equal(t, jobsServicePkg.MainBackportsRepositoryName, addBuildToRepositoryJobInput.RepositoryName)
+	assert.Equal(t, "autodeb", addBuildToRepositoryJobInput.Distribution)
+}
+
 func TestProcessJobStatusArchiveUpgrade(t *testing.T) {
 	servicesTest := servicestest.SetupTest(t)
 	jobsService := servicesTest.Services.Jobs()

@@ -33,6 +33,22 @@ type DSC struct {
 	Filename  string `json:"filename"`
 }
 
+//MirrorURL returns the Debian mirror URL used by the client
+func (client *Client) MirrorURL() string {
+	return mirrorURL
+}
+
+//DSCURL returns the full url of a DSC in the configured mirror
+func (client *Client) DSCURL(dsc *DSC) string {
+	url := fmt.Sprintf(
+		"%s/pool/%s/%s",
+		mirrorURL,
+		dsc.Component,
+		dsc.Filename,
+	)
+	return url
+}
+
 //GetDSCSInSuite returns a list of DSCs matching pkg in distribution
 func (client *Client) GetDSCSInSuite(pkg, distribution string) ([]*DSC, error) {
 	url := fmt.Sprintf(

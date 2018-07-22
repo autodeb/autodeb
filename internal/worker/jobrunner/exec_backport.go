@@ -38,7 +38,7 @@ func (jobRunner *JobRunner) execBackport(
 	// Download the source
 	if err := exec.RunCtxDirStdoutStderr(
 		ctx, workingDirectory, logFile, logFile,
-		"dget", dscURL,
+		"dget", "--allow-unauthenticated", dscURL,
 	); err != nil {
 		return errors.WithMessage(err, "dget failed")
 	}

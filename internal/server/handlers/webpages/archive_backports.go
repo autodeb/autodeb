@@ -112,7 +112,13 @@ func NewArchiveBackportGetHandler(appCtx *appctx.Context) http.Handler {
 func NewArchiveBackportPostHandler(appCtx *appctx.Context) http.Handler {
 	handlerFunc := func(w http.ResponseWriter, r *http.Request, user *models.User) {
 
-		if _, err := appCtx.JobsService().CreateArchiveBackport(user.ID); err != nil {
+		r.ParseForm()
+		packageCount := r.Form.Get("package-count")
+
+		packageCountInt, err := strconv.Atoi(packageCount)
+		if err != nil {
+			appCtx.Sessions().Flash(r, w, "danger", "invalid package count")
+		} else if _, err := appCtx.JobsService().CreateArchiveBackport(user.ID, packageCountInt); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			appCtx.RequestLogger().Error(r, err)
 		} else {
@@ -120,7 +126,6 @@ func NewArchiveBackportPostHandler(appCtx *appctx.Context) http.Handler {
 		}
 
 		http.Redirect(w, r, "/new-archive-backport", http.StatusSeeOther)
-
 	}
 
 	handler := auth.WithUserOrRedirect(handlerFunc, appCtx)

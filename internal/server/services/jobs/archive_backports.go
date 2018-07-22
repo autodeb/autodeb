@@ -6,8 +6,8 @@ import (
 )
 
 // CreateArchiveBackport creates a new ArchiveBackport
-func (service *Service) CreateArchiveBackport(userID uint) (*models.ArchiveBackport, error) {
-	archiveBackport, err := service.db.CreateArchiveBackport(userID)
+func (service *Service) CreateArchiveBackport(userID uint, packageCount int) (*models.ArchiveBackport, error) {
+	archiveBackport, err := service.db.CreateArchiveBackport(userID, packageCount)
 	if err != nil {
 		return nil, err
 	}

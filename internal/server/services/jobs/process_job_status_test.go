@@ -17,7 +17,7 @@ func TestProcessJobStatusBackportAutopkgtest(t *testing.T) {
 	servicesTest := servicestest.SetupTest(t)
 	jobsService := servicesTest.Services.Jobs()
 
-	archiveBackport, err := jobsService.CreateArchiveBackport(566)
+	archiveBackport, err := jobsService.CreateArchiveBackport(566, 55)
 	assert.NoError(t, err)
 
 	// Create a package backport job in the context of the ArchiveBackport

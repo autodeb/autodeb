@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"salsa.debian.org/autodeb-team/autodeb/internal/errors"
 	"salsa.debian.org/autodeb-team/autodeb/internal/ftpmasterapi"
@@ -22,6 +24,12 @@ func (jobRunner *JobRunner) execSetupArchiveBackport(
 
 	if job.ParentType != models.JobParentTypeArchiveBackport {
 		return errors.Errorf("unsupported parent type %s", job.ParentType)
+	}
+
+	// Obtain the ArchiveBackport
+	archiveBackport, err := jobRunner.apiClient.GetArchiveBackport(job.ParentID)
+	if err != nil {
+		return errors.WithMessagef(err, "could not retrieve ArchiveBackport id #%s", archiveBackport.ID)
 	}
 
 	ftpmasterapiClient := ftpmasterapi.NewClient(http.DefaultClient)
@@ -87,8 +95,25 @@ func (jobRunner *JobRunner) execSetupArchiveBackport(
 
 	}
 
-	// Create Upgrade jobs
-	for _, backportCandidate := range backportCandidates {
+	rand.Seed(time.Now().UnixNano())
+	fmt.Fprintln(logFile, "Creating backport jobs...")
+
+	for i := 0; i < archiveBackport.PackageCount || archiveBackport.PackageCount < 0; i++ {
+
+		if len(backportCandidates) < 1 {
+			fmt.Fprintln(logFile, "there are no more source pacakges to backport...")
+			break
+		}
+
+		// select an index
+		index := rand.Intn(len(backportCandidates))
+
+		// grab it from the package list
+		backportCandidate := backportCandidates[index]
+
+		// remove it from the package list
+		backportCandidates = append(backportCandidates[:index], backportCandidates[index+1:]...)
+
 		if _, err := jobRunner.apiClient.CreateJob(
 			&models.Job{
 				Type:       models.JobTypeBackport,

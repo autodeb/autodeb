@@ -7,9 +7,10 @@ import (
 )
 
 // CreateArchiveBackport will create an ArchiveBackport
-func (db *Database) CreateArchiveBackport(userID uint) (*models.ArchiveBackport, error) {
+func (db *Database) CreateArchiveBackport(userID uint, packageCount int) (*models.ArchiveBackport, error) {
 	archiveBackport := &models.ArchiveBackport{
-		UserID: userID,
+		UserID:       userID,
+		PackageCount: packageCount,
 	}
 
 	if err := db.gormDB.Create(archiveBackport).Error; err != nil {

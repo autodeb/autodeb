@@ -13,7 +13,7 @@ func TestArchiveBackportGetHandler(t *testing.T) {
 	testRouter := routertest.SetupTest(t)
 	apiClient := testRouter.APIClient
 
-	expected, err := testRouter.Services.Jobs().CreateArchiveBackport(53)
+	expected, err := testRouter.Services.Jobs().CreateArchiveBackport(53, 99)
 	assert.NoError(t, err)
 	assert.NotNil(t, expected)
 

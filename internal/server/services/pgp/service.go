@@ -1,6 +1,7 @@
 package pgp
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/url"
@@ -130,13 +131,22 @@ func (service *Service) keyRing() (pgp.EntityList, error) {
 		return keyring, nil
 	}
 
-	var readers []io.Reader
+	// Read all keys and serialize them to a buffer
+	var buf bytes.Buffer
 	for _, pgpKey := range pgpKeys {
-		readers = append(readers, strings.NewReader(pgpKey.PublicKey))
+		keyRing, err := pgp.ReadArmoredKeyRing(
+			strings.NewReader(pgpKey.PublicKey),
+		)
+		if err != nil {
+			return nil, errors.WithMessagef(err, "could not load key id %d with fingerprint %s", pgpKey.ID, pgpKey.Fingerprint)
+		}
+		if err := keyRing[0].Serialize(&buf); err != nil {
+			return nil, errors.WithMessagef(err, "could not serialize key id %d with fingerprint %s", pgpKey.ID, pgpKey.Fingerprint)
+		}
 	}
-	multiReader := io.MultiReader(readers...)
 
-	keyring, err := pgp.ReadArmoredKeyRing(multiReader)
+	// Read the buffer as one keyRing
+	keyring, err := pgp.ReadKeyRing(&buf)
 	if err != nil {
 		return nil, err
 	}

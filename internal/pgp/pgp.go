@@ -100,6 +100,11 @@ func ReadArmoredKeyRing(r io.Reader) (openpgp.EntityList, error) {
 	return openpgp.ReadArmoredKeyRing(r)
 }
 
+//ReadKeyRing reads one or more public/private keys.
+func ReadKeyRing(r io.Reader) (openpgp.EntityList, error) {
+	return openpgp.ReadKeyRing(r)
+}
+
 //EntitySignatures returns all signatures of an entity
 func EntitySignatures(entity *openpgp.Entity) []*packet.Signature {
 	var signatures []*packet.Signature

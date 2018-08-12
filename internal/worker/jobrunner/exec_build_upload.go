@@ -51,10 +51,13 @@ func (jobRunner *JobRunner) execBuildUpload(
 		if err != nil {
 			return errors.WithMessagef(err, "could not create dest file at %s", destPath)
 		}
+		defer destFile.Close()
 
 		if _, err := io.Copy(destFile, fileContent); err != nil {
 			return errors.WithMessage(err, "could not copy file")
 		}
+
+		destFile.Close()
 	}
 
 	// Parse the dsc
@@ -82,10 +85,13 @@ func (jobRunner *JobRunner) execBuildUpload(
 		if err != nil {
 			return errors.WithMessagef(err, "could not create %s", filePath)
 		}
+		defer destFile.Close()
 
 		if _, err := io.Copy(destFile, fileContent); err != nil {
 			return errors.WithMessage(err, "could not write file contents")
 		}
+
+		destFile.Close()
 	}
 
 	// Extract the source package

@@ -106,7 +106,7 @@ func TestKeyRing(t *testing.T) {
 	err = service.AddUserPGPKey(1, pgptest.TestKeyPublic, proof)
 	assert.NoError(t, err)
 
-	// ADd the second key
+	// Add the second key
 	proof, err = pgp.Clearsign(
 		strings.NewReader(service.ExpectedPGPKeyProofText(2)),
 		strings.NewReader(pgptest.TestKey2Private),

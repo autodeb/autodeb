@@ -93,6 +93,37 @@ func TestAddPGPKeyAlreadyRegistered(t *testing.T) {
 	assert.Contains(t, err.Error(), "is already registered to user")
 }
 
+func TestKeyRing(t *testing.T) {
+	service := setupTest(t)
+
+	// Add the first key
+	proof, err := pgp.Clearsign(
+		strings.NewReader(service.ExpectedPGPKeyProofText(1)),
+		strings.NewReader(pgptest.TestKeyPrivate),
+	)
+	assert.NoError(t, err)
+
+	err = service.AddUserPGPKey(1, pgptest.TestKeyPublic, proof)
+	assert.NoError(t, err)
+
+	// ADd the second key
+	proof, err = pgp.Clearsign(
+		strings.NewReader(service.ExpectedPGPKeyProofText(2)),
+		strings.NewReader(pgptest.TestKey2Private),
+	)
+	assert.NoError(t, err)
+
+	err = service.AddUserPGPKey(2, pgptest.TestKey2Public, proof)
+	assert.NoError(t, err)
+
+	// Obtain the keyring
+	keyring, err := service.keyRing()
+
+	assert.NoError(t, err)
+	assert.NotNil(t, keyring)
+	assert.Equal(t, 2, len(keyring))
+}
+
 func TestKeyRingEmpty(t *testing.T) {
 	service := setupTest(t)
 	keyring, err := service.keyRing()

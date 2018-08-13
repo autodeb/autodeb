@@ -1,7 +1,7 @@
 //Package pgptest contains an armored PGP key to be used for testing.
 package pgptest
 
-//TestKeyFingerprint is the fingerprint of the key contaianed in this package.
+//TestKeyFingerprint is the fingerprint of TestKeyPublic
 const TestKeyFingerprint = "0x8B5F287532CF42DF1CF7F7EAD31EBBBFC2E40CF3"
 
 //TestKeyPublic is an armored public key to be used for testing purpose.
@@ -136,5 +136,47 @@ iX1pAAU5wZHTR7s+6MaLt9vtG0gnBOV0G6adQ29sVqKljNjbaV9yZAGFn75zS9Xk
 83i61PuxnlUNlIYGC7XdWqtxOR/4/lsecj6d3zPcnfTeqRQe6beKiVHrr/ciY4NU
 i2HeVuilYfCBhFxCGhE3eni9G4RKZdT6CWTqanDy
 =LSir
+-----END PGP PRIVATE KEY BLOCK-----
+`
+
+//TestKey2Fingerprint is the fingerprint of TestKey2Public
+const TestKey2Fingerprint = `0xC6D5D1B67D2E4BCFBEE4FFBB6CDF8E3E1E451C38`
+
+//TestKey2Public is an armored public key to be used for testing purpose.
+const TestKey2Public = `
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mI0EW3HR8AEEAKwdis2dpzd5y2z6eZ06PFNBKo0P2mSlMZgW6JNtSBvVhwf9eBbl
+ya1QCyI596N/Di1gyCpcOiqMXTJfAUkk0BzJGBrdXv8zfd4+piswRGYCoUtTQFhP
+8zAS76F5m5kfGbJuTFc7qF2EKNnfiEHHzyJ35qMUagY/bSf1+jbIvOUPABEBAAG0
+DlRlc3RLZXkyUHVibGljiM4EEwEKADgWIQTG1dG2fS5Lz77k/7ts344+HkUcOAUC
+W3HR8AIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgAAKCRBs344+HkUcOGk2A/9C
+wxaluxeix9wc/OunaWmrv73EAAK4dQgmD+kOgO4GNIxMTSfjU/cZ0ZvIAwiMZyHf
+TBX+AyKCgqGe8K3dgE5ybKalw7q0j8nRVl8A1YUr5QxgFY5MMCVFu0pgxbq0awZS
+ctrgZTtOJKZQE8Q6X7JuTUUTPpgk9lA2PJkBU7DAgA==
+=qgjU
+-----END PGP PUBLIC KEY BLOCK-----
+`
+
+//TestKey2Private is an armored private key to be used for testing purpose.
+const TestKey2Private = `
+-----BEGIN PGP PRIVATE KEY BLOCK-----
+
+lQHYBFtx0fABBACsHYrNnac3ects+nmdOjxTQSqND9pkpTGYFuiTbUgb1YcH/XgW
+5cmtUAsiOfejfw4tYMgqXDoqjF0yXwFJJNAcyRga3V7/M33ePqYrMERmAqFLU0BY
+T/MwEu+heZuZHxmybkxXO6hdhCjZ34hBx88id+ajFGoGP20n9fo2yLzlDwARAQAB
+AAP9FJYOqBFB6DdqcW/JZAOMe5jBHNDXRPp34sJlXFzR0c0fCCxKVNLJ5do7uq2c
+RQietXwXSkRwYJkb/I5dz6sriP5Pfv1dvF/QhxcVIPG4lFiFngJPXJjUYubYiorj
++kVjHenAHw/dMGA54QFVCldmC19E+BxlH7FczeA60lpnVyECAMz/hRUUCZGeJXRj
+0Z0xaGr8tUTPwc0dk1UpoQcpk/8SFmY7wUIJN5sMg/qUzGTcjTDzXWV3mQeJ/vaq
+XfrDp5MCANbvspS2SMCWTCiR8u7ykb1J4wCihqeN2/MtdmKOarbS2ySmnWDQkEm0
+4Fld2WUGb6eyGxh1lK0Btb5zbP27AhUB/R7DZvvq0d23ZY0FUH+4yAqlPBUj88mA
+Pe3H7X+KYSzgVCFlpjC3NqIAyPywiST2wQmuDkEU3qrYaUg9c7i4D9WjMbQOVGVz
+dEtleTJQdWJsaWOIzgQTAQoAOBYhBMbV0bZ9LkvPvuT/u2zfjj4eRRw4BQJbcdHw
+AhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4BAheAAAoJEGzfjj4eRRw4aTYD/0LDFqW7
+F6LH3Bz866dpaau/vcQAArh1CCYP6Q6A7gY0jExNJ+NT9xnRm8gDCIxnId9MFf4D
+IoKCoZ7wrd2ATnJspqXDurSPydFWXwDVhSvlDGAVjkwwJUW7SmDFurRrBlJy2uBl
+O04kplATxDpfsm5NRRM+mCT2UDY8mQFTsMCA
+=bPTG
 -----END PGP PRIVATE KEY BLOCK-----
 `
